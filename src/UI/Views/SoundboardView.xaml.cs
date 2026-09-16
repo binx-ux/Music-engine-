@@ -14,6 +14,7 @@ public partial class SoundboardView : UserControl
     private bool _bound;
     private Point _press;
     private bool _dragArmed;
+    private string _folder = "All";
 
     public SoundboardView() => InitializeComponent();
 
@@ -34,8 +35,23 @@ public partial class SoundboardView : UserControl
         if (_session is null) return;
         _suppress = true;
         Master.Value = _session.Config.Soundboard.MasterVolume;
+        var folders = _session.Layout.Pads
+            .Select(p => string.IsNullOrWhiteSpace(p.Folder) ? "General" : p.Folder)
+            .Distinct()
+            .OrderBy(x => x)
+            .ToList();
+        folders.Insert(0, "All");
+        FolderBox.Items.Clear();
+        foreach (var folder in folders)
+            FolderBox.Items.Add(folder);
+        if (!folders.Contains(_folder))
+            _folder = "All";
+        FolderBox.SelectedItem = _folder;
         GridPads.Items.Clear();
-        foreach (var pad in _session.Layout.Pads.OrderBy(p => p.Order))
+        var pads = _session.Layout.Pads.OrderBy(p => p.Order).AsEnumerable();
+        if (_folder != "All")
+            pads = pads.Where(p => (string.IsNullOrWhiteSpace(p.Folder) ? "General" : p.Folder) == _folder);
+        foreach (var pad in pads)
         {
             var btn = new Button
             {
@@ -79,6 +95,14 @@ public partial class SoundboardView : UserControl
         FadeOut.Value = pad.FadeOut;
         HotkeyBox.Text = pad.Hotkey ?? "";
         _suppress = false;
+    }
+
+    private void FolderChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (_suppress || FolderBox.SelectedItem is not string folder)
+            return;
+        _folder = folder;
+        Rebuild();
     }
 
     private void AddClick(object sender, RoutedEventArgs e)
