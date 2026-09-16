@@ -1,6 +1,6 @@
 $ErrorActionPreference = 'Stop'
 
-$url = 'https://github.com/binx-ux/Cuebox/releases/latest/download/Cuebox.zip'
+$url = 'https://github.com/binx-ux/Music-engine-/releases/latest/download/Cuebox.zip'
 $zip = Join-Path $env:TEMP 'cuebox.zip'
 $dest = Join-Path $env:LOCALAPPDATA 'Cuebox'
 $exe = Join-Path $dest 'Cuebox.exe'

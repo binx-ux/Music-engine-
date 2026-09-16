@@ -1,0 +1,14 @@
+Cuebox License
+Copyright (c) 2026 Kynvyr
+
+You can take Cuebox. Fork it, ship it, sell it, wrap it in a store listing, charge money. That is allowed.
+
+If anyone asks you for a copy, you give them a copy free of charge. Same day they ask, no paywall, no "buy the paid build first", no trial, no email list, no waitlist. No ifs, ands, or buts.
+
+That rule follows the code. If you make a paid app out of this, people who ask you for a copy still get one free. You can keep selling to people who do not ask. You cannot refuse someone who does.
+
+Do whatever else you want with it. Credit is nice. Not required.
+
+NAudio, TagLibSharp, NVorbis, and any other third-party packages keep their own licenses. This file only covers Cuebox code in this repo.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.

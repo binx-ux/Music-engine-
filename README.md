@@ -1,51 +1,67 @@
-# Cuebox
+╭══• ೋ•✧๑♡๑✧•ೋ •══╮
+           Cuebox
+╰══• ೋ•✧๑♡๑✧•ೋ •══╯
 
-Windows mixer for mic, music, and a soundboard. Sends the mix to a virtual cable so Roblox, Discord, and other apps can pick it up like a normal mic.
+≽ ^⎚ ˕ ⎚^ ≼
 
-No game injection. No Spotify DRM ripping.
+*ੈ✩‧₊˚༺☆༻*ੈ✩‧₊˚
 
-## Install (Windows)
+mic + music + soundboard on windows. dumps the mix into a virtual cable so roblox / discord / games just see another mic.
 
-Paste this in Command Prompt. It downloads the zip as raw bytes, writes the file, then unpacks it:
+no injection. no ripping spotify.
+
+<p align="center">
+  <img src="src/UI/Assets/cuebox.png" width="120" alt="Cuebox">
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/Windows-10%2F11-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Windows">
+  <img src="https://img.shields.io/badge/.NET-8-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" alt=".NET 8">
+  <img src="https://img.shields.io/github/v/release/binx-ux/Music-engine-?style=for-the-badge&color=C9A36A" alt="release">
+  <img src="https://img.shields.io/github/downloads/binx-ux/Music-engine-/total?style=for-the-badge&color=7DBA96" alt="downloads">
+  <img src="https://img.shields.io/badge/license-ask%20%3D%20free-C9A36A?style=for-the-badge" alt="license">
+  <img src="https://img.shields.io/github/stars/binx-ux/Music-engine-?style=for-the-badge&color=E8D4B0" alt="stars">
+</p>
+
+──── ୨୧ ────
+
+## install
+
+cmd. writes the zip as bytes then unpacks it.
 
 ```
-powershell -NoP -C "$z=$env:TEMP+'\cuebox.zip'; [IO.File]::WriteAllBytes($z,(iwr -useb 'https://github.com/binx-ux/Cuebox/releases/latest/download/Cuebox.zip').Content); $d=$env:LOCALAPPDATA+'\Cuebox'; if(Test-Path $d){ri $d -Recurse -Force}; Expand-Archive $z $d -Force; start (Join-Path $d 'Cuebox.exe')"
+powershell -NoP -C "$z=$env:TEMP+'\cuebox.zip'; [IO.File]::WriteAllBytes($z,(iwr -useb 'https://github.com/binx-ux/Music-engine-/releases/latest/download/Cuebox.zip').Content); $d=$env:LOCALAPPDATA+'\Cuebox'; if(Test-Path $d){ri $d -Recurse -Force}; Expand-Archive $z $d -Force; start (Join-Path $d 'Cuebox.exe')"
 ```
 
-That puts Cuebox in `%LOCALAPPDATA%\Cuebox` and launches it. Settings live in `%AppData%\Cuebox`.
+lands in `%LOCALAPPDATA%\Cuebox`. settings in `%AppData%\Cuebox`. no extra .net install.
 
-## What it does
+──── ୨୧ ────
 
-- Capture a physical microphone through WASAPI
-- Play local audio files and supported direct audio URLs
-- Trigger a soundboard with global hotkeys
-- Process voice (EQ, compressor, gate, optional pitch correction)
-- Mix those sources with independent monitor and virtual-mic sends
-- Render the mix to headphones and to a virtual cable playback device
-- Show Spotify now playing and control an existing Spotify player through official APIs
+## what it actually does
 
-## Requirements
+- your real mic (wasapi)
+- local files / direct audio urls
+- soundboard + global hotkeys
+- voice stuff if you turn it on (eq, comp, gate, pitch)
+- headphones hear one mix, virtual mic hears another
+- spotify now playing / play pause. not the encrypted stream. that stays on spotify.
 
-- Windows 10 1809 or later, 64-bit. Windows 11 is the primary target.
-- A physical microphone and headphones/speakers
-- A virtual audio cable if you want other apps to hear the mix (see [VIRTUAL_DEVICE.md](VIRTUAL_DEVICE.md))
+need a virtual cable if other apps should hear you. vb-audio cable is the usual one. more in [VIRTUAL_DEVICE.md](VIRTUAL_DEVICE.md).
 
-The download above is self-contained. You do not need to install .NET separately.
+──── ୨୧ ────
 
-## Typical Roblox / Discord setup
+## roblox / discord
 
-1. Install a virtual audio cable (VB-Audio Cable is a common option).
-2. Open Cuebox. Select your real microphone and headphones.
-3. Select the virtual cable's playback device as Virtual Output (often named CABLE Input).
-4. Start the audio engine if it is not already running.
-5. In Roblox or Discord, set the microphone to the matching capture device (often CABLE Output).
-6. Speak, play music, or fire soundboard pads. Other apps receive the mixed signal.
+1. install a virtual cable
+2. open cuebox, pick your mic + headphones
+3. virtual out = `CABLE Input` (or whatever your cable calls playback)
+4. start the engine
+5. in the other app, mic = `CABLE Output`
+6. talk, play a song, smash a pad
 
-## Spotify
+──── ୨୧ ────
 
-See [SPOTIFY.md](SPOTIFY.md). Local files still work if Spotify is disconnected.
-
-## Build from source
+## build it yourself
 
 ```
 dotnet restore Mixline.sln
@@ -54,16 +70,32 @@ dotnet test Mixline.sln -c Release
 dotnet publish src/UI/Mixline.App.csproj -c Release -r win-x64 --self-contained true
 ```
 
-The published exe is `Cuebox.exe`.
+exe name is `Cuebox.exe`.
 
-## Documentation
+more pages if you care: [ARCHITECTURE.md](ARCHITECTURE.md) · [AUDIO.md](AUDIO.md) · [SPOTIFY.md](SPOTIFY.md)
 
-- [ARCHITECTURE.md](ARCHITECTURE.md)
-- [AUDIO.md](AUDIO.md)
-- [SPOTIFY.md](SPOTIFY.md)
-- [VIRTUAL_DEVICE.md](VIRTUAL_DEVICE.md)
-- [CONTRIBUTING.md](CONTRIBUTING.md)
+──── ୨୧ ────
 
-## License
+## license
 
-Application code in this repository is provided for the Cuebox project. Third-party packages keep their own licenses (NAudio, TagLibSharp, NVorbis).
+[LICENSE](LICENSE)
+
+sell it if you want. if somebody asks for a copy you give it to them free. no ifs, ands, or buts.
+
+──── ୨୧ ────
+
+## kyn
+
+⋆˚࿔ kynvyr 𝜗𝜚˚⋆
+
+[github](https://github.com/binx-ux) · [guns.lol](https://guns.lol/kynvyr_) · [ig](https://instagram.com/kynvyr/) · [coffee](https://buymeacoffee.com/kynvyr)
+
+discord: **kynvyr**
+
+<p>
+  <a href="https://github.com/binx-ux"><img src="https://img.shields.io/badge/GitHub-binx--ux-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
+  <a href="https://instagram.com/kynvyr/"><img src="https://img.shields.io/badge/Instagram-kynvyr-E4405F?style=for-the-badge&logo=instagram&logoColor=white" alt="Instagram"></a>
+  <a href="https://buymeacoffee.com/kynvyr"><img src="https://img.shields.io/badge/Buy%20Me%20A%20Coffee-kynvyr-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=black" alt="Buy Me a Coffee"></a>
+  <a href="https://guns.lol/kynvyr_"><img src="https://img.shields.io/badge/guns.lol-kynvyr_-111111?style=for-the-badge" alt="guns.lol"></a>
+  <img src="https://img.shields.io/badge/Discord-kynvyr-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Discord">
+</p>
