@@ -1,5 +1,11 @@
 # Contributing
 
+Bugs, features, and questions go through GitHub Issues. Pick the matching form:
+
+https://github.com/binx-ux/Music-engine-/issues/new/choose
+
+Security holes go to [SECURITY.md](SECURITY.md), not a public issue.
+
 ## Layout
 
 Keep audio code out of `src/UI`. If a change needs WASAPI, put it in `src/Audio`.
@@ -22,4 +28,4 @@ Hardware-dependent WASAPI tests are not run in CI. Use the in-app test tone to c
 
 ## Pull requests
 
-Say what you changed and how you verified it (tone into headphones, virtual cable into Discord, etc.).
+Fork, branch off `master`, open a PR. The form asks what you changed and how you checked it (tone into headphones, virtual cable into Discord, etc.).

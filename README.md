@@ -72,7 +72,17 @@ dotnet publish src/UI/Mixline.App.csproj -c Release -r win-x64 --self-contained 
 
 exe name is `Cuebox.exe`.
 
-more pages if you care: [ARCHITECTURE.md](ARCHITECTURE.md) · [AUDIO.md](AUDIO.md) · [SPOTIFY.md](SPOTIFY.md)
+more pages if you care: [ARCHITECTURE.md](ARCHITECTURE.md) · [AUDIO.md](AUDIO.md) · [SPOTIFY.md](SPOTIFY.md) · [CONTRIBUTING.md](CONTRIBUTING.md)
+
+──── ୨୧ ────
+
+## bugs / ideas / help
+
+use the issue forms. do not dump a blank issue.
+
+https://github.com/binx-ux/Music-engine-/issues/new/choose
+
+security: [SECURITY.md](SECURITY.md)
 
 ──── ୨୧ ────
 
