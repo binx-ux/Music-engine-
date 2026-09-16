@@ -115,13 +115,12 @@ public partial class MainWindow : Window
     {
         try
         {
-            if (_session.Layout.Pads.Count > 0)
-                return;
             var n = await InstantPresets.InstallAsync(_session.Layout, CancellationToken.None);
             if (n <= 0)
                 return;
             _session.SoundboardStore.Save(_session.Layout);
             _session.RaiseLayout();
+            _session.Notify($"Added {n} soundboard presets.");
         }
         catch
         {

@@ -1,5 +1,4 @@
 using Mixline.Core;
-using Mixline.Logging;
 
 namespace Mixline.Soundboard;
 
@@ -9,26 +8,330 @@ public static class InstantPresets
 
     private static readonly (string Name, string File)[] Pack =
     [
-        ("Vine Boom", "vine-boom.mp3"),
+        ("FAHHHHHHHHHHHHHH", "fahhhhhhhhhhhhhh.mp3"),
+        ("VINE BOOM SOUND", "vine-boom.mp3"),
+        ("Fart", "dry-fart.mp3"),
+        ("rizz sound effect", "rizz-sound-effect.mp3"),
         ("Anime Wow", "anime-wow-sound-effect.mp3"),
-        ("Among Us", "among-us-role-reveal-sound.mp3"),
+        ("Among Us role reveal sound", "among-us-role-reveal-sound.mp3"),
         ("Bone Crack", "bone-crack.mp3"),
         ("SpongeBob Fail", "spongebob-fail.mp3"),
-        ("Error", "error_CDOxCYm.mp3"),
-        ("Metal Pipe", "metal-pipe-clang.mp3"),
-        ("Undertaker Bell", "undertakers-bell_2UwFCIe.mp3"),
-        ("Dun Dun Dun", "dun-dun-dun-sound-effect-brass_8nFBccR.mp3"),
-        ("Ding", "ding-sound-effect_2.mp3"),
-        ("Hub Intro", "hub-intro-sound.mp3"),
-        ("Discord Notify", "discord-notification.mp3"),
-        ("Taco Bell", "taco-bell-bong-sfx.mp3"),
-        ("Punch", "punch-gaming-sound-effect-hd_RzlG1GE.mp3"),
-        ("Fortnite Death", "tmp_7901-951678082.mp3"),
-        ("Yippee", "yippeeeeeeeeeeeeee.mp3"),
-        ("MLG Horn", "mlg-airhorn.mp3"),
-        ("Censor Beep", "censor-beep-1.mp3"),
-        ("Rizz", "rizz-sound-effect.mp3"),
-        ("A Few Moments Later", "a-few-moments-later-sponge-bob-sfx-fun.mp3")
+        ("Fart Button", "perfect-fart.mp3"),
+        ("( ͠° ͟ʖ ͡°) sussy?", "deg-deg-sussy.mp3"),
+        ("What a good boy", "what-a-good-boy.mp3"),
+        ("Error SOUNDSS", "error_CDOxCYm.mp3"),
+        ("Metal pipe clang", "metal-pipe-clang.mp3"),
+        ("romanceeeeeeeeeeeeee", "romanceeeeeeeeeeeeee.mp3"),
+        ("I've Got This FAAAAAAAAAHH", "ive-got-this-faaaaaaaaahhhhh.mp3"),
+        ("The Undertaker Bell", "undertakers-bell_2UwFCIe.mp3"),
+        ("dun dun dunnnnnnnn", "dun-dun-dun-sound-effect-brass_8nFBccR.mp3"),
+        ("ding sound effect", "ding-sound-effect_2.mp3"),
+        ("Hub Intro Sound", "hub-intro-sound.mp3"),
+        ("rip my granny loud asf", "rip-my-granny-loud-asf.mp3"),
+        ("Discord Notification", "discord-notification.mp3"),
+        ("Taco Bell Bong", "taco-bell-bong-sfx.mp3"),
+        ("Punch Sound", "punch-gaming-sound-effect-hd_RzlG1GE.mp3"),
+        ("ENRIQUE!", "enrique.mp3"),
+        ("Death sound (Fortnite)", "tmp_7901-951678082.mp3"),
+        ("Galaxy meme", "galaxy-meme.mp3"),
+        ("zvuk fotoapparata", "zvuk-fotoapparata.mp3"),
+        ("daddys home", "daddys-home.mp3"),
+        ("YIPPEEEEEEEEEEEEEE", "yippeeeeeeeeeeeeee.mp3"),
+        ("ACK", "ack.mp3"),
+        ("MLG AIR HORN!!!!!!!!!!!", "mlg-airhorn.mp3"),
+        ("a few moments later sponge", "a-few-moments-later-sponge-bob-sfx-fun.mp3"),
+        ("heavenly musiic", "heavenly-music-gaming-sound-effect-hd-mp3cut.mp3"),
+        ("Censor Beep 1", "censor-beep-1.mp3"),
+        ("nuclear diarrhea", "nuclear-diarrhea.mp3"),
+        ("-999 Social Credit Siren", "999-social-credit-siren.mp3"),
+        ("Fart Meme Sound", "fart-meme-sound.mp3"),
+        ("We are Charlie Kirk phone", "we-are-charlie-kirk-phone.mp3"),
+        ("Door Knocking SOUND EFFECT", "crazy-realistic-knocking-sound-troll-twitch-streamers_small.mp3"),
+        ("GopGopGop", "gopgopgop.mp3"),
+        ("Dog Clicker", "dog-clicker_IygBqAk.mp3"),
+        ("Aww", "studio-audience-awwww-sound-fx.mp3"),
+        ("Mario Jump", "maro-jump-sound-effect_1.mp3"),
+        ("yeah boiii i i i", "yeah-boiii-i-i-i.mp3"),
+        ("Pluh", "pluh.mp3"),
+        ("Camera Flash Sound Effect", "camera-flash-sound-effect.mp3"),
+        ("Womp Womp Womp", "downer_noise.mp3"),
+        ("BRUH sound effect!", "bruh-sound-effect_WstdzdM.mp3"),
+        ("Mouse Click Sound", "mouse-click-sound.mp3"),
+        ("asian meme huh?", "huh_37bAoRo.mp3"),
+        ("slap hard", "slap-soundmaster13-49669815_4L20wGP.mp3"),
+        ("discord call", "discord-call-sound.mp3"),
+        ("Mac Quack", "mac-quack.mp3"),
+        ("Lagging/loading", "loading-lost-connection-green-screen-with-sound-effect-2_K8HORkT.mp3"),
+        ("Daddyy Chill", "daddyy-chill.mp3"),
+        ("Discord Leave Noise", "discord-leave-noise.mp3"),
+        ("Rehehehe", "rehehehe.mp3"),
+        ("jixaw metal pipe falling s", "jixaw-metal-pipe-falling-sound.mp3"),
+        ("You are an idiot!", "you-are-an-idiot.mp3"),
+        ("Popular Riser metallic sou", "popular-riser-metallic-sound-effect.mp3"),
+        ("na na na", "funny-sound-that-will-make-you-to-laugh_1.mp3"),
+        ("Money SoundFX", "money-soundfx.mp3"),
+        ("the weeknd rizzz", "the-weeknd-rizzz.mp3"),
+        ("Pookie Bear", "pookie-bear.mp3"),
+        ("MAN SNORING MEME", "man-snoring-meme_ctrllNn.mp3"),
+        ("Anderdingus", "anderdingus.mp3"),
+        ("Meow 1", "meow-1.mp3"),
+        ("SYFM LOUD", "syfm-loud_xRTiPcw.mp3"),
+        ("Low honor RDR 2", "low-honor-rdr-2.mp3"),
+        ("zvuk litvina", "zvuk-litvina.mp3"),
+        ("brain fart slowed", "brain-fart-slowed.mp3"),
+        ("Apple Pay Sound", "apple-pay-sound.mp3"),
+        ("metal gear alert sound eff", "metal-gear-alert-sound-effect_XKoHReZ.mp3"),
+        ("Huh Cat", "huh-cat.mp3"),
+        ("Another One DJ Khaled", "another-one_dPvHt2Z.mp3"),
+        ("Hello there- obi Wan", "obi-wan-hello-there.mp3"),
+        ("fart with extra reverb", "fart-with-extra-reverb.mp3"),
+        ("bonk doge", "bonk_7zPAD7C.mp3"),
+        ("Chalo", "chalo.mp3"),
+        ("Load and Gunshot Fire", "gunshot-one.mp3"),
+        ("CINEMATIC SUSPENSE RISER", "cinematic-suspense-riser.mp3"),
+        ("Minecraft Click", "minecraft_click.mp3"),
+        ("Man screaming aaaah", "man-screaming-aaaah.mp3"),
+        ("Punch Effect", "punch_u4LmMsr.mp3"),
+        ("FAHHHHHHHH EARRAPE", "fahhhhhhhh-earrape.mp3"),
+        ("YES! - Lara Raj", "yes-lara-raj.mp3"),
+        ("Loud Explosion", "loud-explosion.mp3"),
+        ("where are you goingg", "where-are-you-goingg.mp3"),
+        ("FNAF Yay Children", "crowd_small_chil_ec049202_9klCwI6.mp3"),
+        ("cha-ching money", "cha-ching-money.mp3"),
+        ("Franklin ringtone", "franklin-ringtone.mp3"),
+        ("Pistol-shot", "pistol-shot.mp3"),
+        ("Flapjack Scream", "flap-jack-scream.mp3"),
+        ("roaring knight swoon delta", "roaring-knight-swoon-deltarune.mp3"),
+        ("500 CIGARETTES (TikTok Ver", "500-cigarettes-tiktok-version.mp3"),
+        ("Service Bell (2)", "stupid-f__king-bird.mp3"),
+        ("Swoosh Sound Effects", "swoosh-sound-effects.mp3"),
+        ("Burp & Fart", "burp-fart.mp3"),
+        ("FAHHHHHHHHHHHHHHH", "fahhhhhhhhhhhhhhh.mp3"),
+        ("Clown Circus music", "clown-circus-music.mp3"),
+        ("raaar", "raaar_FerSY7o.mp3"),
+        ("wut", "record-scratch-2.mp3"),
+        ("Smoke alarm beep", "smoke-alarm-beep.mp3"),
+        ("Error glitch", "error-glitch.mp3"),
+        ("undertaker bell repeat", "undertaker-bell-repeat.mp3"),
+        ("ekh", "ekh.mp3"),
+        ("Deltarune Dark Fountain Op", "deltarune-dark-fountain-open.mp3"),
+        ("Muhehehe", "muhehehe.mp3"),
+        ("FAAAH", "faaah.mp3"),
+        ("Du bist gut genug", "du-bist-gut-genug.mp3"),
+        ("Chicken on tree screaming", "chicken-on-tree-screaming.mp3"),
+        ("Dexter meme", "dexter-meme.mp3"),
+        ("BRUH", "movie_1.mp3"),
+        ("M e o w ~", "m-e-o-w.mp3"),
+        ("baby laughing meme", "baby-laughing-meme.mp3"),
+        ("oh my god bro oh hell nah", "oh-my-god-bro-oh-hell-nah-man.mp3"),
+        ("Buzzer", "wrong-answer-sound-effect.mp3"),
+        ("cat laugh meme 1", "cat-laugh-meme-1.mp3"),
+        ("Long brain fart", "long-brain-fart.mp3"),
+        ("fart with reverb", "fart-with-reverb.mp3"),
+        ("GunShottttt", "gunshotjbudden.mp3"),
+        ("YAAAAAAAAY", "kids-saying-yay-sound-effect_3.mp3"),
+        ("sad meow song", "sad-meow-song.mp3"),
+        ("Emotional Damage Meme", "emotional-damage-meme.mp3"),
+        ("Oh My God Meme", "oh-my-god-meme.mp3"),
+        ("lack of a father figure?", "lack-of-a-father-figure.mp3"),
+        ("67 SQlv2Xv", "67_SQlv2Xv.mp3"),
+        ("Meme", "are-you-out-of-your-mind-greenscreen-change-quality-and-end-wont-cut-off_2.mp3"),
+        ("Homer let's the Barts out", "homer-lets-the-barts-out.mp3"),
+        ("*Snore* mimimimimimi", "snore-mimimimimimi.mp3"),
+        ("goku drip", "drip-goku-meme-song-original-dragon-ball-super-music-clash-of-gods-in-description.mp3"),
+        ("AAAAAAAAAAAAAAAAAAAA é lut", "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa-e-lutador.mp3"),
+        ("RUN vine", "run-vine-sound-effect.mp3"),
+        ("my mommy said no more skib", "my-mommy-said-no-more-skibidi-toilet.mp3"),
+        ("gah dayum", "gah-dayum.mp3"),
+        ("Jogo do botão", "psycho-scream-soundbible.mp3"),
+        ("Elevator Music Background", "musica-elevador-short.mp3"),
+        ("iPhone Notification", "notification_o14egLP.mp3"),
+        ("'What' Bottom Text Meme (S", "what-bottom-text-meme-sanctuary-guardian-sound-effect-hd.mp3"),
+        ("LIZARD BUTTON", "lizard-button.mp3"),
+        ("Explosion meme", "explosion-meme_dTCfAHs.mp3"),
+        ("Spiderman Polyester Edit", "spiderman-polyester-edit.mp3"),
+        ("lego breaking", "lego-breaking.mp3"),
+        ("Fart Meme Sound (Better an", "fartmeme.mp3"),
+        ("Lobotomy Sound Effect", "lobotomy-sound-effect.mp3"),
+        ("Rizzbot laugh", "rizzbot-laugh.mp3"),
+        ("I've got this", "ive-got-this.mp3"),
+        ("Bad to the Bone Meme", "bad-to-the-bone-meme.mp3"),
+        ("Wow Anime meme", "anime-wow-sound-effect-mp3cut.mp3"),
+        ("minecraft eating sound", "nom-nom-nom_gPJiWn4.mp3"),
+        ("Bark Fart Sound", "bark-fart-sound.mp3"),
+        ("auraa", "auraa.mp3"),
+        ("moving stone", "moving-stone.mp3"),
+        ("Slap *oh*", "slap-oh_LGvkhyt.mp3"),
+        ("Du bist gut genug - RINGTO", "du-bist-gut-genug-ringtone_uaLN2Cm.mp3"),
+        ("Are baap re yaad aya", "are-baap-re-yaad-aya.mp3"),
+        ("spiderman meme song 2.0", "spiderman-meme-song-2-0.mp3"),
+        ("Extremely loud incorrect b", "extremely-loud-incorrect-buzzer_0cDaG20.mp3"),
+        ("Asian Gong & Music", "asian-gong-music.mp3"),
+        ("Yara Yara Phonk", "yara-yara-phonk.mp3"),
+        ("Your phone ringing", "your-phone-ringing_KIGWJCK.mp3"),
+        ("funky ehh", "funky-ehh.mp3"),
+        ("Heyy daddyyyyy⁓ omg", "heyy-daddyyyyy-omg.mp3"),
+        ("khomiak troll ksivik", "khomiak-troll-ksivik.mp3"),
+        ("Discipline.", "discipline_eqjphn0.mp3"),
+        ("Kwebbelkop laughing or smt", "kwebbelkop-laughing-or-smth.mp3"),
+        ("What The Hell Meme Sound E", "what-the-hell-meme-sound-effect.mp3"),
+        ("app", "aplausos_3.mp3"),
+        ("omg bruh oh hell nah", "omg-bruh-oh-hell-nah.mp3"),
+        ("Sponge Stank Noise", "sponge-stank-noise.mp3"),
+        ("Shut up!", "shutup.swf.mp3"),
+        ("The Price is Right Losing", "the-price-is-right-losing-horn.mp3"),
+        ("Green Giant", "ho-ho-ho-green-giant-audio-clip.mp3"),
+        ("windows xp shutdown", "preview_4.mp3"),
+        ("vy pozvonili tsariu batius", "vy-pozvonili-tsariu-batiushke.mp3"),
+        ("The Ting Goes Bark Fart", "the-ting-goes-bark-fart.mp3"),
+        ("idi nakh i", "idi-nakh-i.mp3"),
+        ("cat iphone ringtone", "cat-iphone-ringtone.mp3"),
+        ("Wait wait wait what the he", "wait-wait-wait-what-the-hell-legend-sound.mp3"),
+        ("Tom scream", "toms-screams.mp3"),
+        ("Deltarune - JARONA", "deltarune-jarona.mp3"),
+        ("Fears to Fathom Notificati", "fears-to-fathom-notification-sound.mp3"),
+        ("ROBLOX oof", "roblox-death-sound_1.mp3"),
+        ("Pop SFX", "pop_7e9Is8L.mp3"),
+        ("danger alarm sound effect", "danger-alarm-sound-effect-meme.mp3"),
+        ("what da dog doin", "yt1s_wU4BGgD.mp3"),
+        ("Wrong Answer Buzzer", "wrong-answer-buzzer.mp3"),
+        ("Jeopardy Theme Song!", "jeopardy-themelq.mp3"),
+        ("FNAF Jumpscare Scream", "five-nights-at-freddys-full-scream-sound_2.mp3"),
+        ("wet fart", "wet-fart_1.mp3"),
+        ("fahhh pump sound", "fahhh-pump-sound.mp3"),
+        ("Here I come San Francisco", "here-i-come-san-francisco.mp3"),
+        ("Gta v notification", "gta-v-notification.mp3"),
+        ("French meme song", "french-meme-song.mp3"),
+        ("Fnaf 1 music box", "fnaf-1-music-box.mp3"),
+        ("Minecraft XP Sound", "orb.mp3"),
+        ("Meccha Chameleon Whistle", "meccha-chameleon-whistle.mp3"),
+        ("MICHAEL DONT LEAVE ME HERE", "michael-dont-leave-me-here.mp3"),
+        ("angry roblox", "angry-roblox.mp3"),
+        ("Minecraft drinking sound", "minecraft-drinking-sound-effect.mp3"),
+        ("Family Feud YES Ding", "family-feud-good-answer.mp3"),
+        ("Gaster Vanish", "gaster-vanish.mp3"),
+        ("nope", "engineer_no01_1.mp3"),
+        ("RICK ROLLED!!!! BWHAHAHAHA", "epic.mp3"),
+        ("they're eating my flesh", "theyre-eating-my-flesh.mp3"),
+        ("Ralsei Splat", "ralsei-splat.mp3"),
+        ("Matlab wo alag hi level ka", "matlab-wo-alag-hi-level-ka-banda-tha.mp3"),
+        ("Cyberpunk 2077 phone call", "cyberpunk-2077-phone-call.mp3"),
+        ("Doge bonk", "bonk_BEtiM8g.mp3"),
+        ("GET OVER HERE Scorpion", "scorpion-get_over_here.mp3"),
+        ("Deltarune ringtone", "deltarune-ringtone_SnkHGfF.mp3"),
+        ("Mr. Tenna says IT'S TV TIM", "mr-tenna-says-its-tv-time.mp3"),
+        ("Nuclear Fart", "nuclear-fart-1.mp3"),
+        ("RDR2 low honour sound", "rdr2-low-honour-sound.mp3"),
+        ("Fortnite default dance bas", "fortnite-default-dance-bass-boosted.mp3"),
+        ("nyon", "nyon.mp3"),
+        ("Tarkov grenade", "grenade-plonk-sound-effect-tarkov-louder.mp3"),
+        ("Pikmin!", "pikmin-gcn.mp3"),
+        ("FBI open UP", "fbi-open-up-sfx.mp3"),
+        ("Abandon weird route", "abandon-weird-route.mp3"),
+        ("klass priam kak vo vtorom", "klass-priam-kak-vo-vtorom-team-fortress.mp3"),
+        ("Weird route chapter 4 jing", "weird-route-chapter-4-jingle.mp3"),
+        ("Electric Zoo", "spongebob-squarepants-the-yellow-album-21-electric-zoo-audiotrimmer.mp3"),
+        ("Ja-Orange 1", "ja-orange-1.mp3"),
+        ("AMOGUS SCREAMING", "guy-yelling-among-us-sound-effect.mp3"),
+        ("Lomando", "lomando_0QYwhgb.mp3"),
+        ("Gaster's Theme", "gasters-theme_PgFVfMX.mp3"),
+        ("Subway Surfers", "subway-surfers.mp3"),
+        ("two hours later", "spongebob-two-hours-later-2019-download-link.mp3"),
+        ("sonic rings falling", "sonic-rings-drop.mp3"),
+        ("Spider-Man thwip", "spider-man-customized-web-thwip-sound-effect-1_ybmate.mp3"),
+        ("flowery i'm falling", "flowery-im-falling.mp3"),
+        ("Careless Whisper", "careless_whispers.mp3"),
+        ("My Jarona", "my-jarona.mp3"),
+        ("Verity (hello)", "verity-hello.mp3"),
+        ("wee weee weee", "weeeee_original_1193597514938524841.mp3"),
+        ("Drum Roll Sound Effect", "drum-roll-gaming-sound-effect-hd.mp3"),
+        ("Final Jeopardy Thinking Mu", "jeopardy-final-jeopardy-thinking-music.mp3"),
+        ("flowery stingus", "flowery-stingus.mp3"),
+        ("Roaring Knight Roar", "roaring-knight-roar.mp3"),
+        ("Come here boy", "daequan-come-here-boy-sound-effect.mp3"),
+        ("VERY LOUD AIRHORN", "veryloudairhorn.mp3"),
+        ("Deltarune Weapons Pull", "deltarune-weapons-pull.mp3"),
+        ("cyberpunk message", "cyberpunk-message.mp3"),
+        ("L theme death note", "00000000000000000.mp3"),
+        ("TF2 Scout Metal Bat", "bat_hit.mp3"),
+        ("Nintendo Game Boy Startup", "nintendo-game-boy-startup.mp3"),
+        ("Nani what!?", "nani_-meme-sound-effect-su0k4q3yrfw-mp3cut.mp3"),
+        ("Matrix song (verity)", "matrix-song-verity.mp3"),
+        ("B SWORD WOOSH", "woosh_s21KzKN.mp3"),
+        ("Miss!", "miss_2G4oN9I.mp3"),
+        ("Old Minecraft Zombie Sound", "old-sound-of-zombie-in-minecraft.mp3"),
+        ("Apple Pay", "applepay.mp3"),
+        ("Prowler Sound Effect", "prowler-sound-effect_6bXErot.mp3"),
+        ("It was at this moment he k", "heknew.mp3"),
+        ("discord join call", "yt1s_nYWSz5R.mp3"),
+        ("Clapping", "aplausos_2.mp3"),
+        ("Reload Gun", "gunreload.mp3"),
+        ("Bruh meme", "movie_1_C2K5NH0.mp3"),
+        ("Fnaf 2 Hallway", "hallway-ambiance-extended-five-nights-at-freddys-2-music.mp3"),
+        ("Odyssey Trial Bow SOUND", "odyssey-trial-bow-sound.mp3"),
+        ("Grindr Sound", "grindr-notification-sound.mp3"),
+        ("bass drop sound effect", "bass-drop-edit_mixdown.mp3"),
+        ("Windows XP - Startup Sound", "windows-xp-startup.mp3"),
+        ("Transformers (transforming", "transforming-sound-from-the-transformers.mp3"),
+        ("Surprise mother f'er", "surprise-mother-fer.mp3"),
+        ("Here Comes The Money", "money_2.mp3"),
+        ("obsession no dont do that", "obsession-no-dont-do-that.mp3"),
+        ("STAY IN CHARACTER", "stay-in-character.mp3"),
+        ("DAMN SON, WHERE'D YA FIND", "damn-son-whered-you-find-this.mp3"),
+        ("SPONGEBOB A FEW MOMENTS LA", "a-few-moments-later-hd.mp3"),
+        ("scout scream", "screaming-scout.mp3"),
+        ("Welcome Home from Jarvis", "welcome-home-from-jarvis.mp3"),
+        ("FAIL SOUND MEME", "fail-sound-effect.mp3"),
+        ("JAWS THEME", "jaws-theme_TDORPKA.mp3"),
+        ("TV Static", "tv-static-01.mp3"),
+        ("Knocked Player Fortnite", "ui-negative-alert.mp3"),
+        ("miguel o'harris (spider-ma", "miguel-oharris-spider-man-2099.mp3"),
+        ("Gong Sound", "asian-gong.mp3"),
+        ("Spiderman 2099 theme", "spiderman-2099-theme.mp3"),
+        ("Yep That's me you...", "original-yep-thats-me-youre-probably-wondering_vRBcfjS.mp3"),
+        ("im in danger", "fma6waln.mp3"),
+        ("John Cena entrance", "cena.mp3"),
+        ("Godzilla Roar 2", "godzilla_2.mp3"),
+        ("I feel like you dont love", "i-feel-like-you-dont-love-me-as-much-as-i-do.mp3"),
+        ("jojo - ayayay", "jojos-bizarre-adventure-ay-ay-ay-ay-_-sound-effect.mp3"),
+        ("Crow Sound Caw", "raven-caw-caw.mp3"),
+        ("20th Century Fox Fanfare", "20th-century-fox-fanfare.mp3"),
+        ("Tiki tiki boosted", "tiki-tiki-boosted.mp3"),
+        ("Verity Edit", "verity-edit.mp3"),
+        ("HAha funny laugh", "ny-video-online-audio-converter.mp3"),
+        ("Correct Answer GameShow", "correct.mp3"),
+        ("The Saxophones Getting Lou", "the-saxophones-getting-louder.mp3"),
+        ("Metal Gear Solid Alert", "tindeck_1.mp3"),
+        ("We are Charlie Kirk (song)", "we-are-charlie-kirk-song.mp3"),
+        ("SUBWAY SURFERS BASS BOOSTE", "subway-surfers-bass-boosted.mp3"),
+        ("Minecraft Damage", "minecraft_hit_soundmp3converter.mp3"),
+        ("Backrooms", "backrooms.mp3"),
+        ("roblox horror", "do-not-open.mp3"),
+        ("NFL Bass Boosted", "nfl.mp3"),
+        ("scubbaaa", "scubbaaa.mp3"),
+        ("Michael Jackson Billie Jea", "michael-jackson-billie-jean.mp3"),
+        ("Crickets Chirping", "crickets-chirping.mp3"),
+        ("Mii Channel Music", "mii-channel-music.mp3"),
+        ("Defy Gravity x God Is Kany", "defy-gravity-x-god-is-kanye.mp3"),
+        ("CSGO AWP", "awp_02.mp3"),
+        ("za gorami gde e", "za-gorami-gde-e.mp3"),
+        ("bankomat melstroi uUdPD2C", "bankomat-melstroi_uUdPD2C.mp3"),
+        ("help me!", "2020-10-29-21-41-22.mp3"),
+        ("Directed by Robert B Weide", "directed-by-robert-b_voI2Z4T.mp3"),
+        ("Tom AAAAAAAAA scream", "tom-scream.mp3"),
+        ("meme violin (sad violin)", "meme-violin-sad-violin.mp3"),
+        ("2017 youtube background mu", "2017-youtube-background-music-low-quality.mp3"),
+        ("tiomnaia noch", "tiomnaia-noch.mp3"),
+        ("Nokia Kick Ringtone", "nokia-kick-ringtone.mp3"),
+        ("He Needs Some Milk", "he-needs-some-milk-vine.mp3"),
+        ("Hava Nagila", "hava-nagila-1-hours-0.mp3"),
+        ("rip my granny she got hit", "rip-my-granny-she-got-hit-by-a-bazooka.mp3"),
+        ("Minnesota Vikings Horn", "vikinghorn.mp3"),
+        ("pkh", "pkh.mp3"),
+        ("Prowler Theme Full", "prowler-theme-full.mp3"),
+        ("Big fart", "faaaaaaaaaaaaaaaaaaaaaaaaaaaaaaart.mp3"),
+        ("Oui - Rizzler", "oui-rizzler.mp3"),
+        ("skibidi toilet", "skibidi-toilet.mp3"),
     ];
 
     public static async Task<int> InstallAsync(SoundboardLayout layout, CancellationToken ct)
@@ -36,37 +339,31 @@ public static class InstantPresets
         var dir = Path.Combine(AppPaths.Presets, "myinstants");
         Directory.CreateDirectory(dir);
         using var http = new HttpClient();
-        http.Timeout = TimeSpan.FromSeconds(25);
-        http.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 Cuebox/1.0");
+        http.Timeout = TimeSpan.FromSeconds(30);
+        http.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0 (Windows NT 10.0; Win64; x64) Cuebox/1.0");
 
-        var added = 0;
+        using var gate = new SemaphoreSlim(6);
         var order = layout.Pads.Count == 0 ? 0 : layout.Pads.Max(p => p.Order) + 1;
+        var added = 0;
+        var tasks = new List<Task<(string Name, string Dest)?>>();
+
         foreach (var (name, file) in Pack)
         {
-            ct.ThrowIfCancellationRequested();
-            if (layout.Pads.Any(p => string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase)))
+            if (layout.Pads.Any(p => string.Equals(p.Name, name, StringComparison.OrdinalIgnoreCase)
+                || string.Equals(Path.GetFileName(p.FilePath), file, StringComparison.OrdinalIgnoreCase)))
                 continue;
-
             var dest = Path.Combine(dir, file);
-            if (!File.Exists(dest) || new FileInfo(dest).Length < 200)
-            {
-                try
-                {
-                    var bytes = await http.GetByteArrayAsync($"{Host}/media/sounds/{file}", ct);
-                    if (bytes.Length < 200)
-                        continue;
-                    await File.WriteAllBytesAsync(dest, bytes, ct);
-                }
-                catch
-                {
-                    continue;
-                }
-            }
+            tasks.Add(Pull(http, gate, name, file, dest, ct));
+        }
 
+        foreach (var item in await Task.WhenAll(tasks))
+        {
+            if (item is null)
+                continue;
             layout.Pads.Add(new SoundPad
             {
-                Name = name,
-                FilePath = dest,
+                Name = item.Value.Name,
+                FilePath = item.Value.Dest,
                 Folder = "Myinstants",
                 Order = order++
             });
@@ -76,5 +373,30 @@ public static class InstantPresets
         if (added > 0 && !layout.Folders.Contains("Myinstants"))
             layout.Folders.Add("Myinstants");
         return added;
+    }
+
+    private static async Task<(string Name, string Dest)?> Pull(
+        HttpClient http, SemaphoreSlim gate, string name, string file, string dest, CancellationToken ct)
+    {
+        await gate.WaitAsync(ct);
+        try
+        {
+            if (!File.Exists(dest) || new FileInfo(dest).Length < 200)
+            {
+                var bytes = await http.GetByteArrayAsync(Host + "/media/sounds/" + file, ct);
+                if (bytes.Length < 200 || bytes.Length > 4_000_000)
+                    return null;
+                await File.WriteAllBytesAsync(dest, bytes, ct);
+            }
+            return (name, dest);
+        }
+        catch
+        {
+            return null;
+        }
+        finally
+        {
+            gate.Release();
+        }
     }
 }
