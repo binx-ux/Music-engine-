@@ -311,23 +311,23 @@ public sealed class AudioEngine : IDisposable
         dest[..(frames * 2)].Clear();
         if (snap.MasterMonitorEnabled)
         {
-            if (snap.MicMonitorEnabled) Add(dest, _micBuf, frames, snap.MicMonitor);
-            if (snap.MusicMonitorEnabled) Add(dest, _musicBuf, frames, snap.MusicMonitor);
-            if (snap.SoundMonitorEnabled) Add(dest, _soundBuf, frames, snap.SoundMonitor);
-            if (snap.TestTone) Add(dest, _toneBuf, frames, 1f);
-            Scale(dest[..(frames * 2)], snap.MonitorVolume * (snap.MasterMute ? 0f : snap.MasterMonitor * snap.MasterVolume));
+            if (snap.MicMonitorEnabled) MixNative.Add(dest, _micBuf.AsSpan(0, frames * 2), snap.MicMonitor);
+            if (snap.MusicMonitorEnabled) MixNative.Add(dest, _musicBuf.AsSpan(0, frames * 2), snap.MusicMonitor);
+            if (snap.SoundMonitorEnabled) MixNative.Add(dest, _soundBuf.AsSpan(0, frames * 2), snap.SoundMonitor);
+            if (snap.TestTone) MixNative.Add(dest, _toneBuf.AsSpan(0, frames * 2), 1f);
+            MixNative.Scale(dest[..(frames * 2)], snap.MonitorVolume * (snap.MasterMute ? 0f : snap.MasterMonitor * snap.MasterVolume));
             if (!snap.BypassProcessing)
                 _masterLimiter.ProcessStereo(dest[..(frames * 2)], frames);
         }
         _masterPeak.Process(dest[..(frames * 2)]);
 
         bus.Clear();
-        Add(bus, _micBuf, frames, snap.MicVirtual);
-        Add(bus, _musicBuf, frames, snap.MusicVirtual);
-        Add(bus, _soundBuf, frames, snap.SoundVirtual);
+        MixNative.Add(bus, _micBuf.AsSpan(0, frames * 2), snap.MicVirtual);
+        MixNative.Add(bus, _musicBuf.AsSpan(0, frames * 2), snap.MusicVirtual);
+        MixNative.Add(bus, _soundBuf.AsSpan(0, frames * 2), snap.SoundVirtual);
         if (snap.TestTone)
-            Add(bus, _toneBuf, frames, 1f);
-        Scale(bus, snap.MasterMute ? 0f : snap.MasterVirtual * snap.MasterVolume);
+            MixNative.Add(bus, _toneBuf.AsSpan(0, frames * 2), 1f);
+        MixNative.Scale(bus, snap.MasterMute ? 0f : snap.MasterVirtual * snap.MasterVolume);
         if (!snap.BypassProcessing)
             _masterLimiter.ProcessStereo(bus, frames);
         _virtualPeak.Process(bus);
@@ -433,20 +433,7 @@ public sealed class AudioEngine : IDisposable
     private static void GainChannel(float[] buf, int frames, float gain, bool mute, bool solo, bool anySolo)
     {
         var g = mute || (anySolo && !solo) ? 0f : Math.Clamp(gain, 0f, AudioConstants.MaxGain);
-        Scale(buf.AsSpan(0, frames * 2), g);
-    }
-
-    private static void Scale(Span<float> buf, float g)
-    {
-        for (var i = 0; i < buf.Length; i++)
-            buf[i] *= g;
-    }
-
-    private static void Add(Span<float> dest, float[] src, int frames, float gain)
-    {
-        var n = frames * 2;
-        for (var i = 0; i < n; i++)
-            dest[i] += src[i] * gain;
+        MixNative.Scale(buf.AsSpan(0, frames * 2), g);
     }
 
     private static float Lerp(float a, float b, float t) => a + (b - a) * t;

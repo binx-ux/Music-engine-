@@ -17,14 +17,7 @@ public sealed class PeakTracker
 
     public void Process(ReadOnlySpan<float> samples)
     {
-        var peak = 0f;
-        for (var i = 0; i < samples.Length; i++)
-        {
-            var a = MathF.Abs(samples[i]);
-            if (a > peak)
-                peak = a;
-        }
-
+        var peak = MixNative.Peak(samples);
         _peak = peak;
         if (peak >= _hold)
         {

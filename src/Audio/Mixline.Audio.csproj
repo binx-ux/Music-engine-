@@ -14,4 +14,10 @@
     <ProjectReference Include="..\Core\Mixline.Core.csproj" />
     <ProjectReference Include="..\Logging\Mixline.Logging.csproj" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="..\..\native\cuebox_dsp\target\release\cuebox_dsp.dll" Condition="Exists('..\..\native\cuebox_dsp\target\release\cuebox_dsp.dll')" CopyToOutputDirectory="PreserveNewest" Link="cuebox_dsp.dll" />
+  </ItemGroup>
+  <Target Name="BuildDsp" BeforeTargets="BeforeBuild">
+    <Exec Command="&quot;$(USERPROFILE)\.cargo\bin\cargo.exe&quot; build --release --manifest-path &quot;$(MSBuildThisFileDirectory)..\..\native\cuebox_dsp\Cargo.toml&quot;" IgnoreExitCode="true" />
+  </Target>
 </Project>

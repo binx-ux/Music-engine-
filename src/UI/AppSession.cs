@@ -53,6 +53,8 @@ public sealed class AppSession : IDisposable
         Hotkeys = new HotkeyService(Log);
         Config = ConfigStore.Load();
         Layout = SoundboardStore.Load(Config.Soundboard.ActiveLayout);
+        LuaPads.Load(Path.Combine(AppContext.BaseDirectory, "scripts", "pads.lua"));
+        LuaPads.Load(Path.Combine(AppPaths.Root, "pads.lua"));
         EnsureDefaultProfiles();
         RefreshProfiles();
         LoadSpotifyTokens();
@@ -184,7 +186,7 @@ public sealed class AppSession : IDisposable
         {
             Id = Guid.NewGuid(),
             Samples = clip.Samples,
-            Volume = pad.Volume * Config.Soundboard.MasterVolume,
+            Volume = LuaPads.Volume(pad) * Config.Soundboard.MasterVolume,
             Pitch = pad.Pitch,
             Speed = pad.Speed,
             Loop = pad.Loop,

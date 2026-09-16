@@ -18,4 +18,5 @@ spotify.tokens
 *.nupkg
 installer/output/
 dist/
+native/**/target/
 
