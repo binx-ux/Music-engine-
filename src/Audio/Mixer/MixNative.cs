@@ -23,8 +23,8 @@ public static unsafe class MixNative
 
         try
         {
-            var probe = stackalloc float[64];
-            NativeYin(probe, 64, 48000, 0.15f);
+            var probe = stackalloc float[1024];
+            NativeYin(probe, 1024, 48000, 0.15f);
             Tune = true;
         }
         catch

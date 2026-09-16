@@ -31,7 +31,9 @@ public partial class HomeView : UserControl
         EngineState.Text = _session.Engine.IsRunning ? "Running" : "Stopped";
         Notice.Text = _session.LastError ?? "";
         var virt = _session.Engine.VirtualStatus();
-        VirtHint.Text = virt.Hint ?? virt.Message;
+        VirtHint.Text = string.IsNullOrWhiteSpace(virt.Hint)
+            ? virt.Message
+            : virt.Message + Environment.NewLine + virt.Hint;
         _mixerStrip.Load();
     }
 

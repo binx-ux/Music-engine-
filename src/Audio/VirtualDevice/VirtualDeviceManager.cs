@@ -38,8 +38,8 @@ public sealed class VirtualDeviceManager
                 {
                     Available = false,
                     Connected = false,
-                    Message = "No virtual audio device found. Install a virtual cable to send Cuebox into Roblox, Discord, or games.",
-                    Hint = "Cuebox talks to Windows capture devices. It does not inject into games."
+                    Message = "No virtual cable found. Install VB-Audio Cable so games get a Cuebox microphone.",
+                    Hint = "Install VB-Audio Cable, then restart Cuebox. Games should use CABLE Output."
                 };
             }
 
@@ -47,11 +47,12 @@ public sealed class VirtualDeviceManager
             {
                 Available = true,
                 Connected = false,
-                Message = "Select a virtual output to send the mix as a microphone.",
+                Message = "Select CABLE Input as virtual output so games can hear you.",
                 Hint = VirtualDeviceCatalog.CaptureHint(candidates[0].Name)
             };
         }
 
+        var gameMic = VirtualDeviceCatalog.PairName(selected.Name);
         return new VirtualRouteStatus
         {
             Available = true,
@@ -60,7 +61,9 @@ public sealed class VirtualDeviceManager
             Message = engineRunning
                 ? $"Sending mix to {selected.Name}"
                 : $"{selected.Name} is selected. Start the engine to send audio.",
-            Hint = VirtualDeviceCatalog.CaptureHint(selected.Name)
+            Hint = engineRunning
+                ? $"In games, pick {gameMic} as the microphone. Windows default mic is pointed there too."
+                : VirtualDeviceCatalog.CaptureHint(selected.Name)
         };
     }
 

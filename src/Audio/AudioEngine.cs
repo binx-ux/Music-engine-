@@ -197,6 +197,7 @@ public sealed class AudioEngine : IDisposable
                     else
                     {
                         _inputName = input.FriendlyName;
+                        config.Devices.InputId ??= input.ID;
                         _micActive = true;
                     }
                 }
@@ -207,7 +208,7 @@ public sealed class AudioEngine : IDisposable
                     _log.Warning("audio", "No microphone selected. Music and soundboard still work.");
                 }
 
-                _virtualId = config.Devices.VirtualOutputId;
+                BindVirtualOutput(config);
                 var virt = ResolveRender(config.Devices.VirtualOutputId, false);
                 if (virt is not null)
                 {
@@ -217,10 +218,12 @@ public sealed class AudioEngine : IDisposable
                     _virtualOut.PlaybackStopped += OnVirtualStopped;
                     _virtualOut.Init(_virtualProvider);
                     _virtualOut.Play();
+                    PromoteGameMic(config, virt.FriendlyName);
                 }
                 else
                 {
                     _virtualName = null;
+                    _log.Warning("audio", "No virtual cable selected. Games will not hear Cuebox.");
                 }
 
                 _monitor.Play();
@@ -266,7 +269,63 @@ public sealed class AudioEngine : IDisposable
         => _virtual.Status(_virtualId, _running && _virtualOut is not null);
 
     private MMDevice? ResolveCapture(string? id)
-        => _devices.GetDevice(id) ?? _devices.GetDefault(DeviceFlow.Capture);
+    {
+        var device = _devices.GetDevice(id);
+        if (IsPhysicalMic(device))
+            return device;
+        foreach (var info in _devices.CaptureDevices())
+        {
+            if (VirtualDeviceCatalog.IsVirtualCapture(info.Name) || VirtualDeviceCatalog.IsMicRoute(info.Name))
+                continue;
+            var next = _devices.GetDevice(info.Id);
+            if (IsPhysicalMic(next))
+                return next;
+        }
+        return null;
+    }
+
+    private static bool IsPhysicalMic(MMDevice? device)
+    {
+        if (device is null)
+            return false;
+        var name = device.FriendlyName;
+        if (VirtualDeviceCatalog.IsVirtualCapture(name) || VirtualDeviceCatalog.IsMicRoute(name))
+            return false;
+        return true;
+    }
+
+    private void BindVirtualOutput(AppConfig config)
+    {
+        var current = _devices.Find(config.Devices.VirtualOutputId, DeviceFlow.Render);
+        if (current is not null && VirtualDeviceCatalog.IsMicRoute(current.Name))
+        {
+            _virtualId = current.Id;
+            return;
+        }
+        var pick = VirtualDeviceCatalog.PreferredVirtualRender(_devices.RenderDevices());
+        if (pick is null)
+        {
+            _virtualId = null;
+            config.Devices.VirtualOutputId = null;
+            return;
+        }
+        config.Devices.VirtualOutputId = pick.Id;
+        _virtualId = pick.Id;
+        _log.Info("audio", $"Virtual output set to {pick.Name}");
+    }
+
+    private void PromoteGameMic(AppConfig config, string renderName)
+    {
+        if (!config.Devices.SetWindowsDefaultMic)
+            return;
+        var pair = VirtualDeviceCatalog.PairCapture(renderName, _devices.CaptureDevices());
+        if (pair is null)
+            return;
+        if (WindowsDefaultEndpoint.SetDefaultCapture(pair.Id))
+            _log.Info("audio", $"Windows microphone set to {pair.Name} for games.");
+        else
+            _log.Warning("audio", $"Could not set Windows microphone. In games pick {pair.Name}.");
+    }
 
     private MMDevice? ResolveRender(string? id, bool fallbackDefault)
     {

@@ -89,6 +89,7 @@ public sealed class AppSession : IDisposable
         var result = Engine.Start(Config);
         if (!result.Success)
             SetError(result.Error ?? "Audio failed.", result.Details);
+        ScheduleSave();
     }
 
     public Result RestartEngine()
@@ -100,6 +101,7 @@ public sealed class AppSession : IDisposable
             SetError(result.Error ?? "Audio failed.", result.Details);
         else
             ClearError();
+        ScheduleSave();
         Push();
         return result;
     }

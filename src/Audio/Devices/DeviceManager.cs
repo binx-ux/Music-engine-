@@ -103,7 +103,7 @@ public sealed class DeviceManager : IDisposable
                     SampleRate = mix.SampleRate,
                     Channels = mix.Channels,
                     State = "Connected",
-                    IsVirtualCandidate = VirtualDeviceCatalog.IsVirtualName(name)
+                    IsVirtualCandidate = VirtualDeviceCatalog.IsMicRoute(name)
                 });
             }
             catch (Exception ex)
@@ -172,27 +172,59 @@ public sealed class DeviceManager : IDisposable
 
 public static class VirtualDeviceCatalog
 {
-    private static readonly string[] NameHints =
-    [
-        "CABLE Input",
-        "CABLE Output",
-        "VB-Audio",
-        "VoiceMeeter",
-        "VAIO",
-        "Cuebox Virtual",
-        "Virtual Cable",
-        "Virtual Audio"
-    ];
+    public static bool IsVirtualName(string name) => IsMicRoute(name);
 
-    public static bool IsVirtualName(string name)
-        => NameHints.Any(h => name.Contains(h, StringComparison.OrdinalIgnoreCase));
+    public static bool IsMicRoute(string name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+            return false;
+        if (Contains(name, "NVIDIA") || Contains(name, "Oculus") || Contains(name, "Meta Virtual")
+            || Contains(name, "Sonar") || Contains(name, "Steam Streaming"))
+            return false;
+        return Contains(name, "CABLE Input")
+            || (Contains(name, "VB-Audio") && Contains(name, "CABLE"))
+            || Contains(name, "VoiceMeeter")
+            || Contains(name, "Cuebox Virtual");
+    }
+
+    public static bool IsVirtualCapture(string name)
+        => Contains(name, "CABLE Output")
+            || Contains(name, "VoiceMeeter Output")
+            || (Contains(name, "VoiceMeeter") && Contains(name, "Output"));
+
+    public static AudioDeviceInfo? PreferredVirtualRender(IEnumerable<AudioDeviceInfo> renders)
+    {
+        var list = renders.Where(d => IsMicRoute(d.Name)).ToList();
+        return list.FirstOrDefault(d => Contains(d.Name, "CABLE Input"))
+            ?? list.FirstOrDefault(d => Contains(d.Name, "VoiceMeeter"))
+            ?? list.FirstOrDefault();
+    }
+
+    public static AudioDeviceInfo? PairCapture(string renderName, IEnumerable<AudioDeviceInfo> captures)
+    {
+        if (Contains(renderName, "CABLE Input"))
+            return captures.FirstOrDefault(c => Contains(c.Name, "CABLE Output"));
+        if (Contains(renderName, "VoiceMeeter"))
+            return captures.FirstOrDefault(c => Contains(c.Name, "VoiceMeeter Output"))
+                ?? captures.FirstOrDefault(c => Contains(c.Name, "VoiceMeeter") && !Contains(c.Name, "Input"));
+        return captures.FirstOrDefault(c => Contains(c.Name, "CABLE Output"));
+    }
 
     public static string CaptureHint(string renderName)
     {
-        if (renderName.Contains("CABLE Input", StringComparison.OrdinalIgnoreCase))
-            return "In other apps, select CABLE Output as the microphone.";
-        if (renderName.Contains("VoiceMeeter", StringComparison.OrdinalIgnoreCase))
-            return "In other apps, select the matching VoiceMeeter output as the microphone.";
-        return "In other apps, select the capture device that belongs to this virtual cable.";
+        var gameMic = PairName(renderName);
+        return $"In Roblox, Discord, and games, set the microphone to {gameMic}. Cuebox sends the mix there.";
     }
+
+    public static string PairName(string renderName)
+    {
+        if (Contains(renderName, "CABLE Input"))
+            return "CABLE Output";
+        if (Contains(renderName, "VoiceMeeter"))
+            return "VoiceMeeter Output";
+        return "the matching virtual capture device";
+    }
+
+    private static bool Contains(string name, string token)
+        => name.Contains(token, StringComparison.OrdinalIgnoreCase);
 }

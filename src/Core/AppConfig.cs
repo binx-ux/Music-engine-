@@ -39,6 +39,7 @@ public sealed class DeviceSettings
     public string? InputId { get; set; }
     public string? OutputId { get; set; }
     public string? VirtualOutputId { get; set; }
+    public bool SetWindowsDefaultMic { get; set; } = true;
 }
 
 public sealed class MixerSettings

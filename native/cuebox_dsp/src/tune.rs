@@ -5,13 +5,27 @@ const MINOR: [i32; 7] = [0, 2, 3, 5, 7, 8, 10];
 
 pub fn yin_hz(buf: &[f32], sample_rate: i32, thresh: f32) -> f32 {
     let n = buf.len();
-    if n < 64 || sample_rate < 8000 {
+    if n < 256 || sample_rate < 8000 {
         return 0.0;
     }
     let half = n / 2;
+    if half < 8 {
+        return 0.0;
+    }
     let sr = sample_rate as f32;
-    let min_lag = ((sr / 900.0) as usize).clamp(2, half - 3);
-    let max_lag = ((sr / 65.0) as usize).clamp(min_lag + 2, (half - 2).min(512));
+    let max_span = (half - 2).min(512);
+    if max_span <= 4 {
+        return 0.0;
+    }
+    let mut min_lag = ((sr / 900.0) as usize).clamp(2, max_span);
+    let mut max_lag = ((sr / 65.0) as usize).min(max_span);
+    if max_lag <= min_lag {
+        min_lag = 2;
+        max_lag = max_span;
+    }
+    if max_lag <= min_lag {
+        return 0.0;
+    }
 
     let mut diff = [0.0f32; 514];
     for tau in 1..=max_lag {

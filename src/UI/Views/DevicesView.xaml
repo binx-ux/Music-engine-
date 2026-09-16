@@ -23,8 +23,10 @@
       <StackPanel>
         <TextBlock Text="VIRTUAL OUTPUT" Style="{StaticResource Caption}"/>
         <ComboBox x:Name="Virtuals" Margin="0,8,0,8" DisplayMemberPath="Name" SelectedValuePath="Id" SelectionChanged="Apply"/>
+        <CheckBox x:Name="GameMic" Content="Set as Windows / game microphone" Margin="0,0,0,8" Checked="Apply" Unchecked="Apply"/>
         <TextBlock x:Name="Hint" TextWrapping="Wrap"/>
-        <Button Content="Restart audio" Style="{StaticResource AccentBtn}" Margin="0,12,0,0" HorizontalAlignment="Left" Click="Restart"/>
+        <Button Content="Use for games" Style="{StaticResource AccentBtn}" Margin="0,12,0,0" HorizontalAlignment="Left" Click="UseForGames"/>
+        <Button Content="Restart audio" Style="{StaticResource QuietBtn}" Margin="0,8,0,0" HorizontalAlignment="Left" Click="Restart"/>
       </StackPanel>
     </Border>
   </StackPanel>
