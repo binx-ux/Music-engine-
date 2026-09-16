@@ -17,6 +17,7 @@ public static class HotkeyParser
     public const int ModControl = 0x0002;
     public const int ModShift = 0x0004;
     public const int ModWin = 0x0008;
+    public const int ModNoRepeat = 0x4000;
 
     public static Result<HotkeyBinding> Parse(string id, string text)
     {
@@ -37,28 +38,73 @@ public static class HotkeyParser
                 mods |= ModShift;
             else if (p.Equals("Win", StringComparison.OrdinalIgnoreCase) || p.Equals("Windows", StringComparison.OrdinalIgnoreCase))
                 mods |= ModWin;
-            else if (p.Length == 1)
-                key = char.ToUpperInvariant(p[0]);
-            else if (p.StartsWith("F", StringComparison.OrdinalIgnoreCase) && int.TryParse(p[1..], out var fn) && fn is >= 1 and <= 24)
-                key = 0x70 + (fn - 1);
-            else if (int.TryParse(p, out var digit) && digit is >= 0 and <= 9)
-                key = 0x30 + digit;
+            else if (TryKey(p, out var vk))
+                key = vk;
             else
                 return Result<HotkeyBinding>.Fail($"Unknown key '{p}'.");
         }
 
         if (key is null)
             return Result<HotkeyBinding>.Fail("A shortcut needs a key, not only modifiers.");
-        if (mods == 0)
-            return Result<HotkeyBinding>.Fail("Global shortcuts need a modifier such as Ctrl or Alt.");
+
+        var fn = key.Value >= 0x70 && key.Value <= 0x87;
+        if (mods == 0 && !fn)
+            return Result<HotkeyBinding>.Fail("Use F1-F12, or add Ctrl / Alt, like Ctrl+1.");
 
         return Result<HotkeyBinding>.Ok(new HotkeyBinding
         {
             Id = id,
             Modifiers = mods,
             Key = key.Value,
-            Display = text.Trim()
+            Display = Format(mods, key.Value)
         });
+    }
+
+    public static bool TryKey(string p, out int vk)
+    {
+        vk = 0;
+        if (p.Length == 1)
+        {
+            var c = char.ToUpperInvariant(p[0]);
+            if (c is >= 'A' and <= 'Z' or >= '0' and <= '9')
+            {
+                vk = c;
+                return true;
+            }
+            return false;
+        }
+        if (p.StartsWith("F", StringComparison.OrdinalIgnoreCase) && int.TryParse(p[1..], out var fn) && fn is >= 1 and <= 24)
+        {
+            vk = 0x70 + (fn - 1);
+            return true;
+        }
+        if (int.TryParse(p, out var digit) && digit is >= 0 and <= 9)
+        {
+            vk = 0x30 + digit;
+            return true;
+        }
+        if (p.Equals("Space", StringComparison.OrdinalIgnoreCase))
+        {
+            vk = 0x20;
+            return true;
+        }
+        return false;
+    }
+
+    public static string Format(int mods, int vk)
+    {
+        var parts = new List<string>();
+        if ((mods & ModControl) != 0) parts.Add("Ctrl");
+        if ((mods & ModAlt) != 0) parts.Add("Alt");
+        if ((mods & ModShift) != 0) parts.Add("Shift");
+        if ((mods & ModWin) != 0) parts.Add("Win");
+        if (vk is >= 0x70 and <= 0x87)
+            parts.Add("F" + (vk - 0x6F));
+        else if (vk == 0x20)
+            parts.Add("Space");
+        else
+            parts.Add(((char)vk).ToString());
+        return string.Join("+", parts);
     }
 }
 

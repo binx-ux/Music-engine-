@@ -1,69 +1,71 @@
 <UserControl x:Class="Mixline.App.Views.VoiceView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-  <StackPanel>
-    <TextBlock Text="Voice" Style="{StaticResource Title}" Margin="0,0,0,4"/>
-    <TextBlock Text="Effects stay off the voice unless you turn them on." Style="{StaticResource Caption}" Margin="0,0,0,14"/>
-    <Border Style="{StaticResource Glass}" Margin="0,0,0,12">
-      <StackPanel>
-        <CheckBox x:Name="Enhance" Content="Voice Enhance" Checked="Changed" Unchecked="Changed"/>
-        <TextBlock Text="Gentle high-pass, compression, and limiting. Stays out of the way unless you turn on stronger effects." Style="{StaticResource Caption}" Margin="0,8,0,0" TextWrapping="Wrap"/>
-        <TextBlock x:Name="Live" Margin="0,10,0,0" Foreground="#C9A36A"/>
-      </StackPanel>
-    </Border>
-    <Grid>
-      <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="*"/>
-        <ColumnDefinition Width="*"/>
-      </Grid.ColumnDefinitions>
-      <Border Style="{StaticResource Glass}" Margin="0,0,8,12">
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel>
+      <TextBlock Text="Voice" Style="{StaticResource Title}" Margin="0,0,0,4"/>
+      <TextBlock Text="Effects stay off the voice unless you turn them on." Style="{StaticResource Caption}" Margin="0,0,0,14"/>
+      <Border Style="{StaticResource Glass}" Margin="0,0,0,12">
         <StackPanel>
-          <CheckBox x:Name="Hpf" Content="High pass" Checked="Changed" Unchecked="Changed"/>
-          <Slider x:Name="HpfHz" Minimum="40" Maximum="160" Value="80" Margin="0,8,0,0" ValueChanged="SliderChanged"/>
-          <CheckBox x:Name="Gate" Content="Noise gate" Margin="0,12,0,0" Checked="Changed" Unchecked="Changed"/>
-          <TextBlock Text="Threshold" Style="{StaticResource Caption}" Margin="0,6,0,2"/>
-          <Slider x:Name="GateTh" Minimum="-70" Maximum="-10" Value="-42" ValueChanged="SliderChanged"/>
-          <CheckBox x:Name="Nr" Content="Noise reduction" Margin="0,12,0,0" Checked="Changed" Unchecked="Changed"/>
-          <Slider x:Name="NrAmt" Minimum="0" Maximum="1" Value="0.25" ValueChanged="SliderChanged"/>
+          <CheckBox x:Name="Enhance" Content="Voice Enhance" Checked="Changed" Unchecked="Changed"/>
+          <TextBlock Text="Gentle high-pass, compression, and limiting. Stays out of the way unless you turn on stronger effects." Style="{StaticResource Caption}" Margin="0,8,0,0" TextWrapping="Wrap"/>
+          <TextBlock x:Name="Live" Margin="0,10,0,0" Foreground="{DynamicResource AccentBrush}"/>
         </StackPanel>
       </Border>
-      <Border Grid.Column="1" Style="{StaticResource Glass}" Margin="8,0,0,12">
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="*"/>
+        </Grid.ColumnDefinitions>
+        <Border Style="{StaticResource Glass}" Margin="0,0,8,12">
+          <StackPanel>
+            <CheckBox x:Name="Hpf" Content="High pass" Checked="Changed" Unchecked="Changed"/>
+            <Slider x:Name="HpfHz" Minimum="40" Maximum="160" Value="80" Margin="0,8,0,0" ValueChanged="SliderChanged"/>
+            <CheckBox x:Name="Gate" Content="Noise gate" Margin="0,12,0,0" Checked="Changed" Unchecked="Changed"/>
+            <TextBlock Text="Threshold" Style="{StaticResource Caption}" Margin="0,6,0,2"/>
+            <Slider x:Name="GateTh" Minimum="-70" Maximum="-10" Value="-42" ValueChanged="SliderChanged"/>
+            <CheckBox x:Name="Nr" Content="Noise reduction" Margin="0,12,0,0" Checked="Changed" Unchecked="Changed"/>
+            <Slider x:Name="NrAmt" Minimum="0" Maximum="1" Value="0.25" ValueChanged="SliderChanged"/>
+          </StackPanel>
+        </Border>
+        <Border Grid.Column="1" Style="{StaticResource Glass}" Margin="8,0,0,12">
+          <StackPanel>
+            <CheckBox x:Name="EqOn" Content="EQ" Checked="Changed" Unchecked="Changed"/>
+            <ComboBox x:Name="EqPreset" Margin="0,8,0,0" SelectionChanged="PresetChanged"/>
+            <CheckBox x:Name="Comp" Content="Compressor" Margin="0,12,0,0" Checked="Changed" Unchecked="Changed"/>
+            <TextBlock Text="Threshold / Ratio" Style="{StaticResource Caption}" Margin="0,6,0,2"/>
+            <Slider x:Name="CompTh" Minimum="-40" Maximum="0" Value="-18" ValueChanged="SliderChanged"/>
+            <Slider x:Name="CompRatio" Minimum="1" Maximum="12" Value="3" ValueChanged="SliderChanged"/>
+            <TextBlock x:Name="Gr" Style="{StaticResource Caption}" Margin="0,6,0,0"/>
+          </StackPanel>
+        </Border>
+      </Grid>
+      <Border Style="{StaticResource Glass}">
         <StackPanel>
-          <CheckBox x:Name="EqOn" Content="EQ" Checked="Changed" Unchecked="Changed"/>
-          <ComboBox x:Name="EqPreset" Margin="0,8,0,0" SelectionChanged="PresetChanged"/>
-          <CheckBox x:Name="Comp" Content="Compressor" Margin="0,12,0,0" Checked="Changed" Unchecked="Changed"/>
-          <TextBlock Text="Threshold / Ratio" Style="{StaticResource Caption}" Margin="0,6,0,2"/>
-          <Slider x:Name="CompTh" Minimum="-40" Maximum="0" Value="-18" ValueChanged="SliderChanged"/>
-          <Slider x:Name="CompRatio" Minimum="1" Maximum="12" Value="3" ValueChanged="SliderChanged"/>
-          <TextBlock x:Name="Gr" Style="{StaticResource Caption}" Margin="0,6,0,0"/>
+          <TextBlock Text="Pitch correction" Style="{StaticResource Caption}"/>
+          <ComboBox x:Name="Tune" Margin="0,8,0,8" SelectionChanged="ComboChanged">
+            <ComboBoxItem Content="Off"/>
+            <ComboBoxItem Content="Light"/>
+            <ComboBoxItem Content="Medium"/>
+            <ComboBoxItem Content="Strong"/>
+          </ComboBox>
+          <Grid Margin="0,0,0,8">
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <ComboBox x:Name="TuneKey" Margin="0,0,6,0" SelectionChanged="ComboChanged"/>
+            <ComboBox x:Name="TuneScale" Grid.Column="1" Margin="6,0,0,0" SelectionChanged="ComboChanged"/>
+          </Grid>
+          <TextBlock Text="Amount / retune speed" Style="{StaticResource Caption}"/>
+          <Slider x:Name="TuneAmt" Minimum="0" Maximum="1" Value="0.4" ValueChanged="SliderChanged"/>
+          <Slider x:Name="TuneSpeed" Minimum="0" Maximum="1" Value="0.35" ValueChanged="SliderChanged"/>
+          <CheckBox x:Name="Formant" Content="Formant preservation" Margin="0,8,0,0" Checked="Changed" Unchecked="Changed"/>
+          <CheckBox x:Name="DeEss" Content="De-esser" Margin="0,8,0,0" Checked="Changed" Unchecked="Changed"/>
+          <CheckBox x:Name="Sat" Content="Saturation" Checked="Changed" Unchecked="Changed"/>
+          <CheckBox x:Name="Lim" Content="Limiter" IsChecked="True" Checked="Changed" Unchecked="Changed"/>
         </StackPanel>
       </Border>
-    </Grid>
-    <Border Style="{StaticResource Glass}">
-      <StackPanel>
-        <TextBlock Text="Pitch correction" Style="{StaticResource Caption}"/>
-        <ComboBox x:Name="Tune" Margin="0,8,0,8" SelectionChanged="ComboChanged">
-          <ComboBoxItem Content="Off"/>
-          <ComboBoxItem Content="Light"/>
-          <ComboBoxItem Content="Medium"/>
-          <ComboBoxItem Content="Strong"/>
-        </ComboBox>
-        <Grid Margin="0,0,0,8">
-          <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="*"/>
-          </Grid.ColumnDefinitions>
-          <ComboBox x:Name="TuneKey" Margin="0,0,6,0" SelectionChanged="ComboChanged"/>
-          <ComboBox x:Name="TuneScale" Grid.Column="1" Margin="6,0,0,0" SelectionChanged="ComboChanged"/>
-        </Grid>
-        <TextBlock Text="Amount / retune speed" Style="{StaticResource Caption}"/>
-        <Slider x:Name="TuneAmt" Minimum="0" Maximum="1" Value="0.4" ValueChanged="SliderChanged"/>
-        <Slider x:Name="TuneSpeed" Minimum="0" Maximum="1" Value="0.35" ValueChanged="SliderChanged"/>
-        <CheckBox x:Name="Formant" Content="Formant preservation" Margin="0,8,0,0" Checked="Changed" Unchecked="Changed"/>
-        <CheckBox x:Name="DeEss" Content="De-esser" Margin="0,8,0,0" Checked="Changed" Unchecked="Changed"/>
-        <CheckBox x:Name="Sat" Content="Saturation" Checked="Changed" Unchecked="Changed"/>
-        <CheckBox x:Name="Lim" Content="Limiter" IsChecked="True" Checked="Changed" Unchecked="Changed"/>
-      </StackPanel>
-    </Border>
-  </StackPanel>
+    </StackPanel>
+  </ScrollViewer>
 </UserControl>

@@ -57,7 +57,8 @@ public sealed class HotkeyService : IDisposable
         }
 
         var atom = _next++;
-        if (!RegisterHotKey(_hwnd, atom, binding.Modifiers, binding.Key))
+        var mods = binding.Modifiers | HotkeyParser.ModNoRepeat;
+        if (!RegisterHotKey(_hwnd, atom, mods, binding.Key))
         {
             var err = Marshal.GetLastWin32Error();
             var message = err == 1409

@@ -10,7 +10,7 @@ public partial class App : Application
     private Mutex? _mutex;
     private bool _ownsMutex;
 
-    protected override void OnStartup(StartupEventArgs e)
+    private void Boot(object sender, StartupEventArgs e)
     {
         _mutex = new Mutex(true, AppInfo.MutexName, out _ownsMutex);
         if (!_ownsMutex)
@@ -27,9 +27,20 @@ public partial class App : Application
                 Session?.Log.Error("app", "Unhandled error.", ex);
         };
 
+        var splash = new SplashWindow();
+        splash.Show();
+        splash.Tick("loading", 0.16);
+
         Session = new AppSession();
-        base.OnStartup(e);
+        Theme.Apply(Session.Config.Appearance);
+        splash.Tick("loading", 0.52);
         Session.StartEngineIfNeeded();
+        splash.Tick("loading", 0.9);
+
+        var main = new MainWindow();
+        MainWindow = main;
+        main.Show();
+        splash.Close();
     }
 
     private void OnUiException(object sender, DispatcherUnhandledExceptionEventArgs e)

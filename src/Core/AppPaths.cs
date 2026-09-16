@@ -12,6 +12,7 @@ public static class AppPaths
     public static string Soundboard => Path.Combine(Root, "Soundboard");
     public static string Presets => Path.Combine(Root, "Presets");
     public static string Cache => Path.Combine(Root, "Cache");
+    public static string Music => Path.Combine(Root, "Music");
     public static string Backups => Path.Combine(Root, "Backups");
     public static string TokenFile => Path.Combine(Root, "spotify.bin");
 
@@ -24,6 +25,7 @@ public static class AppPaths
         Directory.CreateDirectory(Soundboard);
         Directory.CreateDirectory(Presets);
         Directory.CreateDirectory(Cache);
+        Directory.CreateDirectory(Music);
         Directory.CreateDirectory(Backups);
     }
 

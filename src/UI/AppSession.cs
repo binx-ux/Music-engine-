@@ -25,6 +25,7 @@ public sealed class AppSession : IDisposable
     public SoundboardStore SoundboardStore { get; }
     public SpotifyClient Spotify { get; }
     public HotkeyService Hotkeys { get; }
+    public YtDlpClient Downloader { get; }
     public AppConfig Config { get; private set; }
     public SoundboardLayout Layout { get; private set; }
     public ObservableCollection<string> Profiles { get; } = [];
@@ -51,6 +52,7 @@ public sealed class AppSession : IDisposable
         SoundboardStore = new SoundboardStore(Log);
         Spotify = new SpotifyClient(Log);
         Hotkeys = new HotkeyService(Log);
+        Downloader = new YtDlpClient(Log);
         Config = ConfigStore.Load();
         Layout = SoundboardStore.Load(Config.Soundboard.ActiveLayout);
         LuaPads.Load(Path.Combine(AppContext.BaseDirectory, "scripts", "pads.lua"));
@@ -59,7 +61,7 @@ public sealed class AppSession : IDisposable
         RefreshProfiles();
         LoadSpotifyTokens();
 
-        Engine.ErrorRaised += (_, msg) => Notify(msg);
+        Engine.ErrorRaised += (_, msg) => SetError(msg, null);
         Engine.StatusChanged += (_, msg) => Log.Info("ui", msg);
         Hotkeys.Triggered += OnHotkey;
         Hotkeys.Conflict += c => Notify(c.Message);
@@ -172,7 +174,10 @@ public sealed class AppSession : IDisposable
             return;
         }
 
-        if (!_clips.TryGetValue(pad.Id, out var clip))
+        DecodedClip? clip;
+        lock (_clips)
+            _clips.TryGetValue(pad.Id, out clip);
+        if (clip is null)
         {
             var loaded = await Task.Run(() => ClipLoader.Load(pad.FilePath, Engine.SampleRate, Log));
             if (!loaded.Success || loaded.Value is null)
@@ -181,7 +186,8 @@ public sealed class AppSession : IDisposable
                 return;
             }
             clip = loaded.Value;
-            _clips[pad.Id] = clip;
+            lock (_clips)
+                _clips[pad.Id] = clip;
         }
 
         Engine.PlaySound(new VoicePlayback
@@ -214,6 +220,88 @@ public sealed class AppSession : IDisposable
         }
     }
 
+    public void PrefetchPad(SoundPad pad)
+    {
+        if (string.IsNullOrWhiteSpace(pad.FilePath) || !File.Exists(pad.FilePath))
+            return;
+        lock (_clips)
+        {
+            if (_clips.ContainsKey(pad.Id))
+                return;
+        }
+        var id = pad.Id;
+        var path = pad.FilePath;
+        var rate = Engine.SampleRate;
+        _ = Task.Run(() =>
+        {
+            var loaded = ClipLoader.Load(path, rate, Log);
+            if (!loaded.Success || loaded.Value is null)
+                return;
+            lock (_clips)
+                _clips[id] = loaded.Value;
+        });
+    }
+
+    public async Task<(bool Ok, string Message, List<TrackInfo> Tracks)> ImportLink(string text)
+    {
+        text = (text ?? "").Trim();
+        var tracks = new List<TrackInfo>();
+        if (string.IsNullOrWhiteSpace(text))
+            return (false, "Paste a YouTube, SoundCloud, or audio link.", tracks);
+        if (File.Exists(text) && AudioFileSupport.IsSupportedFile(text))
+        {
+            tracks.Add(AudioFileSupport.ReadMetadata(text));
+            return (true, "Added file.", tracks);
+        }
+        if (!Uri.TryCreate(text, UriKind.Absolute, out var uri) ||
+            (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
+            return (false, "Paste a link or a file path.", tracks);
+
+        var check = await _urls.ValidateAsync(text, CancellationToken.None);
+        if (check.Ok)
+        {
+            tracks.Add(new TrackInfo
+            {
+                Path = text,
+                Title = check.Title ?? uri.Host,
+                FileName = check.Title ?? uri.Host,
+                IsUrl = true,
+                SourceUrl = text
+            });
+            return (true, "Ready to play.", tracks);
+        }
+
+        Notify("Downloading...");
+        var got = await Downloader.DownloadLinkAsync(text, CancellationToken.None);
+        if (!got.Success || got.Value is null || got.Value.Count == 0)
+            return (false, got.Error ?? "Download failed.", tracks);
+        foreach (var file in got.Value)
+            tracks.Add(AudioFileSupport.ReadMetadata(file) with { SourceUrl = text });
+        return (true, $"Downloaded {tracks.Count} track(s).", tracks);
+    }
+
+    public async Task<(bool Ok, string Message, List<TrackInfo> Tracks)> FindCleanRap()
+    {
+        Notify("Finding clean rap for Roblox...");
+        var got = await Downloader.FindCleanRapAsync(CancellationToken.None);
+        var tracks = new List<TrackInfo>();
+        if (!got.Success || got.Value is null || got.Value.Count == 0)
+            return (false, got.Error ?? "Could not find clean rap.", tracks);
+        foreach (var file in got.Value)
+            tracks.Add(AudioFileSupport.ReadMetadata(file));
+        return (true, $"Added {tracks.Count} clean rap tracks.", tracks);
+    }
+
+    public string ShareCurrent()
+    {
+        var t = Engine.Music.Current;
+        if (t is null)
+            return "";
+        if (!string.IsNullOrWhiteSpace(t.SourceUrl))
+            return t.Title + Environment.NewLine + t.SourceUrl;
+        return t.Title + Environment.NewLine + t.Path;
+    }
+
     public async Task<Result> ConnectSpotify()
         => await Spotify.ConnectAsync(Config.Spotify.ClientId ?? "", Config.Spotify.RedirectUri, CancellationToken.None);
 
@@ -232,17 +320,8 @@ public sealed class AppSession : IDisposable
 
     public async Task<(bool Ok, string Message, TrackInfo? Track)> TryUrl(string url)
     {
-        var check = await _urls.ValidateAsync(url, CancellationToken.None);
-        if (!check.Ok)
-            return (false, check.Message, null);
-        var track = new TrackInfo
-        {
-            Path = url,
-            Title = check.Title ?? url,
-            FileName = url,
-            IsUrl = true
-        };
-        return (true, check.Message, track);
+        var result = await ImportLink(url);
+        return (result.Ok, result.Message, result.Tracks.FirstOrDefault());
     }
 
     public void TickMeters()
@@ -265,7 +344,6 @@ public sealed class AppSession : IDisposable
             while (Notifications.Count > 8)
                 Notifications.RemoveAt(Notifications.Count - 1);
         });
-        LastError = message;
         Changed?.Invoke();
     }
 

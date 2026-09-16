@@ -24,8 +24,9 @@ public sealed class AudioEngine : IDisposable
     private readonly AppLog _log;
     private readonly DeviceManager _devices;
     private readonly VirtualDeviceManager _virtual;
-    private readonly FloatRingBuffer _micRing = new(1 << 15);
-    private readonly FloatRingBuffer _virtualRing = new(1 << 15);
+    private readonly FloatRingBuffer _micRing = new(1 << 16);
+    private readonly FloatRingBuffer _virtualRing = new(1 << 17);
+    private readonly FloatRingBuffer _monitorRing = new(1 << 17);
     private readonly VoiceChain _voice = new();
     private readonly Limiter _masterLimiter = new();
     private readonly object _startLock = new();
@@ -52,9 +53,11 @@ public sealed class AudioEngine : IDisposable
     private PeakTracker _virtualPeak = new(48000);
     private ToneGenerator _tone = new(48000);
     private int _sampleRate = AudioConstants.DefaultSampleRate;
-    private int _bufferMs = 20;
+    private int _bufferMs = 32;
     private bool _running;
     private bool _micActive;
+    private volatile bool _mixRun;
+    private Thread? _mixThread;
     private DateTime _startedUtc;
     private string? _inputName;
     private string? _outputName;
@@ -214,11 +217,11 @@ public sealed class AudioEngine : IDisposable
                 {
                     _virtualName = virt.FriendlyName;
                     _virtualProvider = new VirtualProvider(this, _sampleRate);
-                    _virtualOut = new WasapiOut(virt, AudioClientShareMode.Shared, true, Math.Max(_bufferMs, 20));
+                    _virtualOut = new WasapiOut(virt, AudioClientShareMode.Shared, true, Math.Max(_bufferMs, 50));
                     _virtualOut.PlaybackStopped += OnVirtualStopped;
                     _virtualOut.Init(_virtualProvider);
-                    _virtualOut.Play();
                     PromoteGameMic(config, virt.FriendlyName);
+
                 }
                 else
                 {
@@ -226,6 +229,9 @@ public sealed class AudioEngine : IDisposable
                     _log.Warning("audio", "No virtual cable selected. Games will not hear Cuebox.");
                 }
 
+                StartMixer();
+                if (_virtualOut is not null)
+                    _virtualOut.Play();
                 _monitor.Play();
                 _running = true;
                 _startedUtc = DateTime.UtcNow;
@@ -252,6 +258,7 @@ public sealed class AudioEngine : IDisposable
     {
         _running = false;
         _micActive = false;
+        StopMixer();
         try { _monitor?.Stop(); } catch { }
         try { _virtualOut?.Stop(); } catch { }
         _capture?.Dispose();
@@ -260,6 +267,7 @@ public sealed class AudioEngine : IDisposable
         DisposeOut(ref _virtualOut);
         _micRing.Clear();
         _virtualRing.Clear();
+        _monitorRing.Clear();
         _inputName = null;
         _outputName = null;
         _virtualName = null;
@@ -547,6 +555,50 @@ public sealed class AudioEngine : IDisposable
         ErrorRaised?.Invoke(this, message);
     }
 
+    private void StartMixer()
+    {
+        StopMixer();
+        _monitorRing.Clear();
+        _virtualRing.Clear();
+        _mixRun = true;
+        _mixThread = new Thread(MixLoop)
+        {
+            IsBackground = true,
+            Name = "Cuebox.Mix",
+            Priority = ThreadPriority.Highest
+        };
+        _mixThread.Start();
+        var need = Math.Max(2048, _sampleRate * 2 * 80 / 1000);
+        for (var i = 0; i < 100 && _monitorRing.AvailableRead < need; i++)
+            Thread.Sleep(2);
+    }
+
+    private void StopMixer()
+    {
+        _mixRun = false;
+        var t = _mixThread;
+        _mixThread = null;
+        t?.Join(400);
+    }
+
+    private void MixLoop()
+    {
+        var frames = 512;
+        var stereo = frames * 2;
+        var scratch = new float[stereo];
+        var target = Math.Max(stereo * 8, _sampleRate * 2 * 90 / 1000);
+        while (_mixRun)
+        {
+            if (_monitorRing.AvailableRead >= target && _virtualRing.AvailableRead >= target)
+            {
+                Thread.Sleep(1);
+                continue;
+            }
+            MixMonitorAndVirtual(scratch.AsSpan(0, stereo), frames);
+            _monitorRing.Write(scratch.AsSpan(0, stereo));
+        }
+    }
+
     private static void DisposeOut(ref WasapiOut? output)
     {
         if (output is null)
@@ -577,8 +629,7 @@ public sealed class AudioEngine : IDisposable
 
         public int Read(float[] buffer, int offset, int count)
         {
-            var frames = count / 2;
-            _engine.MixMonitorAndVirtual(buffer.AsSpan(offset, count), frames);
+            _engine._monitorRing.ReadOrZero(buffer.AsSpan(offset, count));
             return count;
         }
     }

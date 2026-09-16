@@ -1,74 +1,88 @@
 <UserControl x:Class="Mixline.App.Views.SettingsView"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-  <StackPanel>
-    <TextBlock Text="Settings" Style="{StaticResource Title}" Margin="0,0,0,4"/>
-    <TextBlock Text="Audio, Spotify, profiles, and startup." Style="{StaticResource Caption}" Margin="0,0,0,14"/>
-    <Border Style="{StaticResource Glass}" Margin="0,0,0,12">
-      <StackPanel>
-        <TextBlock Text="AUDIO" Style="{StaticResource Caption}"/>
-        <TextBlock Text="Buffer" Style="{StaticResource Caption}" Margin="0,10,0,4"/>
-        <ComboBox x:Name="Buffer" SelectionChanged="ComboSave">
-          <ComboBoxItem Content="Low Latency"/>
-          <ComboBoxItem Content="Balanced"/>
-          <ComboBoxItem Content="Stable"/>
-          <ComboBoxItem Content="Custom"/>
-        </ComboBox>
-        <TextBlock Text="Custom buffer (ms)" Style="{StaticResource Caption}" Margin="0,8,0,4"/>
-        <Slider x:Name="CustomMs" Minimum="5" Maximum="80" Value="20" ValueChanged="SliderSave"/>
-        <CheckBox x:Name="Exclusive" Content="Exclusive mode" Margin="0,10,0,0" Checked="Save" Unchecked="Save"/>
-        <CheckBox x:Name="Bypass" Content="Bypass processing (advanced)" Checked="Save" Unchecked="Save"/>
-        <CheckBox x:Name="Tone" Content="Test tone" Checked="Save" Unchecked="Save"/>
-        <Button Content="Restart audio" Style="{StaticResource QuietBtn}" Margin="0,12,0,0" HorizontalAlignment="Left" Click="Restart"/>
-      </StackPanel>
-    </Border>
-    <Border Style="{StaticResource Glass}" Margin="0,0,0,12">
-      <StackPanel>
-        <TextBlock Text="SPOTIFY" Style="{StaticResource Caption}"/>
-        <TextBlock Text="Client ID from the Spotify Developer Dashboard. PKCE login, no client secret stored." TextWrapping="Wrap" Margin="0,8,0,8"/>
-        <TextBox x:Name="ClientId" Margin="0,0,0,8"/>
-        <TextBlock Text="Run this in a terminal (asks first):" Style="{StaticResource Caption}" Margin="0,0,0,4"/>
-        <TextBox x:Name="FindCmd" IsReadOnly="True" TextWrapping="Wrap" Margin="0,0,0,8"/>
-        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-          <Button Content="Copy cmd" Style="{StaticResource QuietBtn}" Click="CopyFindCmd" Margin="0,0,8,0"/>
-          <Button Content="Find Client ID" Style="{StaticResource QuietBtn}" Click="FindClientId"/>
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel>
+      <TextBlock Text="Settings" Style="{StaticResource Title}" Margin="0,0,0,10"/>
+      <Border Style="{StaticResource Glass}" Margin="0,0,0,10" Padding="14">
+        <StackPanel>
+          <TextBlock Text="LOOK" Style="{StaticResource Caption}"/>
+          <TextBlock Text="Pick a palette or paste your own hex." Style="{StaticResource Caption}" Margin="0,6,0,8"/>
+          <WrapPanel x:Name="ThemeRow" Margin="0,0,0,8"/>
+          <DockPanel>
+            <Button DockPanel.Dock="Right" Content="Set" Style="{StaticResource QuietBtn}" Click="SetHex" Width="52" Margin="8,0,0,0"/>
+            <TextBox x:Name="HexBox"/>
+          </DockPanel>
+          <TextBlock Text="UI scale" Style="{StaticResource Caption}" Margin="0,12,0,4"/>
+          <Slider x:Name="UiScale" Minimum="0.9" Maximum="1.2" Value="1" TickFrequency="0.05" IsSnapToTickEnabled="True" ValueChanged="ScaleSave"/>
         </StackPanel>
-        <StackPanel Orientation="Horizontal">
-          <Button Content="Connect Spotify" Style="{StaticResource AccentBtn}" Click="ConnectSp" Margin="0,0,8,0"/>
-          <Button Content="Disconnect" Style="{StaticResource QuietBtn}" Click="DisconnectSp"/>
+      </Border>
+      <Border Style="{StaticResource Glass}" Margin="0,0,0,10">
+        <StackPanel>
+          <TextBlock Text="AUDIO" Style="{StaticResource Caption}"/>
+          <TextBlock Text="Buffer" Style="{StaticResource Caption}" Margin="0,10,0,4"/>
+          <ComboBox x:Name="Buffer" SelectionChanged="ComboSave">
+            <ComboBoxItem Content="Low Latency"/>
+            <ComboBoxItem Content="Balanced"/>
+            <ComboBoxItem Content="Stable"/>
+            <ComboBoxItem Content="Custom"/>
+          </ComboBox>
+          <TextBlock Text="Custom buffer (ms)" Style="{StaticResource Caption}" Margin="0,8,0,4"/>
+          <Slider x:Name="CustomMs" Minimum="5" Maximum="80" Value="20" ValueChanged="SliderSave"/>
+          <CheckBox x:Name="Exclusive" Content="Exclusive mode" Margin="0,10,0,0" Checked="Save" Unchecked="Save"/>
+          <CheckBox x:Name="Bypass" Content="Bypass processing (advanced)" Checked="Save" Unchecked="Save"/>
+          <CheckBox x:Name="Tone" Content="Test tone" Checked="Save" Unchecked="Save"/>
+          <Button Content="Restart audio" Style="{StaticResource QuietBtn}" Margin="0,12,0,0" HorizontalAlignment="Left" Click="Restart"/>
         </StackPanel>
-        <TextBlock x:Name="SpStatus" Style="{StaticResource Caption}" Margin="0,8,0,0"/>
-      </StackPanel>
-    </Border>
-    <Border Style="{StaticResource Glass}" Margin="0,0,0,12">
-      <StackPanel>
-        <TextBlock Text="PROFILES" Style="{StaticResource Caption}"/>
-        <ComboBox x:Name="ProfileBox" Margin="0,8,0,8"/>
-        <StackPanel Orientation="Horizontal">
-          <Button Content="Switch" Style="{StaticResource QuietBtn}" Click="SwitchProfile" Margin="0,0,8,0"/>
-          <Button Content="Save current" Style="{StaticResource QuietBtn}" Click="SaveProfile"/>
+      </Border>
+      <Border Style="{StaticResource Glass}" Margin="0,0,0,10">
+        <StackPanel>
+          <TextBlock Text="SPOTIFY" Style="{StaticResource Caption}"/>
+          <TextBlock Text="Client ID from the Spotify Developer Dashboard. PKCE login, no client secret stored." TextWrapping="Wrap" Margin="0,8,0,8"/>
+          <TextBox x:Name="ClientId" Margin="0,0,0,8"/>
+          <TextBlock Text="Run this in a terminal (asks first):" Style="{StaticResource Caption}" Margin="0,0,0,4"/>
+          <TextBox x:Name="FindCmd" IsReadOnly="True" TextWrapping="Wrap" Margin="0,0,0,8"/>
+          <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+            <Button Content="Copy cmd" Style="{StaticResource QuietBtn}" Click="CopyFindCmd" Margin="0,0,8,0"/>
+            <Button Content="Find Client ID" Style="{StaticResource QuietBtn}" Click="FindClientId"/>
+          </StackPanel>
+          <StackPanel Orientation="Horizontal">
+            <Button Content="Connect Spotify" Style="{StaticResource AccentBtn}" Click="ConnectSp" Margin="0,0,8,0"/>
+            <Button Content="Disconnect" Style="{StaticResource QuietBtn}" Click="DisconnectSp"/>
+          </StackPanel>
+          <TextBlock x:Name="SpStatus" Style="{StaticResource Caption}" Margin="0,8,0,0"/>
         </StackPanel>
-      </StackPanel>
-    </Border>
-    <Border Style="{StaticResource Glass}" Margin="0,0,0,12">
-      <StackPanel>
-        <TextBlock Text="BACKUP" Style="{StaticResource Caption}"/>
-        <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
-          <Button Content="Export" Style="{StaticResource QuietBtn}" Click="Export" Margin="0,0,8,0"/>
-          <Button Content="Import" Style="{StaticResource QuietBtn}" Click="Import"/>
+      </Border>
+      <Border Style="{StaticResource Glass}" Margin="0,0,0,10">
+        <StackPanel>
+          <TextBlock Text="PROFILES" Style="{StaticResource Caption}"/>
+          <ComboBox x:Name="ProfileBox" Margin="0,8,0,8"/>
+          <StackPanel Orientation="Horizontal">
+            <Button Content="Switch" Style="{StaticResource QuietBtn}" Click="SwitchProfile" Margin="0,0,8,0"/>
+            <Button Content="Save current" Style="{StaticResource QuietBtn}" Click="SaveProfile"/>
+          </StackPanel>
         </StackPanel>
-      </StackPanel>
-    </Border>
-    <Border Style="{StaticResource Glass}">
-      <StackPanel>
-        <TextBlock Text="STARTUP / ADVANCED" Style="{StaticResource Caption}"/>
-        <CheckBox x:Name="WinStart" Content="Start with Windows" Margin="0,10,0,0" Checked="Save" Unchecked="Save"/>
-        <CheckBox x:Name="MinStart" Content="Start minimized" Checked="Save" Unchecked="Save"/>
-        <CheckBox x:Name="AutoEngine" Content="Start audio engine automatically" Checked="Save" Unchecked="Save"/>
-        <Button Content="Copy diagnostic info" Style="{StaticResource QuietBtn}" Margin="0,12,0,0" HorizontalAlignment="Left" Click="CopyDiag"/>
-        <TextBlock x:Name="Err" Foreground="#C75C5C" Margin="0,8,0,0" TextWrapping="Wrap"/>
-        <Button x:Name="DetailsBtn" Content="View details" Style="{StaticResource QuietBtn}" HorizontalAlignment="Left" Click="Details"/>
-      </StackPanel>
-    </Border>
-  </StackPanel>
+      </Border>
+      <Border Style="{StaticResource Glass}" Margin="0,0,0,10">
+        <StackPanel>
+          <TextBlock Text="BACKUP" Style="{StaticResource Caption}"/>
+          <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
+            <Button Content="Export" Style="{StaticResource QuietBtn}" Click="Export" Margin="0,0,8,0"/>
+            <Button Content="Import" Style="{StaticResource QuietBtn}" Click="Import"/>
+          </StackPanel>
+        </StackPanel>
+      </Border>
+      <Border Style="{StaticResource Glass}">
+        <StackPanel>
+          <TextBlock Text="STARTUP" Style="{StaticResource Caption}"/>
+          <CheckBox x:Name="WinStart" Content="Start with Windows" Margin="0,10,0,0" Checked="Save" Unchecked="Save"/>
+          <CheckBox x:Name="MinStart" Content="Start minimized" Checked="Save" Unchecked="Save"/>
+          <CheckBox x:Name="AutoEngine" Content="Start audio engine automatically" Checked="Save" Unchecked="Save"/>
+          <Button Content="Copy diagnostic info" Style="{StaticResource QuietBtn}" Margin="0,12,0,0" HorizontalAlignment="Left" Click="CopyDiag"/>
+          <TextBlock x:Name="Err" Foreground="#C75C5C" Margin="0,8,0,0" TextWrapping="Wrap"/>
+          <Button x:Name="DetailsBtn" Content="View details" Style="{StaticResource QuietBtn}" HorizontalAlignment="Left" Click="Details"/>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </ScrollViewer>
 </UserControl>

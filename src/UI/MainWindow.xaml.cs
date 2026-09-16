@@ -1,6 +1,7 @@
 ﻿using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
@@ -31,6 +32,7 @@ public partial class MainWindow : Window
     private readonly VoiceView _voice = new();
     private readonly DevicesView _devices = new();
     private readonly SettingsView _settings = new();
+    private readonly DispatcherTimer _toastTimer = new() { Interval = TimeSpan.FromSeconds(4) };
     private byte[]? _artBytes;
     private string? _artUrl;
     private bool _playIconPlaying;
@@ -42,12 +44,31 @@ public partial class MainWindow : Window
     {
         InitializeComponent();
         SourceInitialized += (_, _) => NativeBackdrop.TryApply(this, true);
+        Theme.Changed += OnTheme;
         Loaded += OnLoaded;
         Closed += (_, _) =>
         {
+            Theme.Changed -= OnTheme;
             _meterTimer.Stop();
             _spotifyTimer.Stop();
+            _toastTimer.Stop();
         };
+    }
+
+    private void OnTheme()
+    {
+        NativeBackdrop.TryApply(this, true);
+        ApplyScale();
+    }
+
+    private void ApplyScale()
+    {
+        var s = _session.Config.Appearance.UiScale;
+        if (s < 0.9 || s > 1.2)
+            s = 1;
+        LayoutTransform = Math.Abs(s - 1) < 0.01
+            ? Transform.Identity
+            : new ScaleTransform(s, s);
     }
 
     private void OnLoaded(object sender, RoutedEventArgs e)
@@ -71,6 +92,13 @@ public partial class MainWindow : Window
         _meterTimer.Start();
         _spotifyTimer.Tick += async (_, _) => await _session.RefreshSpotify(CancellationToken.None);
         _spotifyTimer.Start();
+        _toastTimer.Tick += (_, _) =>
+        {
+            _toastTimer.Stop();
+            ToastText.Text = "";
+        };
+        _session.Notifications.CollectionChanged += (_, _) => Dispatcher.BeginInvoke(ShowToast);
+        ApplyScale();
         RefreshChrome();
         CopySpotifyFinder();
         _ = LoadInstantPresets();
@@ -85,7 +113,9 @@ public partial class MainWindow : Window
         var src = e.OriginalSource as DependencyObject;
         while (src is not null && !ReferenceEquals(src, sender))
         {
-            if (src is Button)
+            if (src is Button or Slider or Thumb)
+                return;
+            if (src is FrameworkElement fe && (fe.Name is "ChromeSeekWell" or "ChromeSeekFill"))
                 return;
             src = VisualTreeHelper.GetParent(src);
         }
@@ -120,6 +150,7 @@ public partial class MainWindow : Window
                 return;
             _session.SoundboardStore.Save(_session.Layout);
             _session.RaiseLayout();
+            _session.RegisterHotkeys();
             _session.Notify($"Added {n} soundboard presets.");
         }
         catch
@@ -158,16 +189,30 @@ public partial class MainWindow : Window
     private void RefreshChrome()
     {
         var track = _session.Engine.Music.Current;
-        var key = track is null ? "" : track.Title + "\n" + track.Artist + "\n" + track.FileName;
-        if (track is not null && key != _nowKey)
+        if (track is null)
         {
-            _nowKey = key;
-            NowTitle.Text = track.Title;
-            NowArtist.Text = string.IsNullOrWhiteSpace(track.Artist) ? track.FileName : track.Artist;
-            SetArt(track.Artwork);
+            if (_nowKey != "")
+            {
+                _nowKey = "";
+                NowTitle.Text = "Nothing playing";
+                NowArtist.Text = "Queue a file or paste a link";
+                SetArt(null);
+            }
+        }
+        else
+        {
+            var key = track.Title + "\n" + track.Artist + "\n" + track.FileName;
+            if (key != _nowKey)
+            {
+                _nowKey = key;
+                NowTitle.Text = track.Title;
+                NowArtist.Text = string.IsNullOrWhiteSpace(track.Artist) ? track.FileName : track.Artist;
+                SetArt(track.Artwork);
+            }
         }
 
         SetPlayIcon(_session.Engine.Music.IsPlaying);
+        TickChromeSeek();
 
         var virt = _session.Engine.VirtualStatus();
         if (virt.Connected != _virtConnected)
@@ -196,6 +241,7 @@ public partial class MainWindow : Window
         else if (page == _voice) _voice.UpdateLive(meters);
         else if (page == _music) _music.TickPosition();
         SetPlayIcon(_session.Engine.Music.IsPlaying);
+        TickChromeSeek();
         var track = _session.Engine.Music.Current;
         if (!ReferenceEquals(track, _chromeTrack))
         {
@@ -210,6 +256,34 @@ public partial class MainWindow : Window
             return;
         _playIconPlaying = playing;
         PlayIcon.Data = playing ? PauseGeo : PlayGeo;
+    }
+
+    private void TickChromeSeek()
+    {
+        var music = _session.Engine.Music;
+        var dur = music.Duration.TotalSeconds;
+        var frac = dur <= 0 ? 0 : Math.Clamp(music.Position.TotalSeconds / dur, 0, 1);
+        ChromeSeekFill.Width = ChromeSeekWell.ActualWidth * frac;
+    }
+
+    private void ChromeSeekClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        var dur = _session.Engine.Music.Duration.TotalSeconds;
+        if (dur <= 0)
+            return;
+        var x = e.GetPosition(ChromeSeekWell).X / Math.Max(1, ChromeSeekWell.ActualWidth);
+        _session.Engine.Music.Seek(TimeSpan.FromSeconds(Math.Clamp(x, 0, 1) * dur));
+        TickChromeSeek();
+        e.Handled = true;
+    }
+
+    private void ShowToast()
+    {
+        if (_session.Notifications.Count == 0)
+            return;
+        ToastText.Text = _session.Notifications[0];
+        _toastTimer.Stop();
+        _toastTimer.Start();
     }
 
     private void OnSpotify(SpotifyNowPlaying? now)

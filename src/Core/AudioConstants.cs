@@ -62,9 +62,9 @@ public static class BufferPresetValues
 {
     public static int Milliseconds(BufferPreset preset) => preset switch
     {
-        BufferPreset.LowLatency => 10,
-        BufferPreset.Balanced => 20,
-        BufferPreset.Stable => 40,
+        BufferPreset.LowLatency => 16,
+        BufferPreset.Balanced => 32,
+        BufferPreset.Stable => 64,
         _ => 20
     };
 }

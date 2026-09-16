@@ -3,54 +3,71 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:views="clr-namespace:Mixline.App.Views"
              xmlns:c="clr-namespace:Mixline.App.Controls">
-  <StackPanel>
-    <Grid>
+  <Grid>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+      <RowDefinition Height="Auto"/>
+    </Grid.RowDefinitions>
+    <Border Style="{StaticResource Glass}" Padding="12" Margin="0,0,0,10">
+      <StackPanel>
+        <DockPanel>
+          <Border x:Name="EnginePill" DockPanel.Dock="Right" CornerRadius="8" Padding="8,2" Background="#18000000" VerticalAlignment="Center">
+            <TextBlock x:Name="EngineState" Style="{StaticResource Caption}"/>
+          </Border>
+          <TextBlock Text="MIX" Style="{StaticResource Kicker}" VerticalAlignment="Center"/>
+        </DockPanel>
+        <views:MixerStrip x:Name="_mixerStrip" Margin="0,6,0,6"/>
+        <c:LevelMeter x:Name="MasterMeter" Height="7"/>
+      </StackPanel>
+    </Border>
+    <Grid Grid.Row="1">
       <Grid.ColumnDefinitions>
         <ColumnDefinition Width="*"/>
         <ColumnDefinition Width="*"/>
-        <ColumnDefinition Width="1.15*"/>
+        <ColumnDefinition Width="1.25*"/>
       </Grid.ColumnDefinitions>
-      <Border Style="{StaticResource Glass}" Margin="0,0,12,14">
-        <StackPanel>
-          <TextBlock Text="MICROPHONE" Style="{StaticResource Kicker}"/>
-          <TextBlock x:Name="MicName" Text="—" Style="{StaticResource Title}" FontSize="16" Margin="0,8,0,2"/>
-          <TextBlock x:Name="OutName" Style="{StaticResource Caption}" Margin="0,0,0,12"/>
-          <c:LevelMeter x:Name="MicMeter" Height="10" Margin="0,0,0,10"/>
-          <TextBlock Text="Processing stays on this PC. Cuebox does not write recordings." Style="{StaticResource Caption}" TextWrapping="Wrap"/>
-        </StackPanel>
+      <Border Style="{StaticResource Glass}" Padding="12" Margin="0,0,8,0">
+        <DockPanel>
+          <StackPanel DockPanel.Dock="Top">
+            <TextBlock Text="MIC" Style="{StaticResource Kicker}"/>
+            <TextBlock x:Name="MicName" Text="—" FontSize="15" FontWeight="SemiBold" Margin="0,6,0,2"/>
+            <TextBlock x:Name="OutName" Style="{StaticResource Caption}" Margin="0,0,0,8"/>
+          </StackPanel>
+          <c:LevelMeter x:Name="MicMeter" Height="8" VerticalAlignment="Bottom"/>
+        </DockPanel>
       </Border>
-      <Border Grid.Column="1" Style="{StaticResource Glass}" Margin="0,0,12,14">
-        <StackPanel>
-          <TextBlock Text="MUSIC" Style="{StaticResource Kicker}"/>
-          <TextBlock Text="Files mix into the virtual mic." FontSize="16" FontWeight="SemiBold" Margin="0,8,0,2"/>
-          <TextBlock Text="Spotify metadata is separate." Style="{StaticResource Caption}" Margin="0,0,0,12"/>
-          <c:LevelMeter x:Name="MusicMeter" Height="10"/>
-        </StackPanel>
+      <Border Grid.Column="1" Style="{StaticResource Glass}" Padding="12" Margin="0,0,8,0">
+        <DockPanel>
+          <StackPanel DockPanel.Dock="Top">
+            <TextBlock Text="MUSIC" Style="{StaticResource Kicker}"/>
+            <TextBlock Text="Into the virtual mic" FontSize="15" FontWeight="SemiBold" Margin="0,6,0,8"/>
+            <Button Content="Find clean rap" Style="{StaticResource AccentBtn}" HorizontalAlignment="Left" Click="CleanRap"/>
+          </StackPanel>
+          <c:LevelMeter x:Name="MusicMeter" Height="8" VerticalAlignment="Bottom"/>
+        </DockPanel>
       </Border>
-      <Border Grid.Column="2" Style="{StaticResource Glass}" Margin="0,0,0,14">
-        <StackPanel>
-          <TextBlock Text="SOUNDBOARD" Style="{StaticResource Kicker}"/>
-          <views:MiniBoardView x:Name="_miniBoard" Margin="0,10,0,10"/>
-          <c:LevelMeter x:Name="BoardMeter" Height="10"/>
-        </StackPanel>
+      <Border Grid.Column="2" Style="{StaticResource Glass}" Padding="12">
+        <Grid>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+          </Grid.RowDefinitions>
+          <TextBlock Text="PADS" Style="{StaticResource Kicker}"/>
+          <ScrollViewer Grid.Row="1" Margin="0,8,0,8" VerticalScrollBarVisibility="Auto">
+            <views:MiniBoardView x:Name="_miniBoard"/>
+          </ScrollViewer>
+          <c:LevelMeter x:Name="BoardMeter" Grid.Row="2" Height="8"/>
+        </Grid>
       </Border>
     </Grid>
-    <Border Style="{StaticResource Glass}" Margin="0,0,0,14">
+    <Border Grid.Row="2" Style="{StaticResource Glass}" Padding="12" Margin="0,10,0,0">
       <StackPanel>
-        <Grid>
-          <TextBlock Text="MIXER" Style="{StaticResource Kicker}"/>
-          <TextBlock x:Name="EngineState" HorizontalAlignment="Right" Style="{StaticResource Caption}"/>
-        </Grid>
-        <views:MixerStrip x:Name="_mixerStrip" Margin="0,8,0,8"/>
-        <c:LevelMeter x:Name="MasterMeter" Height="8"/>
+        <TextBlock Text="CABLE" Style="{StaticResource Kicker}"/>
+        <TextBlock x:Name="VirtHint" Margin="0,6,0,0" TextWrapping="Wrap"/>
+        <TextBlock x:Name="Notice" Margin="0,6,0,0" Foreground="{DynamicResource DangerBrush}" TextWrapping="Wrap"/>
       </StackPanel>
     </Border>
-    <Border Style="{StaticResource Glass}">
-      <StackPanel>
-        <TextBlock Text="VIRTUAL MIC" Style="{StaticResource Kicker}"/>
-        <TextBlock x:Name="VirtHint" Margin="0,8,0,0" TextWrapping="Wrap" LineHeight="20"/>
-        <TextBlock x:Name="Notice" Margin="0,8,0,0" Foreground="#C45C58" TextWrapping="Wrap"/>
-      </StackPanel>
-    </Border>
-  </StackPanel>
+  </Grid>
 </UserControl>

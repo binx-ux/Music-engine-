@@ -38,7 +38,7 @@ internal static class NativeBackdrop
         DwmSetWindowAttribute(hwnd, DwmwaWindowCornerPreference, ref corner, sizeof(int));
         var backdrop = acrylic ? DwmsbtAcrylic : 2;
         var hr = DwmSetWindowAttribute(hwnd, DwmwaSystemBackdropType, ref backdrop, sizeof(int));
-        var border = 0x006AA3C9;
+        var border = Theme.DwmColor(Theme.Accent);
         DwmSetWindowAttribute(hwnd, DwmwaBorderColor, ref border, sizeof(int));
         var none = DwmwaColorNone;
         DwmSetWindowAttribute(hwnd, DwmwaCaptionColor, ref none, sizeof(int));

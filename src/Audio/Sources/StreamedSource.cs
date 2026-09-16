@@ -11,9 +11,9 @@ public sealed class StreamedSource : IAudioSource
 {
     private readonly AppLog _log;
     private readonly int _engineRate;
-    private readonly FloatRingBuffer _ring = new(1 << 16);
+    private readonly FloatRingBuffer _ring = new(1 << 18);
     private readonly object _gate = new();
-    private readonly float[] _pumpBuf = new float[2048];
+    private readonly float[] _pumpBuf = new float[8192];
     private WaveStream? _stream;
     private ISampleProvider? _provider;
     private Thread? _thread;
@@ -38,7 +38,7 @@ public sealed class StreamedSource : IAudioSource
         {
             IsBackground = true,
             Name = "Cuebox.MusicDecode",
-            Priority = ThreadPriority.AboveNormal
+            Priority = ThreadPriority.Highest
         };
         _thread.Start();
     }
@@ -66,12 +66,12 @@ public sealed class StreamedSource : IAudioSource
                         FileName = pathOrUrl,
                         Title = pathOrUrl,
                         IsUrl = true,
+                        SourceUrl = pathOrUrl,
                         Duration = _stream.TotalTime
                     }
                     : AudioFileSupport.ReadMetadata(pathOrUrl) with { Duration = _stream.TotalTime };
                 _ring.Clear();
                 _playing = true;
-                return Result.Ok();
             }
             catch (Exception ex)
             {
@@ -81,6 +81,11 @@ public sealed class StreamedSource : IAudioSource
                 return Result.Fail(msg, ex.Message);
             }
         }
+
+        var need = Math.Min(_ring.Capacity / 4, _engineRate * 2);
+        for (var i = 0; i < 80 && _ring.AvailableRead < need && _playing; i++)
+            Thread.Sleep(5);
+        return Result.Ok();
     }
 
     public int Read(Span<float> stereo, int frames)
@@ -158,41 +163,39 @@ public sealed class StreamedSource : IAudioSource
 
                 if (!_playing || _provider is null)
                 {
-                    Thread.Sleep(8);
+                    Thread.Sleep(6);
                     continue;
                 }
 
-                if (_ring.AvailableWrite < _pumpBuf.Length + 8)
+                var filled = false;
+                while (_playing && _provider is not null && _ring.AvailableWrite > _pumpBuf.Length + 64)
                 {
-                    Thread.Sleep(2);
-                    continue;
-                }
-
-                int read;
-                lock (_gate)
-                {
-                    if (_provider is null)
-                        continue;
-                    read = _provider.Read(_pumpBuf, 0, _pumpBuf.Length);
-                    if (read <= 0)
+                    int read;
+                    lock (_gate)
                     {
-                        if (_loop && _stream is not null)
+                        if (_provider is null)
+                            break;
+                        read = _provider.Read(_pumpBuf, 0, _pumpBuf.Length);
+                        if (read <= 0 && _loop && _stream is not null)
                         {
                             _stream.Position = 0;
                             read = _provider.Read(_pumpBuf, 0, _pumpBuf.Length);
                         }
                     }
+
+                    if (read <= 0)
+                    {
+                        _playing = false;
+                        _ended = true;
+                        break;
+                    }
+
+                    _ring.Write(_pumpBuf.AsSpan(0, read));
+                    filled = true;
                 }
 
-                if (read <= 0)
-                {
-                    _playing = false;
-                    _ended = true;
-                    Thread.Sleep(8);
-                    continue;
-                }
-
-                _ring.Write(_pumpBuf.AsSpan(0, read));
+                if (!filled)
+                    Thread.Sleep(2);
             }
             catch
             {

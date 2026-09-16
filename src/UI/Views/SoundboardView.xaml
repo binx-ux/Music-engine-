@@ -4,50 +4,73 @@
   <Grid>
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="*"/>
-      <ColumnDefinition Width="280"/>
+      <ColumnDefinition Width="258"/>
     </Grid.ColumnDefinitions>
-    <StackPanel>
-      <DockPanel Margin="0,0,12,4">
-        <TextBlock Text="Soundboard" Style="{StaticResource Title}"/>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-          <ComboBox x:Name="FolderBox" Width="150" Margin="0,0,8,0" SelectionChanged="FolderChanged"/>
-          <Button Content="Add sound" Style="{StaticResource QuietBtn}" Click="AddClick" Margin="0,0,8,0"/>
-          <Button Content="Load presets" Style="{StaticResource QuietBtn}" Click="LoadPresets" Margin="0,0,8,0"/>
-          <Button Content="Stop all" Style="{StaticResource QuietBtn}" Click="StopAll"/>
-        </StackPanel>
-      </DockPanel>
-      <TextBlock Text="Double-click a pad to play. Drag to reorder." Style="{StaticResource Caption}" Margin="0,0,12,12"/>
-      <TextBlock Text="Master" Style="{StaticResource Caption}"/>
-      <Slider x:Name="Master" Minimum="0" Maximum="1.5" Value="1" Margin="0,4,12,12" ValueChanged="MasterChanged"/>
-      <ItemsControl x:Name="GridPads">
-        <ItemsControl.ItemsPanel>
-          <ItemsPanelTemplate>
-            <WrapPanel/>
-          </ItemsPanelTemplate>
-        </ItemsControl.ItemsPanel>
-      </ItemsControl>
-    </StackPanel>
-    <Border Grid.Column="1" Style="{StaticResource Glass}">
-      <StackPanel>
-        <TextBlock Text="PAD" Style="{StaticResource Caption}"/>
-        <TextBox x:Name="NameBox" Margin="0,8,0,8" TextChanged="PadText"/>
-        <TextBox x:Name="FileBox" Margin="0,0,0,8" IsReadOnly="True"/>
-        <Button Content="Choose file" Style="{StaticResource QuietBtn}" Click="ChooseFile"/>
-        <TextBlock Text="Volume" Style="{StaticResource Caption}" Margin="0,12,0,4"/>
-        <Slider x:Name="Vol" Minimum="0" Maximum="1.5" Value="1" ValueChanged="PadSlider"/>
-        <TextBlock Text="Pitch" Style="{StaticResource Caption}" Margin="0,8,0,4"/>
-        <Slider x:Name="Pitch" Minimum="0.5" Maximum="2" Value="1" ValueChanged="PadSlider"/>
-        <TextBlock Text="Speed" Style="{StaticResource Caption}" Margin="0,8,0,4"/>
-        <Slider x:Name="Speed" Minimum="0.5" Maximum="2" Value="1" ValueChanged="PadSlider"/>
-        <CheckBox x:Name="Loop" Content="Loop" Margin="0,8,0,0" Checked="PadChanged" Unchecked="PadChanged"/>
-        <TextBlock Text="Fade in (sec)" Style="{StaticResource Caption}" Margin="0,8,0,4"/>
-        <Slider x:Name="FadeIn" Minimum="0" Maximum="2" ValueChanged="PadSlider"/>
-        <TextBlock Text="Fade out (sec)" Style="{StaticResource Caption}" Margin="0,8,0,4"/>
-        <Slider x:Name="FadeOut" Minimum="0" Maximum="2" ValueChanged="PadSlider"/>
-        <TextBlock Text="Hotkey  (example: Ctrl+Alt+1)" Style="{StaticResource Caption}" Margin="0,8,0,4"/>
-        <TextBox x:Name="HotkeyBox" TextChanged="PadText"/>
-        <Button Content="Play" Style="{StaticResource AccentBtn}" Margin="0,14,0,0" Click="PlaySelected"/>
+    <Grid.RowDefinitions>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="Auto"/>
+      <RowDefinition Height="*"/>
+    </Grid.RowDefinitions>
+
+    <DockPanel Margin="0,0,10,6">
+      <TextBlock Text="Board" Style="{StaticResource Title}"/>
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+        <ComboBox x:Name="FolderBox" Width="132" Margin="0,0,6,0" SelectionChanged="FolderChanged"/>
+        <Button Content="Add" Style="{StaticResource QuietBtn}" Click="AddClick" Margin="0,0,6,0"/>
+        <Button Content="Presets" Style="{StaticResource QuietBtn}" Click="LoadPresets" Margin="0,0,6,0"/>
+        <Button Content="Stop" Style="{StaticResource QuietBtn}" Click="StopAll"/>
       </StackPanel>
+    </DockPanel>
+
+    <Grid Grid.Row="1" Margin="0,0,10,8">
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="*"/>
+        <ColumnDefinition Width="160"/>
+      </Grid.ColumnDefinitions>
+      <Grid>
+        <TextBox x:Name="SearchBox" TextChanged="SearchChanged"/>
+        <TextBlock x:Name="SearchHint" Text="Search pads" Style="{StaticResource Caption}" Margin="12,8,0,0" IsHitTestVisible="False"/>
+      </Grid>
+      <Slider x:Name="Master" Grid.Column="1" Minimum="0" Maximum="1.5" Value="1" Margin="10,0,0,0" VerticalAlignment="Center" ValueChanged="MasterChanged" ToolTip="Pad volume"/>
+    </Grid>
+
+    <Grid Grid.Row="2" Margin="0,0,10,0">
+      <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <ItemsControl x:Name="GridPads">
+          <ItemsControl.ItemsPanel>
+            <ItemsPanelTemplate>
+              <WrapPanel/>
+            </ItemsPanelTemplate>
+          </ItemsControl.ItemsPanel>
+        </ItemsControl>
+      </ScrollViewer>
+      <TextBlock x:Name="EmptyPads" Text="No pads in this folder." Style="{StaticResource Caption}"
+                 HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed"/>
+    </Grid>
+
+    <Border Grid.Column="1" Grid.RowSpan="3" Style="{StaticResource Glass}" Padding="12">
+      <ScrollViewer VerticalScrollBarVisibility="Auto">
+        <StackPanel>
+          <TextBlock Text="PAD" Style="{StaticResource Caption}"/>
+          <TextBox x:Name="NameBox" Margin="0,8,0,8" TextChanged="PadText"/>
+          <TextBox x:Name="FileBox" Margin="0,0,0,8" IsReadOnly="True"/>
+          <Button Content="File" Style="{StaticResource QuietBtn}" Click="ChooseFile"/>
+          <TextBlock Text="Vol" Style="{StaticResource Caption}" Margin="0,12,0,4"/>
+          <Slider x:Name="Vol" Minimum="0" Maximum="1.5" Value="1" ValueChanged="PadSlider"/>
+          <TextBlock Text="Pitch" Style="{StaticResource Caption}" Margin="0,8,0,4"/>
+          <Slider x:Name="Pitch" Minimum="0.5" Maximum="2" Value="1" ValueChanged="PadSlider"/>
+          <TextBlock Text="Speed" Style="{StaticResource Caption}" Margin="0,8,0,4"/>
+          <Slider x:Name="Speed" Minimum="0.5" Maximum="2" Value="1" ValueChanged="PadSlider"/>
+          <CheckBox x:Name="Loop" Content="Loop" Margin="0,8,0,0" Checked="PadChanged" Unchecked="PadChanged"/>
+          <TextBlock Text="Fade in" Style="{StaticResource Caption}" Margin="0,8,0,4"/>
+          <Slider x:Name="FadeIn" Minimum="0" Maximum="2" ValueChanged="PadSlider"/>
+          <TextBlock Text="Fade out" Style="{StaticResource Caption}" Margin="0,8,0,4"/>
+          <Slider x:Name="FadeOut" Minimum="0" Maximum="2" ValueChanged="PadSlider"/>
+          <TextBlock Text="Hotkey (click, then press a key)" Style="{StaticResource Caption}" Margin="0,8,0,4" TextWrapping="Wrap"/>
+          <TextBox x:Name="HotkeyBox" PreviewKeyDown="HotkeyKey" IsReadOnly="True"/>
+          <Button Content="Play" Style="{StaticResource AccentBtn}" Margin="0,12,0,0" Click="PlaySelected"/>
+        </StackPanel>
+      </ScrollViewer>
     </Border>
   </Grid>
 </UserControl>

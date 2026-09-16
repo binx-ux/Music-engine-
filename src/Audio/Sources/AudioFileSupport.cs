@@ -1,3 +1,6 @@
+using NAudio.Vorbis;
+using NAudio.Wave;
+using NAudio.Wave.SampleProviders;
 using Mixline.Core;
 using Mixline.Logging;
 
@@ -60,34 +63,30 @@ public static class ClipLoader
     {
         try
         {
-            using var source = new StreamedSource(log, engineRate);
-            var opened = source.Open(path, false, false);
-            if (!opened.Success)
-                return Result<DecodedClip>.Fail(opened.Error ?? "Could not load sound.", opened.Details);
+            using WaveStream stream = Path.GetExtension(path).Equals(".ogg", StringComparison.OrdinalIgnoreCase)
+                ? new VorbisWaveReader(path)
+                : new AudioFileReader(path);
 
-            var duration = source.Duration;
-            if (duration.TotalSeconds > maxSeconds)
+            if (stream.TotalTime.TotalSeconds > maxSeconds)
                 return Result<DecodedClip>.Fail("Sound is too long to load into the soundboard.");
 
-            var frames = Math.Max(1, (int)Math.Ceiling(Math.Max(duration.TotalSeconds, 0.2) * engineRate) + engineRate);
+            ISampleProvider sample = stream.ToSampleProvider();
+            if (sample.WaveFormat.Channels == 1)
+                sample = new MonoToStereoSampleProvider(sample);
+            if (sample.WaveFormat.SampleRate != engineRate)
+                sample = new WdlResamplingSampleProvider(sample, engineRate);
+
+            var frames = Math.Max(1, (int)Math.Ceiling(Math.Max(stream.TotalTime.TotalSeconds, 0.05) * engineRate) + 256);
             var data = new float[frames * 2];
             var written = 0;
-            var temp = new float[2048];
-            var spins = 0;
-            while (written < frames && spins < 2000)
+            var temp = new float[4096];
+            while (written < frames)
             {
-                var n = source.Read(temp, temp.Length / 2);
+                var n = sample.Read(temp, 0, Math.Min(temp.Length, (frames - written) * 2));
                 if (n <= 0)
-                {
-                    if (source.Ended)
-                        break;
-                    Thread.Sleep(5);
-                    spins++;
-                    continue;
-                }
-                var copy = Math.Min(n, frames - written);
-                temp.AsSpan(0, copy * 2).CopyTo(data.AsSpan(written * 2));
-                written += copy;
+                    break;
+                temp.AsSpan(0, n).CopyTo(data.AsSpan(written * 2));
+                written += n / 2;
             }
 
             Array.Resize(ref data, Math.Max(2, written * 2));

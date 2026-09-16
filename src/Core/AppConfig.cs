@@ -21,8 +21,8 @@ public sealed class AppConfig
 public sealed class AudioSettings
 {
     public int SampleRate { get; set; } = AudioConstants.DefaultSampleRate;
-    public BufferPreset BufferPreset { get; set; } = BufferPreset.Balanced;
-    public int CustomBufferMs { get; set; } = 20;
+    public BufferPreset BufferPreset { get; set; } = BufferPreset.Stable;
+    public int CustomBufferMs { get; set; } = 48;
     public ShareModeSetting ShareMode { get; set; } = ShareModeSetting.Shared;
     public bool BypassProcessing { get; set; }
 
@@ -162,6 +162,8 @@ public sealed class AppearanceSettings
 {
     public bool UseSystemBackdrop { get; set; } = true;
     public double UiScale { get; set; } = 1.0;
+    public string Theme { get; set; } = "Night";
+    public string AccentHex { get; set; } = "";
 }
 
 public sealed class StorageSettings

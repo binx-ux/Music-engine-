@@ -1,5 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
+using System.Windows.Media;
 using Microsoft.Win32;
 using Mixline.Core;
 using Mixline.Spotify;
@@ -46,7 +48,92 @@ public partial class SettingsView : UserControl
         MinStart.IsChecked = c.Startup.StartMinimized;
         AutoEngine.IsChecked = c.Startup.StartEngineAutomatically;
         Err.Text = _session.LastError ?? "";
+        HexBox.Text = string.IsNullOrWhiteSpace(c.Appearance.AccentHex)
+            ? Theme.PresetHex(c.Appearance.Theme)
+            : c.Appearance.AccentHex;
+        var scale = c.Appearance.UiScale;
+        if (scale < 0.9 || scale > 1.2)
+            scale = 1;
+        UiScale.Value = scale;
+        BuildThemes();
+        MarkThemes();
         _suppress = false;
+    }
+
+    private void BuildThemes()
+    {
+        if (ThemeRow.Children.Count > 0)
+            return;
+        foreach (var p in Theme.Presets)
+        {
+            var fill = (SolidColorBrush)new BrushConverter().ConvertFrom(p.Hex)!;
+            fill.Freeze();
+            var btn = new Button
+            {
+                Width = 78,
+                Height = 46,
+                Margin = new Thickness(0, 0, 8, 8),
+                Tag = p.Id,
+                ToolTip = p.Hex,
+                Cursor = Cursors.Hand,
+                Content = p.Label,
+                Background = fill,
+                Style = (Style)FindResource("ThemeChip")
+            };
+            btn.Click += (_, _) => PickTheme((string)btn.Tag);
+            ThemeRow.Children.Add(btn);
+        }
+    }
+
+    private void MarkThemes()
+    {
+        if (_session is null) return;
+        var id = _session.Config.Appearance.Theme;
+        foreach (Button btn in ThemeRow.Children)
+        {
+            var on = (string)btn.Tag == id;
+            btn.BorderThickness = new Thickness(on ? 2 : 1);
+            btn.BorderBrush = on
+                ? Brushes.White
+                : new SolidColorBrush(Color.FromArgb(0x33, 0, 0, 0));
+        }
+    }
+
+    private void ScaleSave(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (_suppress || _session is null) return;
+        _session.Config.Appearance.UiScale = Math.Round(UiScale.Value, 2);
+        Theme.Apply(_session.Config.Appearance);
+        _session.ScheduleSave();
+    }
+
+    private void PickTheme(string id)
+    {
+        if (_session is null) return;
+        _session.Config.Appearance.Theme = id;
+        _session.Config.Appearance.AccentHex = Theme.PresetHex(id);
+        HexBox.Text = _session.Config.Appearance.AccentHex;
+        Theme.Apply(_session.Config.Appearance);
+        MarkThemes();
+        _session.ScheduleSave();
+    }
+
+    private void SetHex(object sender, RoutedEventArgs e)
+    {
+        if (_session is null) return;
+        var hex = HexBox.Text.Trim();
+        if (!Theme.LooksHex(hex))
+        {
+            _session.Notify("Use a hex color like #C9A36A.");
+            return;
+        }
+        if (!hex.StartsWith('#'))
+            hex = "#" + hex;
+        _session.Config.Appearance.Theme = "Custom";
+        _session.Config.Appearance.AccentHex = hex;
+        Theme.Apply(_session.Config.Appearance);
+        MarkThemes();
+        _session.ScheduleSave();
     }
 
     private void ComboSave(object sender, SelectionChangedEventArgs e) => Save(sender, e);

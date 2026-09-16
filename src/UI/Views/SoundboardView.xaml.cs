@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Windows.Media;
 using Microsoft.Win32;
 using Mixline.Soundboard;
 
@@ -14,7 +15,8 @@ public partial class SoundboardView : UserControl
     private bool _bound;
     private Point _press;
     private bool _dragArmed;
-    private string _folder = "All";
+    private string _folder = "Myinstants";
+    private string _search = "";
 
     public SoundboardView() => InitializeComponent();
 
@@ -51,22 +53,36 @@ public partial class SoundboardView : UserControl
         var pads = _session.Layout.Pads.OrderBy(p => p.Order).AsEnumerable();
         if (_folder != "All")
             pads = pads.Where(p => (string.IsNullOrWhiteSpace(p.Folder) ? "General" : p.Folder) == _folder);
+        if (!string.IsNullOrWhiteSpace(_search))
+            pads = pads.Where(p => (p.Name ?? "").Contains(_search, StringComparison.OrdinalIgnoreCase));
         foreach (var pad in pads)
         {
             var btn = new Button
             {
-                Content = pad.Name,
                 Tag = pad,
                 Style = (Style)FindResource("PadBtn"),
-                AllowDrop = true
+                AllowDrop = true,
+                ToolTip = string.IsNullOrWhiteSpace(pad.Hotkey) ? pad.Name : pad.Name + "  ·  " + pad.Hotkey,
+                Content = PadFace(pad)
             };
-            btn.Click += (_, _) => Select(pad);
-            btn.MouseDoubleClick += async (_, _) => await _session.PlayPad(pad);
+            btn.Click += async (_, _) =>
+            {
+                if (_dragArmed) return;
+                Select(pad);
+                await _session.PlayPad(pad);
+            };
+            btn.MouseRightButtonUp += (_, e) =>
+            {
+                Select(pad);
+                e.Handled = true;
+            };
             btn.PreviewMouseLeftButtonDown += PadPress;
             btn.PreviewMouseMove += PadDrag;
             btn.Drop += PadDrop;
             GridPads.Items.Add(btn);
         }
+        EmptyPads.Visibility = GridPads.Items.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
+        SearchHint.Visibility = string.IsNullOrWhiteSpace(SearchBox.Text) ? Visibility.Visible : Visibility.Collapsed;
         _suppress = false;
         if (_selected is not null)
             Select(_selected);
@@ -76,8 +92,14 @@ public partial class SoundboardView : UserControl
     {
         foreach (Button btn in GridPads.Items)
         {
-            if (btn.Tag is SoundPad pad)
-                btn.Content = pad.Name;
+            if (btn.Tag is SoundPad pad && btn.Content is Grid g)
+            {
+                if (g.Children[0] is TextBlock name)
+                    name.Text = pad.Name;
+                if (g.Children[1] is TextBlock key)
+                    key.Text = pad.Hotkey ?? "";
+                btn.ToolTip = string.IsNullOrWhiteSpace(pad.Hotkey) ? pad.Name : pad.Name + "  ·  " + pad.Hotkey;
+            }
         }
     }
 
@@ -95,6 +117,87 @@ public partial class SoundboardView : UserControl
         FadeOut.Value = pad.FadeOut;
         HotkeyBox.Text = pad.Hotkey ?? "";
         _suppress = false;
+        _session?.PrefetchPad(pad);
+        PaintPads();
+    }
+
+    private void PaintPads()
+    {
+        foreach (Button btn in GridPads.Items)
+        {
+            if (btn.Tag is not SoundPad pad)
+                continue;
+            if (ReferenceEquals(pad, _selected))
+            {
+                btn.BorderBrush = (Brush)FindResource("AccentBrush");
+                btn.Background = (Brush)FindResource("AccentGhostBrush");
+            }
+            else
+            {
+                btn.ClearValue(BorderBrushProperty);
+                btn.ClearValue(BackgroundProperty);
+            }
+        }
+    }
+
+    private static Grid PadFace(SoundPad pad)
+    {
+        var grid = new Grid();
+        grid.Children.Add(new TextBlock
+        {
+            Text = pad.Name,
+            TextWrapping = TextWrapping.Wrap,
+            TextTrimming = TextTrimming.CharacterEllipsis,
+            FontSize = 12,
+            TextAlignment = TextAlignment.Left,
+            VerticalAlignment = VerticalAlignment.Top
+        });
+        grid.Children.Add(new TextBlock
+        {
+            Text = pad.Hotkey ?? "",
+            FontSize = 10,
+            Opacity = 0.5,
+            HorizontalAlignment = HorizontalAlignment.Right,
+            VerticalAlignment = VerticalAlignment.Bottom
+        });
+        return grid;
+    }
+
+    private void SearchChanged(object sender, TextChangedEventArgs e)
+    {
+        _search = SearchBox.Text ?? "";
+        if (_suppress) return;
+        Rebuild();
+    }
+
+    private void HotkeyKey(object sender, KeyEventArgs e)
+    {
+        if (_suppress || _selected is null || _session is null)
+            return;
+        if (e.Key is Key.Tab or Key.Escape or Key.LeftCtrl or Key.RightCtrl or Key.LeftAlt or Key.RightAlt
+            or Key.LeftShift or Key.RightShift or Key.LWin or Key.RWin or Key.System)
+            return;
+        e.Handled = true;
+        var mods = 0;
+        if (Keyboard.Modifiers.HasFlag(ModifierKeys.Control)) mods |= Mixline.IPC.HotkeyParser.ModControl;
+        if (Keyboard.Modifiers.HasFlag(ModifierKeys.Alt)) mods |= Mixline.IPC.HotkeyParser.ModAlt;
+        if (Keyboard.Modifiers.HasFlag(ModifierKeys.Shift)) mods |= Mixline.IPC.HotkeyParser.ModShift;
+        if (Keyboard.Modifiers.HasFlag(ModifierKeys.Windows)) mods |= Mixline.IPC.HotkeyParser.ModWin;
+        var key = e.Key == Key.System ? e.SystemKey : e.Key;
+        var vk = KeyInterop.VirtualKeyFromKey(key);
+        if (vk == 0)
+            return;
+        var text = Mixline.IPC.HotkeyParser.Format(mods, vk);
+        var parsed = Mixline.IPC.HotkeyParser.Parse(_selected.Id.ToString(), text);
+        if (!parsed.Success)
+        {
+            _session.Notify(parsed.Error ?? "Could not bind that key.");
+            return;
+        }
+        HotkeyBox.Text = parsed.Value!.Display;
+        _selected.Hotkey = parsed.Value.Display;
+        _session.ScheduleSave();
+        _session.RegisterHotkeys();
     }
 
     private void FolderChanged(object sender, SelectionChangedEventArgs e)
@@ -123,6 +226,7 @@ public partial class SoundboardView : UserControl
             var n = await InstantPresets.InstallAsync(_session.Layout, CancellationToken.None);
             _session.SoundboardStore.Save(_session.Layout);
             _session.RaiseLayout();
+            _session.RegisterHotkeys();
             _session.Notify(n > 0 ? $"Added {n} Myinstants sounds." : "Presets already on the board.");
         }
         catch (Exception ex)
@@ -155,8 +259,6 @@ public partial class SoundboardView : UserControl
         _selected.FadeOut = (float)FadeOut.Value;
         _selected.Hotkey = HotkeyBox.Text;
         _session.ScheduleSave();
-        if (sender == HotkeyBox)
-            _session.RegisterHotkeys();
         if (sender == NameBox)
             _session.RaisePadNames();
         else

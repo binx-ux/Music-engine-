@@ -29,14 +29,14 @@ public partial class MiniBoardView : UserControl
     {
         if (_session is null) return;
         Pads.Children.Clear();
-        foreach (var pad in _session.Layout.Pads.OrderBy(p => p.Order).Take(8))
+        foreach (var pad in _session.Layout.Pads.OrderBy(p => p.Order).Take(12))
         {
             var btn = new Button
             {
                 Content = pad.Name,
                 Style = (Style)FindResource("PadBtn"),
-                Width = 108,
-                Height = 56,
+                Width = 104,
+                Height = 52,
                 FontSize = 11,
                 Margin = new Thickness(0, 0, 8, 8),
                 Tag = pad

@@ -5,46 +5,88 @@
   <Grid>
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="*"/>
-      <ColumnDefinition Width="300"/>
+      <ColumnDefinition Width="280"/>
     </Grid.ColumnDefinitions>
-    <StackPanel Margin="0,0,12,0">
-      <DockPanel>
+    <Grid Margin="0,0,12,0">
+      <Grid.RowDefinitions>
+        <RowDefinition Height="Auto"/>
+        <RowDefinition Height="*"/>
+        <RowDefinition Height="Auto"/>
+      </Grid.RowDefinitions>
+      <DockPanel Margin="0,0,0,8">
         <TextBlock Text="Music" Style="{StaticResource Title}"/>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-          <Button Content="Add files" Style="{StaticResource QuietBtn}" Click="AddFiles" Margin="0,0,8,0"/>
-          <Button Content="Add folder" Style="{StaticResource QuietBtn}" Click="AddFolder"/>
+          <Button Content="Files" Style="{StaticResource QuietBtn}" Click="AddFiles" Margin="0,0,6,0"/>
+          <Button Content="Folder" Style="{StaticResource QuietBtn}" Click="AddFolder"/>
         </StackPanel>
       </DockPanel>
-      <TextBlock Text="Drop files or a folder here." Style="{StaticResource Caption}" Margin="0,4,0,0"/>
-      <ListBox x:Name="QueueList" Margin="0,12,0,0" Height="420" MouseDoubleClick="QueuePlay"
-               Background="#14000000" Foreground="#E7E9ED" BorderBrush="#28FFFFFF"/>
-      <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
-        <Button Content="Play" Style="{StaticResource AccentBtn}" Click="Play" Margin="0,0,8,0"/>
-        <Button Content="Pause" Style="{StaticResource QuietBtn}" Click="Pause" Margin="0,0,8,0"/>
-        <Button Content="Stop" Style="{StaticResource QuietBtn}" Click="Stop" Margin="0,0,8,0"/>
-        <CheckBox x:Name="Shuffle" Content="Shuffle" VerticalAlignment="Center" Margin="8,0" Checked="Flags" Unchecked="Flags"/>
-        <ComboBox x:Name="Loop" Width="120" SelectionChanged="LoopChanged">
-          <ComboBoxItem Content="Loop off"/>
-          <ComboBoxItem Content="Loop one"/>
-          <ComboBoxItem Content="Loop all"/>
-        </ComboBox>
+      <Grid Grid.Row="1">
+        <ListBox x:Name="QueueList" MouseDoubleClick="QueuePlay" MouseLeftButtonUp="QueueClick">
+          <ListBox.ItemTemplate>
+            <DataTemplate>
+              <Grid>
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="*"/>
+                  <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Margin="0,0,12,0">
+                  <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+                  <TextBlock Text="{Binding Artist}" Style="{StaticResource Caption}" TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+                <TextBlock Grid.Column="1" Text="{Binding Length}" Style="{StaticResource Caption}" VerticalAlignment="Center"/>
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+        <TextBlock x:Name="EmptyQueue" Text="Drop files here, or paste a link on the right."
+                   Style="{StaticResource Caption}" HorizontalAlignment="Center" VerticalAlignment="Center"
+                   TextWrapping="Wrap" TextAlignment="Center" Margin="24" IsHitTestVisible="False"/>
+      </Grid>
+      <StackPanel Grid.Row="2" Margin="0,10,0,0">
+        <Slider x:Name="Seek" Minimum="0" Maximum="1" PreviewMouseUp="Seeked"/>
+        <DockPanel Margin="0,6,0,0">
+          <TextBlock x:Name="PosText" Style="{StaticResource Caption}" VerticalAlignment="Center"/>
+          <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button Content="Play" Style="{StaticResource AccentBtn}" Click="Play" Margin="0,0,6,0"/>
+            <Button Content="Pause" Style="{StaticResource QuietBtn}" Click="Pause" Margin="0,0,6,0"/>
+            <Button Content="Stop" Style="{StaticResource QuietBtn}" Click="Stop" Margin="0,0,8,0"/>
+            <CheckBox x:Name="Shuffle" Content="Shuffle" VerticalAlignment="Center" Margin="0,0,8,0" Checked="Flags" Unchecked="Flags"/>
+            <ComboBox x:Name="Loop" Width="108" SelectionChanged="LoopChanged">
+              <ComboBoxItem Content="Off"/>
+              <ComboBoxItem Content="One"/>
+              <ComboBoxItem Content="All"/>
+            </ComboBox>
+          </StackPanel>
+        </DockPanel>
       </StackPanel>
-      <Slider x:Name="Seek" Minimum="0" Maximum="1" Margin="0,12,0,0" PreviewMouseUp="Seeked"/>
-      <TextBlock x:Name="PosText" Style="{StaticResource Caption}" Margin="0,4,0,0"/>
-    </StackPanel>
-    <Border Grid.Column="1" Style="{StaticResource Glass}">
-      <StackPanel>
-        <TextBlock Text="URL" Style="{StaticResource Caption}"/>
-        <TextBox x:Name="UrlBox" Margin="0,8,0,8"/>
-        <Button Content="Load URL" Style="{StaticResource QuietBtn}" Click="LoadUrl"/>
-        <TextBlock x:Name="UrlStatus" Style="{StaticResource Caption}" Margin="0,8,0,0" TextWrapping="Wrap"/>
-        <TextBlock Text="Spotify" Style="{StaticResource Caption}" Margin="0,18,0,8"/>
-        <TextBlock Text="Connect on the Settings page. Cuebox can show now playing and control an existing Spotify player. Encrypted Spotify audio cannot be mixed into the virtual microphone." TextWrapping="Wrap"/>
-        <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
-          <Button Content="Spotify play" Style="{StaticResource QuietBtn}" Click="SpPlay" Margin="0,0,6,0"/>
-          <Button Content="Pause" Style="{StaticResource QuietBtn}" Click="SpPause"/>
+    </Grid>
+    <Border Grid.Column="1" Style="{StaticResource Glass}" Padding="12">
+      <DockPanel>
+        <StackPanel DockPanel.Dock="Top">
+          <TextBlock Text="CLEAN RAP" Style="{StaticResource Caption}"/>
+          <TextBlock Text="Radio edits for game voice chat." TextWrapping="Wrap" Margin="0,6,0,8"/>
+          <Button Content="Find clean rap" Style="{StaticResource AccentBtn}" Click="CleanRap" HorizontalAlignment="Left"/>
+          <TextBlock Text="LINK" Style="{StaticResource Caption}" Margin="0,18,0,6"/>
+          <Grid Margin="0,0,0,8">
+            <TextBox x:Name="UrlBox" KeyDown="UrlKey" TextChanged="UrlChanged"/>
+            <TextBlock x:Name="UrlHint" Text="Paste a YouTube or mp3 link" Style="{StaticResource Caption}"
+                       Margin="12,8,0,0" IsHitTestVisible="False"/>
+          </Grid>
+          <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+            <Button Content="Add link" Style="{StaticResource QuietBtn}" Click="LoadUrl" Margin="0,0,6,0"/>
+            <Button Content="Share" Style="{StaticResource QuietBtn}" Click="Share"/>
+          </StackPanel>
+          <TextBlock x:Name="UrlStatus" Style="{StaticResource Caption}" TextWrapping="Wrap"/>
         </StackPanel>
-      </StackPanel>
+        <StackPanel VerticalAlignment="Bottom">
+          <TextBlock Text="SPOTIFY" Style="{StaticResource Caption}"/>
+          <TextBlock Text="Metadata only. Encrypted audio cannot go to the virtual mic." TextWrapping="Wrap" Margin="0,6,0,10"/>
+          <StackPanel Orientation="Horizontal">
+            <Button Content="Play" Style="{StaticResource QuietBtn}" Click="SpPlay" Margin="0,0,6,0"/>
+            <Button Content="Pause" Style="{StaticResource QuietBtn}" Click="SpPause"/>
+          </StackPanel>
+        </StackPanel>
+      </DockPanel>
     </Border>
   </Grid>
 </UserControl>

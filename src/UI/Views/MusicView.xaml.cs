@@ -43,7 +43,10 @@ public partial class MusicView : UserControl
         _suppress = true;
         QueueList.Items.Clear();
         foreach (var t in _session.Engine.Music.Queue)
-            QueueList.Items.Add($"{t.Title}  ·  {t.Artist}");
+            QueueList.Items.Add(t);
+        if (_session.Engine.Music.Index >= 0 && _session.Engine.Music.Index < QueueList.Items.Count)
+            QueueList.SelectedIndex = _session.Engine.Music.Index;
+        EmptyQueue.Visibility = QueueList.Items.Count == 0 ? Visibility.Visible : Visibility.Collapsed;
         Shuffle.IsChecked = _session.Config.Music.Shuffle;
         Loop.SelectedIndex = (int)_session.Config.Music.Loop;
         TickPosition();
@@ -70,7 +73,15 @@ public partial class MusicView : UserControl
         Refresh();
     }
 
-    private void QueuePlay(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    private void QueuePlay(object sender, System.Windows.Input.MouseButtonEventArgs e) => PlaySelected();
+
+    private void QueueClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (e.ClickCount == 1)
+            PlaySelected();
+    }
+
+    private void PlaySelected()
     {
         if (_session is null || QueueList.SelectedIndex < 0) return;
         _session.Engine.Music.PlayIndex(QueueList.SelectedIndex);
@@ -100,17 +111,63 @@ public partial class MusicView : UserControl
         _session.Engine.Music.Seek(TimeSpan.FromSeconds(Seek.Value * dur.TotalSeconds));
     }
 
-    private async void LoadUrl(object sender, RoutedEventArgs e)
+    private async void LoadUrl(object sender, RoutedEventArgs e) => await AddLink();
+
+    private async void UrlKey(object sender, System.Windows.Input.KeyEventArgs e)
+    {
+        if (e.Key == System.Windows.Input.Key.Enter)
+        {
+            e.Handled = true;
+            await AddLink();
+        }
+    }
+
+    private void UrlChanged(object sender, TextChangedEventArgs e)
+        => UrlHint.Visibility = string.IsNullOrWhiteSpace(UrlBox.Text) ? Visibility.Visible : Visibility.Collapsed;
+
+    private async Task AddLink()
     {
         if (_session is null) return;
-        var result = await _session.TryUrl(UrlBox.Text.Trim());
+        var result = await _session.ImportLink(UrlBox.Text);
         UrlStatus.Text = result.Message;
-        if (result.Ok && result.Track is not null)
+        if (!result.Ok)
+            return;
+        foreach (var t in result.Tracks)
+            _session.Engine.Music.Add(t);
+        PersistQueue();
+        Refresh();
+        if (result.Tracks.Count > 0)
+            _session.Engine.Music.PlayIndex(_session.Engine.Music.Queue.Count - result.Tracks.Count);
+    }
+
+    private async void CleanRap(object sender, RoutedEventArgs e)
+    {
+        if (_session is null) return;
+        UrlStatus.Text = "Finding clean rap...";
+        var result = await _session.FindCleanRap();
+        UrlStatus.Text = result.Message;
+        if (!result.Ok)
+            return;
+        var start = _session.Engine.Music.Queue.Count;
+        foreach (var t in result.Tracks)
+            _session.Engine.Music.Add(t);
+        PersistQueue();
+        Refresh();
+        if (result.Tracks.Count > 0)
+            _session.Engine.Music.PlayIndex(start);
+    }
+
+    private void Share(object sender, RoutedEventArgs e)
+    {
+        if (_session is null) return;
+        var text = _session.ShareCurrent();
+        if (string.IsNullOrWhiteSpace(text))
         {
-            _session.Engine.Music.Add(result.Track);
-            PersistQueue();
-            Refresh();
+            UrlStatus.Text = "Play a song first, then share it.";
+            return;
         }
+        Clipboard.SetText(text);
+        UrlStatus.Text = "Copied. Send that to a friend and they can paste it in Add link.";
     }
 
     private async void SpPlay(object sender, RoutedEventArgs e)
