@@ -43,12 +43,12 @@ public sealed class DeviceSettings
 
 public sealed class MixerSettings
 {
-    public ChannelSettings Mic { get; set; } = new() { Volume = 1f, MonitorSend = 0f, VirtualSend = 1f };
+    public ChannelSettings Mic { get; set; } = new() { Volume = 1f, MonitorSend = 1f, VirtualSend = 1f };
     public ChannelSettings Music { get; set; } = new() { Volume = 0.7f, MonitorSend = 1f, VirtualSend = 0.7f };
     public ChannelSettings Soundboard { get; set; } = new() { Volume = 0.85f, MonitorSend = 1f, VirtualSend = 1f };
     public ChannelSettings Master { get; set; } = new() { Volume = 0.9f, MonitorSend = 1f, VirtualSend = 1f };
     public float MonitorVolume { get; set; } = 0.85f;
-    public bool MicMonitor { get; set; }
+    public bool MicMonitor { get; set; } = true;
     public bool MusicMonitor { get; set; } = true;
     public bool SoundboardMonitor { get; set; } = true;
     public bool MasterMonitor { get; set; } = true;
@@ -125,8 +125,8 @@ public sealed class AutotuneSettings
 {
     public int Key { get; set; }
     public MusicalScale Scale { get; set; } = MusicalScale.Major;
-    public float RetuneSpeed { get; set; } = 0.35f;
-    public float Amount { get; set; } = 0.4f;
+    public float RetuneSpeed { get; set; } = 0.55f;
+    public float Amount { get; set; } = 0.75f;
     public bool FormantPreservation { get; set; } = true;
 }
 

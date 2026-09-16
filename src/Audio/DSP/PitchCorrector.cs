@@ -1,31 +1,51 @@
+using Mixline.Audio.Mixer;
 using Mixline.Core;
 
 namespace Mixline.Audio.DSP;
 
 public sealed class PitchCorrector
 {
-    private readonly float[] _buf = new float[2048];
+    private readonly float[] _ana = new float[2048];
+    private readonly float[] _delay = new float[4096];
     private int _fill;
+    private int _write;
+    private float _read;
     private float _targetRatio = 1f;
     private float _ratio = 1f;
-    private float _phase;
     private int _sampleRate = AudioConstants.DefaultSampleRate;
     private AutotuneMode _mode = AutotuneMode.Off;
     private AutotuneSettings _settings = new();
     private float _amount;
+    private float _slew;
+    private int _hold;
 
     public void Configure(int sampleRate, AutotuneMode mode, AutotuneSettings settings)
     {
+        if (_sampleRate != sampleRate)
+        {
+            Array.Clear(_delay);
+            _write = 0;
+            _read = 0f;
+            _fill = 0;
+        }
         _sampleRate = sampleRate;
         _mode = mode;
         _settings = settings;
         _amount = mode switch
         {
-            AutotuneMode.Light => 0.25f * settings.Amount,
-            AutotuneMode.Medium => 0.55f * settings.Amount,
-            AutotuneMode.Strong => MathF.Max(0.75f, settings.Amount),
+            AutotuneMode.Light => 0.5f + 0.4f * settings.Amount,
+            AutotuneMode.Medium => 0.78f + 0.22f * settings.Amount,
+            AutotuneMode.Strong => 0.94f + 0.06f * settings.Amount,
             _ => 0f
         };
+        var tauMs = mode switch
+        {
+            AutotuneMode.Strong => 1.2f + (1f - settings.RetuneSpeed) * 10f,
+            AutotuneMode.Medium => 7f + (1f - settings.RetuneSpeed) * 32f,
+            AutotuneMode.Light => 22f + (1f - settings.RetuneSpeed) * 80f,
+            _ => 40f
+        };
+        _slew = 1f - MathF.Exp(-1f / MathF.Max(1f, tauMs * 0.001f * sampleRate));
     }
 
     public void ProcessStereo(Span<float> buffer, int frames)
@@ -36,65 +56,80 @@ public sealed class PitchCorrector
         for (var i = 0; i < frames; i++)
         {
             var sample = 0.5f * (buffer[i * 2] + buffer[i * 2 + 1]);
-            if (_fill < _buf.Length)
-                _buf[_fill++] = sample;
+            if (_fill < _ana.Length)
+                _ana[_fill++] = sample;
+        }
 
-            if (_fill >= 1024)
+        if (_fill >= 1024)
+        {
+            var window = _ana.AsSpan(0, Math.Min(_fill, 2048));
+            var freq = MixNative.Yin(window, _sampleRate);
+            if (freq <= 0f)
+                freq = DetectPitch(window, _sampleRate);
+            if (freq > 70f && freq < 900f)
             {
-                var freq = DetectPitch(_buf.AsSpan(0, 1024), _sampleRate);
-                if (freq > 70f && freq < 800f)
-                {
-                    var snapped = Snap(freq, _settings.Key, _settings.Scale);
-                    var desired = snapped / freq;
-                    desired = Math.Clamp(desired, 0.5f, 2f);
-                    var speed = 0.02f + _settings.RetuneSpeed * 0.2f;
-                    _targetRatio += speed * (desired - _targetRatio);
-                }
-                Array.Copy(_buf, 512, _buf, 0, _fill - 512);
-                _fill -= 512;
-            }
-
-            _ratio += 0.05f * (_targetRatio - _ratio);
-            var shift = 1f + (_ratio - 1f) * _amount;
-            _phase += shift;
-            if (_phase >= 1f)
-                _phase -= 1f;
-
-            if (_settings.FormantPreservation)
-            {
-                var wet = sample * (2f - shift);
-                buffer[i * 2] = buffer[i * 2] + (wet - buffer[i * 2]) * _amount * 0.35f;
-                buffer[i * 2 + 1] = buffer[i * 2 + 1] + (wet - buffer[i * 2 + 1]) * _amount * 0.35f;
+                var snapped = MixNative.SnapHz(freq, _settings.Key, (int)_settings.Scale);
+                if (snapped <= 0f)
+                    snapped = Snap(freq, _settings.Key, _settings.Scale);
+                var desired = Math.Clamp(snapped / freq, 0.5f, 2f);
+                _targetRatio = desired;
+                _hold = (int)(_sampleRate * 0.04f);
             }
             else
             {
-                var wet = sample * shift;
-                buffer[i * 2] = Lerp(buffer[i * 2], wet, _amount);
-                buffer[i * 2 + 1] = Lerp(buffer[i * 2 + 1], wet, _amount);
+                _hold -= frames;
+                if (_hold <= 0)
+                    _targetRatio += 0.08f * (1f - _targetRatio);
             }
+            var keep = Math.Min(768, _fill);
+            Array.Copy(_ana, _fill - keep, _ana, 0, keep);
+            _fill = keep;
         }
-    }
 
-    private static float Lerp(float a, float b, float t) => a + (b - a) * t;
+        _ratio += (1f - MathF.Pow(1f - _slew, Math.Max(1, frames))) * (_targetRatio - _ratio);
+        var shift = 1f + (_ratio - 1f) * _amount;
+        MixNative.PitchShift(
+            buffer,
+            frames,
+            _delay,
+            ref _write,
+            ref _read,
+            shift,
+            _amount,
+            _settings.FormantPreservation);
+    }
 
     private static float DetectPitch(ReadOnlySpan<float> x, int sampleRate)
     {
         var n = x.Length;
-        var minLag = sampleRate / 800;
-        var maxLag = Math.Min(sampleRate / 70, n / 2);
+        if (n < 64)
+            return 0f;
+        var minLag = Math.Max(2, sampleRate / 900);
+        var maxLag = Math.Min(sampleRate / 70, n / 2 - 2);
+        if (maxLag <= minLag)
+            return 0f;
         var bestLag = minLag;
-        var best = float.MinValue;
-        for (var lag = minLag; lag <= maxLag; lag++)
+        var best = float.MaxValue;
+        var running = 0f;
+        for (var lag = 1; lag <= maxLag; lag++)
         {
             var sum = 0f;
-            for (var i = 0; i < n - lag; i++)
-                sum += x[i] * x[i + lag];
-            if (sum > best)
+            var last = n - lag;
+            for (var i = 0; i < last; i++)
             {
-                best = sum;
+                var d = x[i] - x[i + lag];
+                sum += d * d;
+            }
+            running += sum;
+            var cmndf = sum * lag / MathF.Max(running, 1e-12f);
+            if (lag >= minLag && cmndf < best)
+            {
+                best = cmndf;
                 bestLag = lag;
             }
         }
+        if (best > 0.35f)
+            return 0f;
         return sampleRate / (float)bestLag;
     }
 
@@ -107,25 +142,19 @@ public sealed class PitchCorrector
         var nearest = MathF.Round(midi);
         if (scale != MusicalScale.Chromatic)
         {
-            var pc = ((int)nearest - key) % 12;
-            if (pc < 0) pc += 12;
             var allowed = scale == MusicalScale.Major ? Major : Minor;
-            if (Array.IndexOf(allowed, pc) < 0)
+            if (!InScale(nearest, key, allowed))
             {
                 var down = nearest - 1;
                 var up = nearest + 1;
                 for (var i = 0; i < 6; i++)
                 {
-                    var dpc = ((int)down - key) % 12;
-                    if (dpc < 0) dpc += 12;
-                    if (Array.IndexOf(allowed, dpc) >= 0)
+                    if (InScale(down, key, allowed))
                     {
                         nearest = down;
                         break;
                     }
-                    var upc = ((int)up - key) % 12;
-                    if (upc < 0) upc += 12;
-                    if (Array.IndexOf(allowed, upc) >= 0)
+                    if (InScale(up, key, allowed))
                     {
                         nearest = up;
                         break;
@@ -136,5 +165,12 @@ public sealed class PitchCorrector
             }
         }
         return 440f * MathF.Pow(2f, (nearest - 69f) / 12f);
+    }
+
+    private static bool InScale(float midi, int key, int[] allowed)
+    {
+        var pc = ((int)midi - key) % 12;
+        if (pc < 0) pc += 12;
+        return Array.IndexOf(allowed, pc) >= 0;
     }
 }

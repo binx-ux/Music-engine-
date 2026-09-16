@@ -148,6 +148,8 @@ public sealed class ConfigStore
         config.Storage ??= new StorageSettings();
         config.Advanced ??= new AdvancedSettings();
         config.Startup ??= new StartupSettings();
+        if (config.Mixer.Mic.MonitorSend <= 0f)
+            config.Mixer.Mic.MonitorSend = 1f;
         return config;
     }
 

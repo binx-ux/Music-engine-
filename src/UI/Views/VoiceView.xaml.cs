@@ -22,6 +22,11 @@ public partial class VoiceView : UserControl
             _bound = true;
             foreach (var n in EqPresets.Names)
                 EqPreset.Items.Add(n);
+            foreach (var k in new[] { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" })
+                TuneKey.Items.Add(k);
+            TuneScale.Items.Add("Chromatic");
+            TuneScale.Items.Add("Major");
+            TuneScale.Items.Add("Minor");
             session.Changed += () => Dispatcher.BeginInvoke(Load);
         }
         Load();
@@ -54,6 +59,8 @@ public partial class VoiceView : UserControl
         CompTh.Value = v.CompressorSettings.ThresholdDb;
         CompRatio.Value = v.CompressorSettings.Ratio;
         Tune.SelectedIndex = (int)v.Autotune;
+        TuneKey.SelectedIndex = Math.Clamp(v.AutotuneSettings.Key, 0, 11);
+        TuneScale.SelectedIndex = Math.Clamp((int)v.AutotuneSettings.Scale, 0, 2);
         TuneAmt.Value = v.AutotuneSettings.Amount;
         TuneSpeed.Value = v.AutotuneSettings.RetuneSpeed;
         Formant.IsChecked = v.AutotuneSettings.FormantPreservation;
@@ -92,6 +99,8 @@ public partial class VoiceView : UserControl
         v.CompressorSettings.ThresholdDb = (float)CompTh.Value;
         v.CompressorSettings.Ratio = (float)CompRatio.Value;
         v.Autotune = (AutotuneMode)Math.Max(0, Tune.SelectedIndex);
+        v.AutotuneSettings.Key = Math.Max(0, TuneKey.SelectedIndex);
+        v.AutotuneSettings.Scale = (MusicalScale)Math.Max(0, TuneScale.SelectedIndex);
         v.AutotuneSettings.Amount = (float)TuneAmt.Value;
         v.AutotuneSettings.RetuneSpeed = (float)TuneSpeed.Value;
         v.AutotuneSettings.FormantPreservation = Formant.IsChecked == true;

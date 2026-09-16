@@ -48,6 +48,14 @@
           <ComboBoxItem Content="Medium"/>
           <ComboBoxItem Content="Strong"/>
         </ComboBox>
+        <Grid Margin="0,0,0,8">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="*"/>
+          </Grid.ColumnDefinitions>
+          <ComboBox x:Name="TuneKey" Margin="0,0,6,0" SelectionChanged="ComboChanged"/>
+          <ComboBox x:Name="TuneScale" Grid.Column="1" Margin="6,0,0,0" SelectionChanged="ComboChanged"/>
+        </Grid>
         <TextBlock Text="Amount / retune speed" Style="{StaticResource Caption}"/>
         <Slider x:Name="TuneAmt" Minimum="0" Maximum="1" Value="0.4" ValueChanged="SliderChanged"/>
         <Slider x:Name="TuneSpeed" Minimum="0" Maximum="1" Value="0.35" ValueChanged="SliderChanged"/>

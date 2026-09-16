@@ -28,7 +28,7 @@
       <Border Grid.RowSpan="3" Grid.ColumnSpan="2" Background="{StaticResource GrainBrush}" Opacity="0.045" IsHitTestVisible="False"/>
       <Border Grid.RowSpan="3" Grid.ColumnSpan="2" Height="1" VerticalAlignment="Top" Background="#55FFFFFF" IsHitTestVisible="False"/>
 
-      <Grid Grid.ColumnSpan="2" Panel.ZIndex="5">
+      <Grid Grid.ColumnSpan="2" Panel.ZIndex="20" ClipToBounds="True">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="176"/>
           <ColumnDefinition Width="*"/>
@@ -41,15 +41,16 @@
           <TextBlock Text="Cuebox" FontWeight="SemiBold" FontSize="15" VerticalAlignment="Center"/>
         </StackPanel>
 
-        <Border Grid.Column="1" Style="{StaticResource GlassTight}" Padding="8,6" Margin="8,10,12,10" MaxWidth="560" HorizontalAlignment="Left"
-                WindowChrome.IsHitTestVisibleInChrome="True" Panel.ZIndex="6">
+        <Border Grid.Column="1" Style="{StaticResource GlassTight}" Padding="6,4" Margin="8,6,12,6" MaxWidth="560" MaxHeight="44"
+                HorizontalAlignment="Left" VerticalAlignment="Center"
+                WindowChrome.IsHitTestVisibleInChrome="True" Panel.ZIndex="40">
           <Grid>
             <Grid.ColumnDefinitions>
               <ColumnDefinition Width="Auto"/>
               <ColumnDefinition Width="*"/>
               <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
-            <Border Width="36" Height="36" CornerRadius="7" Background="#22000000" ClipToBounds="True"
+            <Border Width="28" Height="28" CornerRadius="7" Background="#22000000" ClipToBounds="True"
                     WindowChrome.IsHitTestVisibleInChrome="True">
               <Image x:Name="ArtImage" Stretch="UniformToFill"/>
             </Border>
@@ -76,7 +77,7 @@
           </Grid>
         </Border>
 
-        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,8,0" Panel.ZIndex="6">
+        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,8,0" Panel.ZIndex="30">
           <Button Content="—" Style="{StaticResource GhostBtn}" Click="MinClick"/>
           <Button x:Name="MaxBtn" Content="▢" Style="{StaticResource GhostBtn}" Click="MaxClick"/>
           <Button Content="✕" Style="{StaticResource GhostBtn}" Click="CloseClick"/>
@@ -99,7 +100,7 @@
       </Border>
 
       <ScrollViewer Grid.Row="1" Grid.Column="1" Panel.ZIndex="2" Padding="22,16,22,18"
-                    VerticalScrollBarVisibility="Auto" ClipToBounds="False" CanContentScroll="False">
+                    VerticalScrollBarVisibility="Auto" ClipToBounds="True" CanContentScroll="False">
         <ContentControl x:Name="Host" ClipToBounds="False"/>
       </ScrollViewer>
 

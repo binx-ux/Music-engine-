@@ -206,12 +206,12 @@
     </Style>
 
     <Style x:Key="PlayBtn" TargetType="Button" BasedOn="{StaticResource IconBtn}">
-      <Setter Property="Width" Value="38"/>
-      <Setter Property="Height" Value="38"/>
+      <Setter Property="Width" Value="28"/>
+      <Setter Property="Height" Value="28"/>
       <Setter Property="Template">
         <Setter.Value>
           <ControlTemplate TargetType="Button">
-            <Border x:Name="bd" Background="#C9A36A" CornerRadius="19">
+            <Border x:Name="bd" Background="#C9A36A" CornerRadius="14">
               <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
             </Border>
             <ControlTemplate.Triggers>
@@ -391,7 +391,11 @@
         <Setter.Value>
           <ControlTemplate TargetType="ComboBoxItem">
             <Border x:Name="bd" Background="Transparent" Padding="{TemplateBinding Padding}">
-              <ContentPresenter/>
+              <ContentPresenter Content="{TemplateBinding Content}"
+                                ContentTemplate="{TemplateBinding ContentTemplate}"
+                                ContentStringFormat="{TemplateBinding ContentStringFormat}"
+                                HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                VerticalAlignment="Center"/>
             </Border>
             <ControlTemplate.Triggers>
               <Trigger Property="IsHighlighted" Value="True">
@@ -429,7 +433,9 @@
                 </ToggleButton.Template>
               </ToggleButton>
               <ContentPresenter Margin="10,7,28,7" VerticalAlignment="Center" IsHitTestVisible="False"
-                                Content="{TemplateBinding SelectionBoxItem}" ContentTemplate="{TemplateBinding SelectionBoxItemTemplate}"/>
+                                Content="{Binding SelectionBoxItem, RelativeSource={RelativeSource TemplatedParent}}"
+                                ContentTemplate="{Binding SelectionBoxItemTemplate, RelativeSource={RelativeSource TemplatedParent}}"
+                                ContentStringFormat="{Binding SelectionBoxItemStringFormat, RelativeSource={RelativeSource TemplatedParent}}"/>
               <Popup x:Name="PART_Popup" Placement="Bottom" VerticalOffset="4"
                      PlacementTarget="{Binding RelativeSource={RelativeSource TemplatedParent}}"
                      IsOpen="{Binding IsDropDownOpen, RelativeSource={RelativeSource TemplatedParent}, Mode=TwoWay}"

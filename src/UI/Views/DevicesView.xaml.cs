@@ -19,6 +19,7 @@ public partial class DevicesView : UserControl
         {
             _bound = true;
             session.Engine.Devices.DevicesChanged += (_, _) => Dispatcher.BeginInvoke(Reload);
+            session.Changed += () => Dispatcher.BeginInvoke(Reload);
         }
         Reload();
     }
@@ -39,18 +40,36 @@ public partial class DevicesView : UserControl
 
     private static void Fill(ComboBox box, IReadOnlyList<AudioDeviceInfo> items, string? selected)
     {
+        box.DisplayMemberPath = nameof(AudioDeviceInfo.Name);
+        box.SelectedValuePath = nameof(AudioDeviceInfo.Id);
         box.ItemsSource = items;
-        box.SelectedItem = items.FirstOrDefault(i => i.Id == selected) ?? items.FirstOrDefault(i => i.IsDefault);
+        var pick = items.FirstOrDefault(i => i.Id == selected)
+            ?? items.FirstOrDefault(i => i.IsDefault)
+            ?? items.FirstOrDefault();
+        if (pick is null)
+        {
+            box.SelectedIndex = -1;
+            return;
+        }
+        box.SelectedItem = pick;
+        box.SelectedValue = pick.Id;
     }
 
     private void Apply(object sender, SelectionChangedEventArgs e)
     {
         if (_suppress || _session is null) return;
-        _session.Config.Devices.InputId = (Inputs.SelectedItem as AudioDeviceInfo)?.Id;
-        _session.Config.Devices.OutputId = (Outputs.SelectedItem as AudioDeviceInfo)?.Id;
-        _session.Config.Devices.VirtualOutputId = (Virtuals.SelectedItem as AudioDeviceInfo)?.Id;
+        var nextIn = (Inputs.SelectedItem as AudioDeviceInfo)?.Id;
+        var nextOut = (Outputs.SelectedItem as AudioDeviceInfo)?.Id;
+        var nextVirt = (Virtuals.SelectedItem as AudioDeviceInfo)?.Id;
+        var cfg = _session.Config.Devices;
+        var changed = nextIn != cfg.InputId || nextOut != cfg.OutputId || nextVirt != cfg.VirtualOutputId;
+        cfg.InputId = nextIn;
+        cfg.OutputId = nextOut;
+        cfg.VirtualOutputId = nextVirt;
         _session.ScheduleSave();
         Hint.Text = _session.Engine.VirtualStatus().Hint ?? "";
+        if (changed)
+            _session.RestartEngine();
     }
 
     private void Restart(object sender, RoutedEventArgs e)

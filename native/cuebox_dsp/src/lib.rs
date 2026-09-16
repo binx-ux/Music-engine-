@@ -1,5 +1,7 @@
 #![allow(clippy::missing_safety_doc)]
 
+mod tune;
+
 #[no_mangle]
 pub unsafe extern "C" fn cuebox_scale(buf: *mut f32, len: usize, gain: f32) {
     if buf.is_null() || len == 0 {

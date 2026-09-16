@@ -19,6 +19,12 @@ public sealed class AudioDeviceInfo
     public int Channels { get; init; }
     public string State { get; init; } = "Connected";
     public bool IsVirtualCandidate { get; init; }
+
+    public override string ToString() => Name;
+
+    public override bool Equals(object? obj) => obj is AudioDeviceInfo other && other.Id == Id;
+
+    public override int GetHashCode() => Id.GetHashCode(StringComparison.Ordinal);
 }
 
 public sealed class DeviceListChangedEventArgs : EventArgs

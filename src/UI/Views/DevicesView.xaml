@@ -10,19 +10,19 @@
     <Border Style="{StaticResource Glass}" Margin="0,0,0,12">
       <StackPanel>
         <TextBlock Text="MICROPHONE" Style="{StaticResource Caption}"/>
-        <ComboBox x:Name="Inputs" Margin="0,8,0,0" DisplayMemberPath="Name" SelectionChanged="Apply"/>
+        <ComboBox x:Name="Inputs" Margin="0,8,0,0" DisplayMemberPath="Name" SelectedValuePath="Id" SelectionChanged="Apply"/>
       </StackPanel>
     </Border>
     <Border Style="{StaticResource Glass}" Margin="0,0,0,12">
       <StackPanel>
         <TextBlock Text="HEADPHONES / SPEAKERS" Style="{StaticResource Caption}"/>
-        <ComboBox x:Name="Outputs" Margin="0,8,0,0" DisplayMemberPath="Name" SelectionChanged="Apply"/>
+        <ComboBox x:Name="Outputs" Margin="0,8,0,0" DisplayMemberPath="Name" SelectedValuePath="Id" SelectionChanged="Apply"/>
       </StackPanel>
     </Border>
     <Border Style="{StaticResource Glass}">
       <StackPanel>
         <TextBlock Text="VIRTUAL OUTPUT" Style="{StaticResource Caption}"/>
-        <ComboBox x:Name="Virtuals" Margin="0,8,0,8" DisplayMemberPath="Name" SelectionChanged="Apply"/>
+        <ComboBox x:Name="Virtuals" Margin="0,8,0,8" DisplayMemberPath="Name" SelectedValuePath="Id" SelectionChanged="Apply"/>
         <TextBlock x:Name="Hint" TextWrapping="Wrap"/>
         <Button Content="Restart audio" Style="{StaticResource AccentBtn}" Margin="0,12,0,0" HorizontalAlignment="Left" Click="Restart"/>
       </StackPanel>
