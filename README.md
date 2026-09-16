@@ -19,7 +19,7 @@ no injection. no ripping spotify.
   <img src="https://img.shields.io/badge/.NET-8-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" alt=".NET 8">
   <img src="https://img.shields.io/github/v/release/binx-ux/Music-engine-?style=for-the-badge&color=C9A36A" alt="release">
   <img src="https://img.shields.io/github/downloads/binx-ux/Music-engine-/total?style=for-the-badge&color=7DBA96" alt="downloads">
-  <img src="https://img.shields.io/badge/license-ask%20%3D%20free-C9A36A?style=for-the-badge" alt="license">
+  <img src="https://img.shields.io/badge/license-MIT-C9A36A?style=for-the-badge" alt="MIT">
   <img src="https://img.shields.io/github/stars/binx-ux/Music-engine-?style=for-the-badge&color=E8D4B0" alt="stars">
 </p>
 
@@ -78,9 +78,9 @@ more pages if you care: [ARCHITECTURE.md](ARCHITECTURE.md) · [AUDIO.md](AUDIO.m
 
 ## license
 
-[LICENSE](LICENSE)
+[MIT](LICENSE). sell it if you want.
 
-sell it if you want. if somebody asks for a copy you give it to them free. no ifs, ands, or buts.
+if somebody asks for a copy you still give it to them free. no ifs, ands, or buts.
 
 ──── ୨୧ ────
 
