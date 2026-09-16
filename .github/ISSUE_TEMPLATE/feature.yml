@@ -1,0 +1,36 @@
+name: Feature
+description: Ask for something Cuebox does not do yet
+title: "[feature] "
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Features that need game injection, DLL hooks, or ripping Spotify audio will be closed.
+  - type: textarea
+    id: want
+    attributes:
+      label: What do you want
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why
+      placeholder: What are you doing when the current app gets in the way.
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Area
+      options:
+        - Mixer / routing
+        - Music / links
+        - Soundboard / hotkeys
+        - Voice
+        - UI / themes
+        - Install / startup
+        - Something else
+    validations:
+      required: true

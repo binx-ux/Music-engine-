@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Games cannot hear Cuebox
+    url: https://github.com/binx-ux/Music-engine-/blob/master/VIRTUAL_DEVICE.md
+    about: Virtual cable setup. Cuebox plays into CABLE Input. The game mic is CABLE Output.
+  - name: Spotify encrypted audio
+    url: https://github.com/binx-ux/Music-engine-/blob/master/SPOTIFY.md
+    about: Spotify in Cuebox is metadata and play/pause only. Encrypted streams stay in Spotify.
+  - name: Latest download
+    url: https://github.com/binx-ux/Music-engine-/releases/latest
+    about: Grab Cuebox.zip from Releases.

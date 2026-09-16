@@ -1,0 +1,22 @@
+name: Question
+description: Setup, devices, or "how do I"
+title: "[q] "
+labels: ["question"]
+body:
+  - type: textarea
+    id: ask
+    attributes:
+      label: Question
+    validations:
+      required: true
+  - type: dropdown
+    id: already
+    attributes:
+      label: Did you read these
+      options:
+        - README
+        - VIRTUAL_DEVICE.md
+        - SPOTIFY.md
+        - None yet
+    validations:
+      required: true

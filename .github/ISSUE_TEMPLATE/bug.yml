@@ -1,0 +1,70 @@
+name: Bug
+description: Something is broken in Cuebox
+title: "[bug] "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        If people in Roblox or Discord hear silence, that is usually the cable, not a crash. Read VIRTUAL_DEVICE.md first.
+  - type: textarea
+    id: happened
+    attributes:
+      label: What happened
+      placeholder: Engine starts then dies, pad does nothing, music stutters, window is blank...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What you expected
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps
+      placeholder: |
+        1. Open Cuebox
+        2.
+        3.
+    validations:
+      required: true
+  - type: dropdown
+    id: windows
+    attributes:
+      label: Windows
+      options:
+        - Windows 11
+        - Windows 10
+        - Not sure
+    validations:
+      required: true
+  - type: input
+    id: version
+    attributes:
+      label: Cuebox version
+      placeholder: Release tag or the date on Cuebox.zip
+  - type: dropdown
+    id: cable
+    attributes:
+      label: Virtual cable
+      options:
+        - VB-Audio Cable
+        - VoiceMeeter
+        - Something else
+        - None
+  - type: checkboxes
+    id: routing
+    attributes:
+      label: Routing (if this is a "nobody can hear me" report)
+      options:
+        - label: Cuebox virtual out is CABLE Input (playback)
+        - label: The game / Discord mic is CABLE Output (capture)
+        - label: Engine shows as running
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Paste from %AppData%\Cuebox\Logs. Strip tokens if any showed up. Do not paste recorded audio.
+      render: text
