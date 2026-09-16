@@ -1,0 +1,10 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <RootNamespace>Mixline.IPC</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Mixline.Core.csproj" />
+    <ProjectReference Include="..\Logging\Mixline.Logging.csproj" />
+  </ItemGroup>
+</Project>

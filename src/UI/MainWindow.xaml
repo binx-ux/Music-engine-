@@ -1,0 +1,120 @@
+﻿<Window x:Class="Mixline.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Cuebox"
+        Height="880" Width="1380" MinHeight="740" MinWidth="1140"
+        WindowStartupLocation="CenterScreen"
+        Background="Transparent"
+        Foreground="#F2F3F6"
+        FontFamily="Segoe UI Variable Display, Segoe UI"
+        FontSize="13"
+        StateChanged="WinState">
+  <WindowChrome.WindowChrome>
+    <WindowChrome CaptionHeight="56" ResizeBorderThickness="6" GlassFrameThickness="-1" CornerRadius="0" UseAeroCaptionButtons="False"/>
+  </WindowChrome.WindowChrome>
+  <Border BorderBrush="{StaticResource WindowEdge}" BorderThickness="1" CornerRadius="8">
+    <Grid>
+      <Grid.RowDefinitions>
+        <RowDefinition Height="56"/>
+        <RowDefinition Height="*"/>
+        <RowDefinition Height="40"/>
+      </Grid.RowDefinitions>
+      <Grid.ColumnDefinitions>
+        <ColumnDefinition Width="176"/>
+        <ColumnDefinition Width="*"/>
+      </Grid.ColumnDefinitions>
+
+      <Border Grid.RowSpan="3" Grid.ColumnSpan="2" Background="{StaticResource WindowSheen}" IsHitTestVisible="False"/>
+      <Border Grid.RowSpan="3" Grid.ColumnSpan="2" Background="{StaticResource GrainBrush}" Opacity="0.045" IsHitTestVisible="False"/>
+      <Border Grid.RowSpan="3" Grid.ColumnSpan="2" Height="1" VerticalAlignment="Top" Background="#55FFFFFF" IsHitTestVisible="False"/>
+
+      <Grid Grid.ColumnSpan="2" Panel.ZIndex="5">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="176"/>
+          <ColumnDefinition Width="*"/>
+          <ColumnDefinition Width="Auto"/>
+        </Grid.ColumnDefinitions>
+        <StackPanel Orientation="Horizontal" VerticalAlignment="Center" Margin="16,0,0,0">
+          <Border Width="22" Height="22" CornerRadius="6" ClipToBounds="True" Margin="0,0,10,0">
+            <Image Source="Assets/cuebox.png" Stretch="UniformToFill"/>
+          </Border>
+          <TextBlock Text="Cuebox" FontWeight="SemiBold" FontSize="15" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <Border Grid.Column="1" Style="{StaticResource GlassTight}" Padding="8,6" Margin="8,10,12,10" MaxWidth="560" HorizontalAlignment="Left"
+                WindowChrome.IsHitTestVisibleInChrome="True" Panel.ZIndex="6">
+          <Grid>
+            <Grid.ColumnDefinitions>
+              <ColumnDefinition Width="Auto"/>
+              <ColumnDefinition Width="*"/>
+              <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Border Width="36" Height="36" CornerRadius="7" Background="#22000000" ClipToBounds="True"
+                    WindowChrome.IsHitTestVisibleInChrome="True">
+              <Image x:Name="ArtImage" Stretch="UniformToFill"/>
+            </Border>
+            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="10,0,12,0"
+                        WindowChrome.IsHitTestVisibleInChrome="True">
+              <TextBlock x:Name="NowTitle" Text="Nothing playing" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
+              <TextBlock x:Name="NowArtist" Text="Local files or Spotify Connect" Style="{StaticResource Caption}" TextTrimming="CharacterEllipsis"/>
+            </StackPanel>
+            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center"
+                        WindowChrome.IsHitTestVisibleInChrome="True">
+              <Button Style="{StaticResource IconBtn}" Click="PrevClick" ToolTip="Previous" Margin="0,0,6,0"
+                      WindowChrome.IsHitTestVisibleInChrome="True">
+                <Path Fill="#F2F3F6" Data="M 4,8 L 4,16 L 6,16 L 6,8 Z M 7,12 L 15,7 L 15,17 Z"/>
+              </Button>
+              <Button x:Name="PlayBtn" Style="{StaticResource PlayBtn}" Click="PlayClick" ToolTip="Play"
+                      WindowChrome.IsHitTestVisibleInChrome="True">
+                <Path x:Name="PlayIcon" Fill="#1C1610" Data="M 8,7 L 8,17 L 16,12 Z"/>
+              </Button>
+              <Button Style="{StaticResource IconBtn}" Click="NextClick" ToolTip="Next" Margin="6,0,0,0"
+                      WindowChrome.IsHitTestVisibleInChrome="True">
+                <Path Fill="#F2F3F6" Data="M 5,7 L 13,12 L 5,17 Z M 14,8 L 16,8 L 16,16 L 14,16 Z"/>
+              </Button>
+            </StackPanel>
+          </Grid>
+        </Border>
+
+        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,8,0" Panel.ZIndex="6">
+          <Button Content="—" Style="{StaticResource GhostBtn}" Click="MinClick"/>
+          <Button x:Name="MaxBtn" Content="▢" Style="{StaticResource GhostBtn}" Click="MaxClick"/>
+          <Button Content="✕" Style="{StaticResource GhostBtn}" Click="CloseClick"/>
+        </StackPanel>
+      </Grid>
+
+      <Border Grid.Row="1" Panel.ZIndex="3" BorderBrush="#18FFFFFF" BorderThickness="0,0,1,0">
+        <DockPanel>
+          <TextBlock DockPanel.Dock="Bottom" Text="v1.0" Style="{StaticResource Caption}" Margin="20,0,0,16"/>
+          <StackPanel Margin="8,10,8,0">
+            <RadioButton x:Name="NavHome" Content="Home" Style="{StaticResource NavBtn}" Checked="NavChanged" IsChecked="True"/>
+            <RadioButton x:Name="NavMixer" Content="Mixer" Style="{StaticResource NavBtn}" Checked="NavChanged"/>
+            <RadioButton x:Name="NavBoard" Content="Soundboard" Style="{StaticResource NavBtn}" Checked="NavChanged"/>
+            <RadioButton x:Name="NavMusic" Content="Music" Style="{StaticResource NavBtn}" Checked="NavChanged"/>
+            <RadioButton x:Name="NavVoice" Content="Voice" Style="{StaticResource NavBtn}" Checked="NavChanged"/>
+            <RadioButton x:Name="NavDevices" Content="Devices" Style="{StaticResource NavBtn}" Checked="NavChanged"/>
+            <RadioButton x:Name="NavSettings" Content="Settings" Style="{StaticResource NavBtn}" Checked="NavChanged"/>
+          </StackPanel>
+        </DockPanel>
+      </Border>
+
+      <ScrollViewer Grid.Row="1" Grid.Column="1" Panel.ZIndex="2" Padding="22,16,22,18"
+                    VerticalScrollBarVisibility="Auto" ClipToBounds="False" CanContentScroll="False">
+        <ContentControl x:Name="Host" ClipToBounds="False"/>
+      </ScrollViewer>
+
+      <Border Grid.Row="2" Grid.ColumnSpan="2" Panel.ZIndex="4" BorderBrush="#18FFFFFF" BorderThickness="0,1,0,0" Background="#14000000">
+        <Grid Margin="18,0">
+          <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+            <Ellipse x:Name="VirtDot" Width="7" Height="7" Fill="#666" Margin="0,0,8,0"/>
+            <TextBlock x:Name="VirtText" Text="Virtual mic: not selected" VerticalAlignment="Center" FontSize="12"/>
+            <Border x:Name="MicLivePill" Visibility="Collapsed" Background="#22C9A36A" CornerRadius="8" Padding="8,2" Margin="14,0,0,0">
+              <TextBlock x:Name="MicLive" Text="Mic on" FontSize="11" Foreground="#E8D4B0"/>
+            </Border>
+          </StackPanel>
+          <TextBlock x:Name="LatencyText" HorizontalAlignment="Right" VerticalAlignment="Center" Style="{StaticResource Caption}"/>
+        </Grid>
+      </Border>
+    </Grid>
+  </Border>
+</Window>

@@ -1,0 +1,29 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\cuebox.ico</ApplicationIcon>
+    <RootNamespace>Mixline.App</RootNamespace>
+    <AssemblyName>Cuebox</AssemblyName>
+    <Platforms>x64</Platforms>
+    <RuntimeIdentifier>win-x64</RuntimeIdentifier>
+    <SelfContained>false</SelfContained>
+    <PublishSingleFile>false</PublishSingleFile>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+  <ItemGroup>
+    <Resource Include="Assets\cuebox.png" />
+    <Resource Include="Assets\grain.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Core\Mixline.Core.csproj" />
+    <ProjectReference Include="..\Logging\Mixline.Logging.csproj" />
+    <ProjectReference Include="..\Storage\Mixline.Storage.csproj" />
+    <ProjectReference Include="..\Audio\Mixline.Audio.csproj" />
+    <ProjectReference Include="..\Soundboard\Mixline.Soundboard.csproj" />
+    <ProjectReference Include="..\Spotify\Mixline.Spotify.csproj" />
+    <ProjectReference Include="..\IPC\Mixline.IPC.csproj" />
+  </ItemGroup>
+</Project>

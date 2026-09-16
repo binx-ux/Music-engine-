@@ -1,0 +1,48 @@
+<UserControl x:Class="Mixline.App.Views.MixerStrip"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:c="clr-namespace:Mixline.App.Controls">
+  <UniformGrid Columns="4">
+    <StackPanel HorizontalAlignment="Center">
+      <TextBlock Text="MIC" Style="{StaticResource Kicker}" HorizontalAlignment="Center"/>
+      <StackPanel Orientation="Horizontal" Margin="0,10,0,8" HorizontalAlignment="Center">
+        <c:LevelMeter x:Name="MicMeter" Width="8" Height="168" Vertical="True" Margin="0,0,10,0"/>
+        <Slider x:Name="MicVol" Minimum="0" Maximum="1.5" Value="1" Orientation="Vertical" Height="168" ValueChanged="SliderChanged"/>
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+        <CheckBox x:Name="MicMute" Content="M" ToolTip="Mute" Checked="Changed" Unchecked="Changed" Margin="0,0,10,0"/>
+        <CheckBox x:Name="MicSolo" Content="S" ToolTip="Solo" Checked="Changed" Unchecked="Changed"/>
+      </StackPanel>
+    </StackPanel>
+    <StackPanel HorizontalAlignment="Center">
+      <TextBlock Text="MUSIC" Style="{StaticResource Kicker}" HorizontalAlignment="Center"/>
+      <StackPanel Orientation="Horizontal" Margin="0,10,0,8" HorizontalAlignment="Center">
+        <c:LevelMeter x:Name="MusicMeter" Width="8" Height="168" Vertical="True" Margin="0,0,10,0"/>
+        <Slider x:Name="MusicVol" Minimum="0" Maximum="1.5" Value="0.7" Orientation="Vertical" Height="168" ValueChanged="SliderChanged"/>
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+        <CheckBox x:Name="MusicMute" Content="M" ToolTip="Mute" Checked="Changed" Unchecked="Changed" Margin="0,0,10,0"/>
+        <CheckBox x:Name="MusicSolo" Content="S" ToolTip="Solo" Checked="Changed" Unchecked="Changed"/>
+      </StackPanel>
+    </StackPanel>
+    <StackPanel HorizontalAlignment="Center">
+      <TextBlock Text="BOARD" Style="{StaticResource Kicker}" HorizontalAlignment="Center"/>
+      <StackPanel Orientation="Horizontal" Margin="0,10,0,8" HorizontalAlignment="Center">
+        <c:LevelMeter x:Name="BoardMeter" Width="8" Height="168" Vertical="True" Margin="0,0,10,0"/>
+        <Slider x:Name="BoardVol" Minimum="0" Maximum="1.5" Value="0.85" Orientation="Vertical" Height="168" ValueChanged="SliderChanged"/>
+      </StackPanel>
+      <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+        <CheckBox x:Name="BoardMute" Content="M" ToolTip="Mute" Checked="Changed" Unchecked="Changed" Margin="0,0,10,0"/>
+        <CheckBox x:Name="BoardSolo" Content="S" ToolTip="Solo" Checked="Changed" Unchecked="Changed"/>
+      </StackPanel>
+    </StackPanel>
+    <StackPanel HorizontalAlignment="Center">
+      <TextBlock Text="MASTER" Style="{StaticResource Kicker}" HorizontalAlignment="Center"/>
+      <StackPanel Orientation="Horizontal" Margin="0,10,0,8" HorizontalAlignment="Center">
+        <c:LevelMeter x:Name="MasterMeter" Width="8" Height="168" Vertical="True" Margin="0,0,10,0"/>
+        <Slider x:Name="MasterVol" Minimum="0" Maximum="1.5" Value="0.9" Orientation="Vertical" Height="168" ValueChanged="SliderChanged"/>
+      </StackPanel>
+      <CheckBox x:Name="MasterMute" Content="M" ToolTip="Mute" HorizontalAlignment="Center" Checked="Changed" Unchecked="Changed"/>
+    </StackPanel>
+  </UniformGrid>
+</UserControl>

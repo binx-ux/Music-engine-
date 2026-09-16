@@ -1,0 +1,51 @@
+<UserControl x:Class="Mixline.App.Views.SoundboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Grid>
+    <Grid.ColumnDefinitions>
+      <ColumnDefinition Width="*"/>
+      <ColumnDefinition Width="280"/>
+    </Grid.ColumnDefinitions>
+    <StackPanel>
+      <DockPanel Margin="0,0,12,4">
+        <TextBlock Text="Soundboard" Style="{StaticResource Title}"/>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+          <Button Content="Add sound" Style="{StaticResource QuietBtn}" Click="AddClick" Margin="0,0,8,0"/>
+          <Button Content="Stop all" Style="{StaticResource QuietBtn}" Click="StopAll"/>
+        </StackPanel>
+      </DockPanel>
+      <TextBlock Text="Double-click a pad to play. Drag to reorder." Style="{StaticResource Caption}" Margin="0,0,12,12"/>
+      <TextBlock Text="Master" Style="{StaticResource Caption}"/>
+      <Slider x:Name="Master" Minimum="0" Maximum="1.5" Value="1" Margin="0,4,12,12" ValueChanged="MasterChanged"/>
+      <ItemsControl x:Name="GridPads">
+        <ItemsControl.ItemsPanel>
+          <ItemsPanelTemplate>
+            <WrapPanel/>
+          </ItemsPanelTemplate>
+        </ItemsControl.ItemsPanel>
+      </ItemsControl>
+    </StackPanel>
+    <Border Grid.Column="1" Style="{StaticResource Glass}">
+      <StackPanel>
+        <TextBlock Text="PAD" Style="{StaticResource Caption}"/>
+        <TextBox x:Name="NameBox" Margin="0,8,0,8" TextChanged="PadText"/>
+        <TextBox x:Name="FileBox" Margin="0,0,0,8" IsReadOnly="True"/>
+        <Button Content="Choose file" Style="{StaticResource QuietBtn}" Click="ChooseFile"/>
+        <TextBlock Text="Volume" Style="{StaticResource Caption}" Margin="0,12,0,4"/>
+        <Slider x:Name="Vol" Minimum="0" Maximum="1.5" Value="1" ValueChanged="PadSlider"/>
+        <TextBlock Text="Pitch" Style="{StaticResource Caption}" Margin="0,8,0,4"/>
+        <Slider x:Name="Pitch" Minimum="0.5" Maximum="2" Value="1" ValueChanged="PadSlider"/>
+        <TextBlock Text="Speed" Style="{StaticResource Caption}" Margin="0,8,0,4"/>
+        <Slider x:Name="Speed" Minimum="0.5" Maximum="2" Value="1" ValueChanged="PadSlider"/>
+        <CheckBox x:Name="Loop" Content="Loop" Margin="0,8,0,0" Checked="PadChanged" Unchecked="PadChanged"/>
+        <TextBlock Text="Fade in (sec)" Style="{StaticResource Caption}" Margin="0,8,0,4"/>
+        <Slider x:Name="FadeIn" Minimum="0" Maximum="2" ValueChanged="PadSlider"/>
+        <TextBlock Text="Fade out (sec)" Style="{StaticResource Caption}" Margin="0,8,0,4"/>
+        <Slider x:Name="FadeOut" Minimum="0" Maximum="2" ValueChanged="PadSlider"/>
+        <TextBlock Text="Hotkey  (example: Ctrl+Alt+1)" Style="{StaticResource Caption}" Margin="0,8,0,4"/>
+        <TextBox x:Name="HotkeyBox" TextChanged="PadText"/>
+        <Button Content="Play" Style="{StaticResource AccentBtn}" Margin="0,14,0,0" Click="PlaySelected"/>
+      </StackPanel>
+    </Border>
+  </Grid>
+</UserControl>
