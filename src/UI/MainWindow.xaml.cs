@@ -8,6 +8,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using Mixline.App.Views;
 using Mixline.Audio.Mixer;
+using Mixline.Core;
+using Mixline.Soundboard;
 using Mixline.Spotify;
 
 namespace Mixline.App;
@@ -70,8 +72,60 @@ public partial class MainWindow : Window
         _spotifyTimer.Tick += async (_, _) => await _session.RefreshSpotify(CancellationToken.None);
         _spotifyTimer.Start();
         RefreshChrome();
+        CopySpotifyFinder();
+        _ = LoadInstantPresets();
         if (_session.Config.Startup.StartMinimized)
             WindowState = WindowState.Minimized;
+    }
+
+    private void TitleDrag(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (e.ChangedButton != System.Windows.Input.MouseButton.Left)
+            return;
+        var src = e.OriginalSource as DependencyObject;
+        while (src is not null && !ReferenceEquals(src, sender))
+        {
+            if (src is Button)
+                return;
+            src = VisualTreeHelper.GetParent(src);
+        }
+        if (e.ClickCount == 2)
+        {
+            MaxClick(sender, e);
+            return;
+        }
+        DragMove();
+    }
+
+    private static void CopySpotifyFinder()
+    {
+        try
+        {
+            var dest = Path.Combine(Mixline.Core.AppPaths.Root, "find-spotify-id.ps1");
+            var src = Path.Combine(AppContext.BaseDirectory, "scripts", "find-spotify-id.ps1");
+            if (File.Exists(src))
+                File.Copy(src, dest, true);
+        }
+        catch
+        {
+        }
+    }
+
+    private async Task LoadInstantPresets()
+    {
+        try
+        {
+            if (_session.Layout.Pads.Count > 0)
+                return;
+            var n = await InstantPresets.InstallAsync(_session.Layout, CancellationToken.None);
+            if (n <= 0)
+                return;
+            _session.SoundboardStore.Save(_session.Layout);
+            _session.RaiseLayout();
+        }
+        catch
+        {
+        }
     }
 
     private IntPtr WndProc(IntPtr hwnd, int msg, IntPtr wParam, IntPtr lParam, ref bool handled)

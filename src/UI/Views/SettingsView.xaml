@@ -27,6 +27,12 @@
         <TextBlock Text="SPOTIFY" Style="{StaticResource Caption}"/>
         <TextBlock Text="Client ID from the Spotify Developer Dashboard. PKCE login, no client secret stored." TextWrapping="Wrap" Margin="0,8,0,8"/>
         <TextBox x:Name="ClientId" Margin="0,0,0,8"/>
+        <TextBlock Text="Run this in a terminal (asks first):" Style="{StaticResource Caption}" Margin="0,0,0,4"/>
+        <TextBox x:Name="FindCmd" IsReadOnly="True" TextWrapping="Wrap" Margin="0,0,0,8"/>
+        <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+          <Button Content="Copy cmd" Style="{StaticResource QuietBtn}" Click="CopyFindCmd" Margin="0,0,8,0"/>
+          <Button Content="Find Client ID" Style="{StaticResource QuietBtn}" Click="FindClientId"/>
+        </StackPanel>
         <StackPanel Orientation="Horizontal">
           <Button Content="Connect Spotify" Style="{StaticResource AccentBtn}" Click="ConnectSp" Margin="0,0,8,0"/>
           <Button Content="Disconnect" Style="{StaticResource QuietBtn}" Click="DisconnectSp"/>

@@ -11,6 +11,7 @@
         <TextBlock Text="Soundboard" Style="{StaticResource Title}"/>
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
           <Button Content="Add sound" Style="{StaticResource QuietBtn}" Click="AddClick" Margin="0,0,8,0"/>
+          <Button Content="Load presets" Style="{StaticResource QuietBtn}" Click="LoadPresets" Margin="0,0,8,0"/>
           <Button Content="Stop all" Style="{StaticResource QuietBtn}" Click="StopAll"/>
         </StackPanel>
       </DockPanel>

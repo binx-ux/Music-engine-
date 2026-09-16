@@ -4,15 +4,16 @@
         Title="Cuebox"
         Height="880" Width="1380" MinHeight="740" MinWidth="1140"
         WindowStartupLocation="CenterScreen"
+        ResizeMode="CanResize"
         Background="Transparent"
         Foreground="#F2F3F6"
         FontFamily="Segoe UI Variable Display, Segoe UI"
         FontSize="13"
         StateChanged="WinState">
   <WindowChrome.WindowChrome>
-    <WindowChrome CaptionHeight="56" ResizeBorderThickness="6" GlassFrameThickness="-1" CornerRadius="0" UseAeroCaptionButtons="False"/>
+    <WindowChrome CaptionHeight="0" ResizeBorderThickness="6" GlassFrameThickness="0" CornerRadius="8" UseAeroCaptionButtons="False"/>
   </WindowChrome.WindowChrome>
-  <Border BorderBrush="{StaticResource WindowEdge}" BorderThickness="1" CornerRadius="8">
+  <Border BorderBrush="{StaticResource WindowEdge}" BorderThickness="1" CornerRadius="8" Background="#22000000">
     <Grid>
       <Grid.RowDefinitions>
         <RowDefinition Height="56"/>
@@ -28,7 +29,8 @@
       <Border Grid.RowSpan="3" Grid.ColumnSpan="2" Background="{StaticResource GrainBrush}" Opacity="0.045" IsHitTestVisible="False"/>
       <Border Grid.RowSpan="3" Grid.ColumnSpan="2" Height="1" VerticalAlignment="Top" Background="#55FFFFFF" IsHitTestVisible="False"/>
 
-      <Grid Grid.ColumnSpan="2" Panel.ZIndex="20" ClipToBounds="True">
+      <Grid Grid.ColumnSpan="2" Panel.ZIndex="20" ClipToBounds="True" Background="Transparent"
+            MouseLeftButtonDown="TitleDrag">
         <Grid.ColumnDefinitions>
           <ColumnDefinition Width="176"/>
           <ColumnDefinition Width="*"/>
@@ -104,7 +106,7 @@
         <ContentControl x:Name="Host" ClipToBounds="False"/>
       </ScrollViewer>
 
-      <Border Grid.Row="2" Grid.ColumnSpan="2" Panel.ZIndex="4" BorderBrush="#18FFFFFF" BorderThickness="0,1,0,0" Background="#14000000">
+      <Border Grid.Row="2" Grid.ColumnSpan="2" Panel.ZIndex="4" BorderBrush="#18FFFFFF" BorderThickness="0,1,0,0" Background="#0A000000">
         <Grid Margin="18,0">
           <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
             <Ellipse x:Name="VirtDot" Width="7" Height="7" Fill="#666" Margin="0,0,8,0"/>

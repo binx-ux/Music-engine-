@@ -11,10 +11,11 @@ internal static class NativeBackdrop
     private const int DwmwaWindowCornerPreference = 33;
     private const int DwmwaBorderColor = 34;
     private const int DwmwaCaptionColor = 35;
+    private const int DwmwaTextColor = 36;
     private const int DwmwaSystemBackdropType = 38;
-    private const int DwmsbtMainWindow = 2;
-    private const int DwmsbtTransientWindow = 3;
+    private const int DwmsbtAcrylic = 3;
     private const int DwmWcpRound = 2;
+    private const int DwmwaColorNone = unchecked((int)0xFFFFFFFE);
 
     [DllImport("dwmapi.dll")]
     private static extern int DwmSetWindowAttribute(IntPtr hwnd, int attr, ref int value, int size);
@@ -35,12 +36,13 @@ internal static class NativeBackdrop
         DwmSetWindowAttribute(hwnd, DwmwaUseImmersiveDarkMode, ref dark, sizeof(int));
         var corner = DwmWcpRound;
         DwmSetWindowAttribute(hwnd, DwmwaWindowCornerPreference, ref corner, sizeof(int));
-        var backdrop = acrylic ? DwmsbtTransientWindow : DwmsbtMainWindow;
+        var backdrop = acrylic ? DwmsbtAcrylic : 2;
         var hr = DwmSetWindowAttribute(hwnd, DwmwaSystemBackdropType, ref backdrop, sizeof(int));
         var border = 0x006AA3C9;
         DwmSetWindowAttribute(hwnd, DwmwaBorderColor, ref border, sizeof(int));
-        var caption = 0x00120F0C;
-        DwmSetWindowAttribute(hwnd, DwmwaCaptionColor, ref caption, sizeof(int));
+        var none = DwmwaColorNone;
+        DwmSetWindowAttribute(hwnd, DwmwaCaptionColor, ref none, sizeof(int));
+        DwmSetWindowAttribute(hwnd, DwmwaTextColor, ref none, sizeof(int));
         var margins = new Margins { Left = -1, Right = -1, Top = -1, Bottom = -1 };
         DwmExtendFrameIntoClientArea(hwnd, ref margins);
 
@@ -50,7 +52,7 @@ internal static class NativeBackdrop
             return true;
         }
 
-        window.Background = new SolidColorBrush(Color.FromRgb(12, 13, 16));
+        window.Background = new SolidColorBrush(Color.FromArgb(160, 12, 13, 16));
         return false;
     }
 }

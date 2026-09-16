@@ -2,6 +2,7 @@ using System.Windows;
 using System.Windows.Controls;
 using Microsoft.Win32;
 using Mixline.Core;
+using Mixline.Spotify;
 
 namespace Mixline.App.Views;
 
@@ -35,6 +36,7 @@ public partial class SettingsView : UserControl
         Bypass.IsChecked = c.Audio.BypassProcessing;
         Tone.IsChecked = c.Advanced.TestToneOnStart;
         ClientId.Text = c.Spotify.ClientId ?? "";
+        FindCmd.Text = SpotifyClientIdFinder.Command;
         SpStatus.Text = _session.Spotify.IsConnected
             ? $"Connected as {_session.Spotify.DisplayName}"
             : "Not connected. The app works without Spotify.";
@@ -65,6 +67,39 @@ public partial class SettingsView : UserControl
         c.Startup.StartEngineAutomatically = AutoEngine.IsChecked == true;
         _session.MixerChanged();
         _session.ScheduleSave();
+    }
+
+    private void CopyFindCmd(object sender, RoutedEventArgs e)
+    {
+        Clipboard.SetText(SpotifyClientIdFinder.Command);
+        _session?.Notify("Finder cmd copied.");
+    }
+
+    private void FindClientId(object sender, RoutedEventArgs e)
+    {
+        if (_session is null) return;
+        var ok = MessageBox.Show(
+            "Cuebox will search this PC for a Spotify Client ID in app data and env vars, then paste it here if it finds one. Continue?",
+            "Find Spotify Client ID",
+            MessageBoxButton.YesNo,
+            MessageBoxImage.Question);
+        if (ok != MessageBoxResult.Yes)
+            return;
+
+        var id = SpotifyClientIdFinder.Find();
+        if (string.IsNullOrEmpty(id))
+        {
+            SpStatus.Text = "None found. Create an app at developer.spotify.com/dashboard. Redirect: http://127.0.0.1:43821/callback";
+            try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("https://developer.spotify.com/dashboard") { UseShellExecute = true }); } catch { }
+            return;
+        }
+
+        SpotifyClientIdFinder.SaveFound(id);
+        ClientId.Text = id;
+        _session.Config.Spotify.ClientId = id;
+        _session.ScheduleSave();
+        SpStatus.Text = "Pasted Client ID from this PC.";
+        _session.Notify("Spotify Client ID filled in.");
     }
 
     private void Restart(object sender, RoutedEventArgs e) => _session?.RestartEngine();

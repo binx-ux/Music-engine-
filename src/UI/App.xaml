@@ -12,21 +12,21 @@
     <FontFamily x:Key="AppFont">Segoe UI Variable Display, Segoe UI</FontFamily>
 
     <LinearGradientBrush x:Key="GlassFill" StartPoint="0,0" EndPoint="0,1">
-      <GradientStop Color="#62FFFFFF" Offset="0"/>
-      <GradientStop Color="#28FFFFFF" Offset="0.18"/>
-      <GradientStop Color="#14C5D0DC" Offset="0.55"/>
-      <GradientStop Color="#0AFFFFFF" Offset="1"/>
+      <GradientStop Color="#28FFFFFF" Offset="0"/>
+      <GradientStop Color="#14FFFFFF" Offset="0.18"/>
+      <GradientStop Color="#0AC5D0DC" Offset="0.55"/>
+      <GradientStop Color="#06FFFFFF" Offset="1"/>
     </LinearGradientBrush>
     <LinearGradientBrush x:Key="GlassEdge" StartPoint="0,0" EndPoint="0,1">
-      <GradientStop Color="#90FFFFFF" Offset="0"/>
-      <GradientStop Color="#38FFFFFF" Offset="0.45"/>
-      <GradientStop Color="#22C9A36A" Offset="1"/>
+      <GradientStop Color="#50FFFFFF" Offset="0"/>
+      <GradientStop Color="#22FFFFFF" Offset="0.45"/>
+      <GradientStop Color="#18C9A36A" Offset="1"/>
     </LinearGradientBrush>
     <LinearGradientBrush x:Key="WindowSheen" StartPoint="0,0" EndPoint="1,1">
-      <GradientStop Color="#38FFFFFF" Offset="0"/>
-      <GradientStop Color="#08FFFFFF" Offset="0.38"/>
+      <GradientStop Color="#14FFFFFF" Offset="0"/>
+      <GradientStop Color="#05FFFFFF" Offset="0.38"/>
       <GradientStop Color="#00000000" Offset="0.62"/>
-      <GradientStop Color="#18C9A36A" Offset="1"/>
+      <GradientStop Color="#10C9A36A" Offset="1"/>
     </LinearGradientBrush>
     <LinearGradientBrush x:Key="WindowEdge" StartPoint="0,0" EndPoint="0,1">
       <GradientStop Color="#70FFFFFF" Offset="0"/>

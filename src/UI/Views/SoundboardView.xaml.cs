@@ -91,6 +91,22 @@ public partial class SoundboardView : UserControl
         _session.RaiseLayout();
     }
 
+    private async void LoadPresets(object sender, RoutedEventArgs e)
+    {
+        if (_session is null) return;
+        try
+        {
+            var n = await InstantPresets.InstallAsync(_session.Layout, CancellationToken.None);
+            _session.SoundboardStore.Save(_session.Layout);
+            _session.RaiseLayout();
+            _session.Notify(n > 0 ? $"Added {n} Myinstants sounds." : "Presets already on the board.");
+        }
+        catch (Exception ex)
+        {
+            _session.Notify("Could not load presets. " + ex.Message);
+        }
+    }
+
     private void StopAll(object sender, RoutedEventArgs e) => _session?.Engine.StopAllSounds();
 
     private void MasterChanged(object sender, RoutedPropertyChangedEventArgs<double> e)

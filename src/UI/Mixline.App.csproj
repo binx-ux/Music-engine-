@@ -17,6 +17,7 @@
     <Resource Include="Assets\cuebox.png" />
     <Resource Include="Assets\grain.png" />
     <None Include="..\..\scripts\pads.lua" CopyToOutputDirectory="PreserveNewest" Link="scripts\pads.lua" />
+    <None Include="..\..\scripts\find-spotify-id.ps1" CopyToOutputDirectory="PreserveNewest" Link="scripts\find-spotify-id.ps1" />
     <None Include="..\..\native\cuebox_dsp\target\release\cuebox_dsp.dll" Condition="Exists('..\..\native\cuebox_dsp\target\release\cuebox_dsp.dll')" CopyToOutputDirectory="PreserveNewest" Link="cuebox_dsp.dll" />
   </ItemGroup>
   <ItemGroup>
