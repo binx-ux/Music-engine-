@@ -49,26 +49,26 @@ public struct MixerSnapshot
             MicVolume = mixer.Mic.Volume,
             MicGain = mixer.Mic.Gain,
             MicPan = mixer.Mic.Pan,
-            MicMonitor = mixer.Mic.MonitorSend,
+            MicMonitor = Send(mixer.MicMonitor, mixer.Mic.MonitorSend),
             MicVirtual = mixer.Mic.VirtualSend,
             MicMute = mixer.Mic.Mute,
             MicSolo = mixer.Mic.Solo,
             MusicVolume = mixer.Music.Volume,
             MusicGain = mixer.Music.Gain,
             MusicPan = mixer.Music.Pan,
-            MusicMonitor = mixer.Music.MonitorSend,
+            MusicMonitor = Send(mixer.MusicMonitor, mixer.Music.MonitorSend),
             MusicVirtual = mixer.Music.VirtualSend,
             MusicMute = mixer.Music.Mute,
             MusicSolo = mixer.Music.Solo,
             SoundVolume = mixer.Soundboard.Volume,
             SoundGain = mixer.Soundboard.Gain,
             SoundPan = mixer.Soundboard.Pan,
-            SoundMonitor = mixer.Soundboard.MonitorSend,
+            SoundMonitor = Send(mixer.SoundboardMonitor, mixer.Soundboard.MonitorSend),
             SoundVirtual = mixer.Soundboard.VirtualSend,
             SoundMute = mixer.Soundboard.Mute,
             SoundSolo = mixer.Soundboard.Solo,
             MasterVolume = mixer.Master.Volume,
-            MasterMonitor = mixer.Master.MonitorSend,
+            MasterMonitor = Send(mixer.MasterMonitor, mixer.Master.MonitorSend),
             MasterVirtual = mixer.Master.VirtualSend,
             MasterMute = mixer.Master.Mute,
             MonitorVolume = mixer.MonitorVolume,
@@ -80,6 +80,9 @@ public struct MixerSnapshot
             TestTone = testTone
         };
     }
+
+    private static float Send(bool on, float send)
+        => on ? (send > 0.0001f ? send : 1f) : 0f;
 }
 
 public sealed class VoicePlayback

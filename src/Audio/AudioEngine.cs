@@ -309,15 +309,21 @@ public sealed class AudioEngine : IDisposable
         _soundPeak.Process(sound);
 
         dest[..(frames * 2)].Clear();
-        if (snap.MasterMonitorEnabled)
+        var micSend = snap.MicMonitorEnabled ? (snap.MicMonitor > 0.0001f ? snap.MicMonitor : 1f) : 0f;
+        var musicSend = snap.MusicMonitorEnabled ? (snap.MusicMonitor > 0.0001f ? snap.MusicMonitor : 1f) : 0f;
+        var soundSend = snap.SoundMonitorEnabled ? (snap.SoundMonitor > 0.0001f ? snap.SoundMonitor : 1f) : 0f;
+        var hear = snap.MasterMonitorEnabled || micSend > 0f || musicSend > 0f || soundSend > 0f;
+        if (hear)
         {
             var n = frames * 2;
-            var master = snap.MonitorVolume * (snap.MasterMute ? 0f : snap.MasterMonitor * snap.MasterVolume);
+            var master = snap.MonitorVolume * (snap.MasterMute ? 0f : snap.MasterVolume);
+            if (snap.MasterMonitorEnabled)
+                master *= snap.MasterMonitor > 0.0001f ? snap.MasterMonitor : 1f;
             MixRoute.Bus(
                 dest[..n],
-                mic, snap.MicMonitorEnabled ? snap.MicMonitor : 0f,
-                music, snap.MusicMonitorEnabled ? snap.MusicMonitor : 0f,
-                sound, snap.SoundMonitorEnabled ? snap.SoundMonitor : 0f,
+                mic, micSend,
+                music, musicSend,
+                sound, soundSend,
                 master);
             if (snap.TestTone)
                 MixNative.Add(dest[..n], tone, 1f);
