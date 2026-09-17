@@ -48,6 +48,7 @@ public partial class SettingsView : UserControl
         MinStart.IsChecked = c.Startup.StartMinimized;
         AutoEngine.IsChecked = c.Startup.StartEngineAutomatically;
         Err.Text = _session.LastError ?? "";
+        DataPath.Text = AppPaths.Root;
         HexBox.Text = string.IsNullOrWhiteSpace(c.Appearance.AccentHex)
             ? Theme.PresetHex(c.Appearance.Theme)
             : c.Appearance.AccentHex;
@@ -221,6 +222,25 @@ public partial class SettingsView : UserControl
     {
         var name = ProfileBox.SelectedItem as string ?? _session?.Config.ActiveProfile ?? "Default";
         _session?.SaveCurrentProfile(name);
+    }
+
+    private void MoveData(object sender, RoutedEventArgs e)
+    {
+        if (_session is null) return;
+        var dlg = new OpenFolderDialog
+        {
+            Title = "Cuebox data folder",
+            InitialDirectory = AppPaths.Root
+        };
+        if (dlg.ShowDialog() != true)
+            return;
+        if (!AppPaths.Relocate(dlg.FolderName, out var error))
+        {
+            _session.Notify(error);
+            return;
+        }
+        DataPath.Text = AppPaths.Root;
+        _session.Notify("Data folder set. Restart Cuebox if logs look empty.");
     }
 
     private void Export(object sender, RoutedEventArgs e)

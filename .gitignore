@@ -17,6 +17,7 @@ spotify.tokens
 .idea/
 *.nupkg
 installer/output/
+installer/publish/
 dist/
 native/**/target/
 

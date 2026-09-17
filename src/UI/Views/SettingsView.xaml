@@ -65,6 +65,14 @@
       </Border>
       <Border Style="{StaticResource Glass}" Margin="0,0,0,10">
         <StackPanel>
+          <TextBlock Text="FILES" Style="{StaticResource Caption}"/>
+          <TextBlock Text="App stays where you installed it. This folder is settings, music, logs, and pads." Style="{StaticResource Caption}" Margin="0,6,0,8" FontWeight="Normal" TextWrapping="Wrap"/>
+          <TextBlock x:Name="DataPath" TextWrapping="Wrap" Margin="0,0,0,8"/>
+          <Button Content="Choose data folder" Style="{StaticResource QuietBtn}" HorizontalAlignment="Left" Click="MoveData"/>
+        </StackPanel>
+      </Border>
+      <Border Style="{StaticResource Glass}" Margin="0,0,0,10">
+        <StackPanel>
           <TextBlock Text="BACKUP" Style="{StaticResource Caption}"/>
           <StackPanel Orientation="Horizontal" Margin="0,8,0,0">
             <Button Content="Export" Style="{StaticResource QuietBtn}" Click="Export" Margin="0,0,8,0"/>

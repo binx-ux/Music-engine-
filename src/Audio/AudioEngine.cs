@@ -262,6 +262,10 @@ public sealed class AudioEngine : IDisposable
         StopMixer();
         try { _monitor?.Stop(); } catch { }
         try { _virtualOut?.Stop(); } catch { }
+        if (_monitor is not null)
+            _monitor.PlaybackStopped -= OnMonitorStopped;
+        if (_virtualOut is not null)
+            _virtualOut.PlaybackStopped -= OnVirtualStopped;
         _capture?.Dispose();
         _capture = null;
         DisposeOut(ref _monitor);
@@ -535,6 +539,8 @@ public sealed class AudioEngine : IDisposable
 
     private void OnMonitorStopped(object? sender, StoppedEventArgs e)
     {
+        if (!_running || !ReferenceEquals(sender, _monitor))
+            return;
         if (e.Exception is not null)
         {
             _log.Warning("audio", "Headphones/speakers stopped.", e.Exception.Message);
@@ -545,6 +551,10 @@ public sealed class AudioEngine : IDisposable
 
     private void OnVirtualStopped(object? sender, StoppedEventArgs e)
     {
+        if (!_running || !ReferenceEquals(sender, _virtualOut))
+            return;
+        if (e.Exception is not null)
+            _log.Warning("audio", "Virtual cable stopped.", e.Exception.Message);
         _virtual.LogMissing();
         RaiseError("Virtual microphone device disconnected.");
         _virtualName = null;

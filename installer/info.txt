@@ -1,0 +1,10 @@
+Cuebox talks to Windows audio devices only.
+
+Games and Discord hear you through a virtual cable (VB-Audio Cable).
+Cuebox does not inject into games and does not install a kernel driver.
+
+During setup you pick:
+  1. App folder (Cuebox.exe)
+  2. Data folder (settings, music, logs, pads)
+
+You can move the data folder later in Settings.

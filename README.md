@@ -6,7 +6,7 @@
 
 *ੈ✩‧₊˚༺☆༻*ੈ✩‧₊˚
 
-1.1.0
+1.1.1
 
 mic + music + soundboard on windows. dumps the mix into a virtual cable so roblox / discord / games just see another mic.
 
@@ -29,13 +29,17 @@ no injection. no ripping spotify.
 
 ## install
 
-cmd. writes the zip as bytes then unpacks it.
+download **CueboxSetup.exe** from [Releases](https://github.com/binx-ux/Music-engine-/releases/latest). it asks where the app goes and where settings / music / logs live.
+
+zip works too. unpack `Cuebox.zip` anywhere. optional: a `data.path` file next to `Cuebox.exe` with one line, the data folder.
+
+or powershell (picks both folders):
 
 ```
-powershell -NoP -C "$z=$env:TEMP+'\cuebox.zip'; [IO.File]::WriteAllBytes($z,(iwr -useb 'https://github.com/binx-ux/Music-engine-/releases/latest/download/Cuebox.zip').Content); $d=$env:LOCALAPPDATA+'\Cuebox'; if(Test-Path $d){ri $d -Recurse -Force}; Expand-Archive $z $d -Force; start (Join-Path $d 'Cuebox.exe')"
+powershell -NoP -C "irm 'https://raw.githubusercontent.com/binx-ux/Music-engine-/master/installer/install.ps1' | iex"
 ```
 
-lands in `%LOCALAPPDATA%\Cuebox`. settings in `%AppData%\Cuebox`. no extra .net install.
+self-contained. no extra .net install.
 
 ──── ୨୧ ────
 
