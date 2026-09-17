@@ -1,6 +1,7 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using Microsoft.Win32;
 using Mixline.Audio.Sources;
@@ -101,12 +102,24 @@ public partial class MusicView : UserControl
         Refresh();
     }
 
-    private void QueuePlay(object sender, System.Windows.Input.MouseButtonEventArgs e) => PlaySelected();
-
-    private void PlaySelected()
+    private void QueuePlay(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
-        if (_session is null || QueueList.SelectedIndex < 0) return;
-        _session.Engine.Music.PlayIndex(QueueList.SelectedIndex);
+        if (_session is null || _suppress) return;
+        if (e.ChangedButton != System.Windows.Input.MouseButton.Left) return;
+        var src = e.OriginalSource as DependencyObject;
+        while (src is not null)
+        {
+            if (src is System.Windows.Controls.Primitives.ScrollBar
+                or System.Windows.Controls.Primitives.Thumb
+                or System.Windows.Controls.Primitives.RepeatButton)
+                return;
+            src = VisualTreeHelper.GetParent(src);
+        }
+        if (ItemsControl.ContainerFromElement(QueueList, e.OriginalSource as DependencyObject) is not ListBoxItem item)
+            return;
+        var i = QueueList.ItemContainerGenerator.IndexFromContainer(item);
+        if (i < 0) return;
+        _session.Engine.Music.PlayIndex(i);
         Refresh();
     }
 

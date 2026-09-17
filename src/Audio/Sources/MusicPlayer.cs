@@ -11,6 +11,7 @@ public sealed class MusicPlayer
     private LoopMode _loop = LoopMode.Off;
     private readonly Random _rng = new();
     private readonly List<int> _shuffleBag = [];
+    private readonly List<int> _history = [];
 
     public event Action? Finished;
     public event Action<TrackInfo?>? TrackChanged;
@@ -35,6 +36,7 @@ public sealed class MusicPlayer
     public void ReplaceQueue(IEnumerable<TrackInfo> tracks, int startIndex = 0)
     {
         _queue.Clear();
+        _history.Clear();
         _queue.AddRange(tracks);
         _index = Math.Clamp(startIndex, 0, Math.Max(0, _queue.Count - 1));
         if (_queue.Count == 0)
@@ -47,16 +49,20 @@ public sealed class MusicPlayer
     public void Clear()
     {
         _queue.Clear();
+        _history.Clear();
         _index = -1;
         _source.Close();
         TrackChanged?.Invoke(null);
     }
 
-    public Result PlayIndex(int index)
+    public Result PlayIndex(int index) => PlayAt(index, true);
+
+    private Result PlayAt(int index, bool recordHistory)
     {
         if (_queue.Count == 0)
             return Result.Fail("Nothing is queued.");
 
+        var from = _index;
         var start = Math.Clamp(index, 0, _queue.Count - 1);
         var i = start;
         for (var n = 0; n < _queue.Count; n++)
@@ -66,6 +72,12 @@ public sealed class MusicPlayer
             var opened = _source.Open(track.Path, track.IsUrl, _loop == LoopMode.One);
             if (opened.Success)
             {
+                if (recordHistory && from >= 0 && from != i)
+                {
+                    _history.Add(from);
+                    if (_history.Count > 64)
+                        _history.RemoveAt(0);
+                }
                 TrackChanged?.Invoke(_source.Track);
                 return opened;
             }
@@ -122,10 +134,20 @@ public sealed class MusicPlayer
     {
         if (_queue.Count == 0)
             return Result.Fail("The queue is empty.");
-        if (Position > TimeSpan.FromSeconds(3) && _index >= 0)
-            return PlayIndex(_index);
-        var prev = _index <= 0 ? _queue.Count - 1 : _index - 1;
-        return PlayIndex(prev);
+
+        while (_history.Count > 0)
+        {
+            var prev = _history[^1];
+            _history.RemoveAt(_history.Count - 1);
+            if (prev >= 0 && prev < _queue.Count && prev != _index)
+                return PlayAt(prev, false);
+        }
+
+        if (_queue.Count == 1)
+            return PlayAt(0, false);
+
+        var target = _index <= 0 ? _queue.Count - 1 : _index - 1;
+        return PlayAt(target, false);
     }
 
     public void Seek(TimeSpan position) => _source.Seek(position);

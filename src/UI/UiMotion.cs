@@ -37,6 +37,11 @@ public static class UiMotion
         sc.BeginAnimation(ScaleTransform.ScaleXProperty, Anim(sc.ScaleX, to, ms, Out()));
     }
 
+    public static void ScaleY(ScaleTransform sc, double to, int ms)
+    {
+        sc.BeginAnimation(ScaleTransform.ScaleYProperty, Anim(sc.ScaleY, to, ms, Out()));
+    }
+
     public static void ScaleTo(ScaleTransform sc, double from, double to, int ms)
     {
         sc.BeginAnimation(ScaleTransform.ScaleXProperty, Anim(from, to, ms, Back()));

@@ -5,7 +5,7 @@ title: Spotify
 
 # Spotify
 
-Cuebox talks to Spotify through the documented Web API (PKCE). It can show now playing and send play, pause, skip. It cannot mix full Spotify tracks into your virtual mic. Encrypted audio stays in Spotify.
+Cuebox talks to Spotify through the documented Web API (PKCE). You need Spotify Premium for play, pause, and skip. It cannot mix full Spotify tracks into your virtual mic. Encrypted audio stays in Spotify.
 
 ## Setup
 

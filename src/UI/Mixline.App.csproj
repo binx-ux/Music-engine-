@@ -15,6 +15,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Resource Include="Assets\cuebox.png" />
+    <Resource Include="Assets\cuebox.ico" />
     <Resource Include="Assets\grain.png" />
     <None Include="..\..\scripts\pads.lua" CopyToOutputDirectory="PreserveNewest" Link="scripts\pads.lua" />
     <None Include="..\..\scripts\find-spotify-id.ps1" CopyToOutputDirectory="PreserveNewest" Link="scripts\find-spotify-id.ps1" />

@@ -344,7 +344,7 @@ public sealed class AppSession : IDisposable
     }
 
     public async Task<Result> ConnectSpotify()
-        => await Spotify.ConnectAsync(Config.Spotify.ClientId ?? "", Config.Spotify.RedirectUri, CancellationToken.None);
+        => await Spotify.ConnectAsync(Config.Spotify.ClientId ?? "", CancellationToken.None);
 
     public async Task RefreshSpotify(CancellationToken ct)
     {

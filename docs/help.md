@@ -21,7 +21,9 @@ Cuebox versions look like `1.2.33`.
 - **minor**: second number goes up, the rest stay (`1.2.33` -> `1.3.33`)
 - **fix**: last two numbers go up (`1.2.33` -> `1.2.34`)
 
-Current app release is **1.1.1**.
+Current app release is **1.3.1**.
+
+Cuebox checks GitHub for a new installer when it starts. You can skip minor updates and fixes. Major updates still show the next time you open the app.
 
 ## Build it
 

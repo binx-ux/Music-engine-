@@ -4,8 +4,10 @@ public static class AppInfo
 {
     public const string Name = "Cuebox";
     public const string VirtualMicrophoneName = "Cuebox Virtual Microphone";
-    public const string Version = "1.1.1";
+    public const string Version = "1.3.1";
     public const string ConfigVersion = "1";
     public const string MutexName = "Local\\Cuebox.SingleInstance";
     public const string PipeName = "Cuebox.Engine";
+    public const string GitHubRepo = "binx-ux/Music-engine-";
+    public const string ReleasesApi = "https://api.github.com/repos/binx-ux/Music-engine-/releases/latest";
 }

@@ -21,8 +21,8 @@
       <GradientStop Color="#08FFFFFF" Offset="1"/>
     </LinearGradientBrush>
     <LinearGradientBrush x:Key="GlassFill" StartPoint="0,0" EndPoint="0,1">
-      <GradientStop Color="#12FFFFFF" Offset="0"/>
-      <GradientStop Color="#06FFFFFF" Offset="1"/>
+      <GradientStop Color="#28FFFFFF" Offset="0"/>
+      <GradientStop Color="#14FFFFFF" Offset="1"/>
     </LinearGradientBrush>
     <LinearGradientBrush x:Key="GlassEdge" StartPoint="0,0" EndPoint="0,1">
       <GradientStop Color="#50FFFFFF" Offset="0"/>
@@ -54,7 +54,7 @@
       <Setter Property="Background" Value="{DynamicResource GlassFill}"/>
       <Setter Property="BorderBrush" Value="{DynamicResource GlassEdge}"/>
       <Setter Property="BorderThickness" Value="1"/>
-      <Setter Property="CornerRadius" Value="12"/>
+      <Setter Property="CornerRadius" Value="10"/>
       <Setter Property="Padding" Value="14"/>
       <Setter Property="SnapsToDevicePixels" Value="True"/>
     </Style>
@@ -84,8 +84,8 @@
       <Setter Property="FontSize" Value="13"/>
       <Setter Property="Cursor" Value="Hand"/>
       <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
-      <Setter Property="Padding" Value="12,11"/>
-      <Setter Property="Margin" Value="8,2"/>
+      <Setter Property="Padding" Value="10,10"/>
+      <Setter Property="Margin" Value="2,1"/>
       <Setter Property="Panel.ZIndex" Value="10"/>
       <Setter Property="Template">
         <Setter.Value>

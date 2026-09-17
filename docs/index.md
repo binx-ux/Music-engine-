@@ -9,7 +9,7 @@ title: Home
 
 No injection. No ripping Spotify. Games pick **CABLE Output**.
 
-<a class="get" href="https://github.com/binx-ux/Music-engine-/releases/latest">Get Cuebox 1.1.1</a>
+<a class="get" href="https://github.com/binx-ux/Music-engine-/releases/latest">Get Cuebox 1.3.1</a>
 
 <div class="cards">
   <a class="card" href="{{ '/install/' | relative_url }}"><strong>Install</strong><span>Pick the app folder and a data folder. Self-contained, no extra .NET.</span></a>

@@ -8,7 +8,7 @@ Cuebox uses Spotify's documented Authorization Code with PKCE flow and the Web A
 - Redirect URI: `http://127.0.0.1:43821/callback` (add this URI to your Spotify app)
 - Scopes: `user-read-currently-playing`, `user-read-playback-state`, `user-modify-playback-state`, `user-read-private`
 - Now playing: title, artist, album, artwork, play state
-- Play / pause / next / previous on the user's existing Spotify Connect device
+- Play / pause / next / previous on the user's existing Spotify Connect device (Spotify Premium required)
 
 Tokens are stored with Windows DPAPI (`ProtectedData`, current user) in `%AppData%\Cuebox\spotify.bin`. Logs redact bearer tokens and query secrets.
 

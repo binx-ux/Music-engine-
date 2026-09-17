@@ -38,8 +38,14 @@
       <Border Style="{StaticResource Glass}" Margin="0,0,0,10">
         <StackPanel>
           <TextBlock Text="SPOTIFY" Style="{StaticResource Caption}"/>
-          <TextBlock Text="Client ID from the Spotify Developer Dashboard. PKCE login, no client secret stored." TextWrapping="Wrap" Margin="0,8,0,8"/>
+          <TextBlock Text="You need Spotify Premium. Client ID from the Developer Dashboard. PKCE login, no client secret stored." TextWrapping="Wrap" Margin="0,8,0,8"/>
           <TextBox x:Name="ClientId" Margin="0,0,0,8"/>
+          <TextBlock Text="Redirect URIs to add on that app (both):" Style="{StaticResource Caption}" Margin="0,0,0,4"/>
+          <TextBox x:Name="RedirectBox" IsReadOnly="True" TextWrapping="Wrap" Margin="0,0,0,8"/>
+          <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
+            <Button Content="Copy redirect" Style="{StaticResource QuietBtn}" Click="CopyRedirect" Margin="0,0,8,0"/>
+            <Button Content="Open dashboard" Style="{StaticResource QuietBtn}" Click="OpenDashboard"/>
+          </StackPanel>
           <TextBlock Text="Run this in a terminal (asks first):" Style="{StaticResource Caption}" Margin="0,0,0,4"/>
           <TextBox x:Name="FindCmd" IsReadOnly="True" TextWrapping="Wrap" Margin="0,0,0,8"/>
           <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
@@ -50,7 +56,7 @@
             <Button Content="Connect Spotify" Style="{StaticResource AccentBtn}" Click="ConnectSp" Margin="0,0,8,0"/>
             <Button Content="Disconnect" Style="{StaticResource QuietBtn}" Click="DisconnectSp"/>
           </StackPanel>
-          <TextBlock x:Name="SpStatus" Style="{StaticResource Caption}" Margin="0,8,0,0"/>
+          <TextBlock x:Name="SpStatus" Style="{StaticResource Caption}" Margin="0,8,0,0" TextWrapping="Wrap"/>
         </StackPanel>
       </Border>
       <Border Style="{StaticResource Glass}" Margin="0,0,0,10">
@@ -78,6 +84,15 @@
             <Button Content="Export" Style="{StaticResource QuietBtn}" Click="Export" Margin="0,0,8,0"/>
             <Button Content="Import" Style="{StaticResource QuietBtn}" Click="Import"/>
           </StackPanel>
+        </StackPanel>
+      </Border>
+      <Border Style="{StaticResource Glass}" Margin="0,0,0,10">
+        <StackPanel>
+          <TextBlock Text="UPDATES" Style="{StaticResource Caption}"/>
+          <TextBlock Text="Cuebox checks GitHub for a new installer. You can skip minor updates and fixes. Major updates still show next launch." Style="{StaticResource Caption}" Margin="0,6,0,8" FontWeight="Normal" TextWrapping="Wrap"/>
+          <CheckBox x:Name="CheckUpdates" Content="Check for updates when Cuebox starts" Margin="0,0,0,8" Checked="Save" Unchecked="Save"/>
+          <Button Content="Check now" Style="{StaticResource QuietBtn}" HorizontalAlignment="Left" Click="CheckNow"/>
+          <TextBlock x:Name="UpdateStatus" Style="{StaticResource Caption}" Margin="0,8,0,0" TextWrapping="Wrap"/>
         </StackPanel>
       </Border>
       <Border Style="{StaticResource Glass}">

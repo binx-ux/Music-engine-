@@ -52,7 +52,7 @@
       </Border>
 
       <Grid Grid.Row="2">
-        <ListBox x:Name="QueueList" MouseDoubleClick="QueuePlay">
+        <ListBox x:Name="QueueList" PreviewMouseLeftButtonUp="QueuePlay" Cursor="Hand">
           <ListBox.ItemTemplate>
             <DataTemplate>
               <Grid Height="52">
@@ -120,7 +120,7 @@
         <Border Style="{StaticResource Glass}" Padding="16">
           <StackPanel>
             <TextBlock Text="SPOTIFY" Style="{StaticResource Kicker}"/>
-            <TextBlock Text="Metadata only. Encrypted audio stays in Spotify." TextWrapping="Wrap" Margin="0,8,0,12" Foreground="{DynamicResource MutedBrush}"/>
+            <TextBlock Text="You need Spotify Premium. Play, pause, and skip go to your Spotify app. Encrypted audio stays in Spotify." TextWrapping="Wrap" Margin="0,8,0,12" Foreground="{DynamicResource MutedBrush}"/>
             <StackPanel Orientation="Horizontal">
               <Button Content="Play" Style="{StaticResource QuietBtn}" Click="SpPlay" Margin="0,0,6,0"/>
               <Button Content="Pause" Style="{StaticResource QuietBtn}" Click="SpPause"/>

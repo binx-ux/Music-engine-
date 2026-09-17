@@ -1,0 +1,41 @@
+<Window x:Class="Mixline.App.UpdateWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Cuebox update"
+        Icon="Assets/cuebox.ico"
+        Width="460" Height="360"
+        WindowStartupLocation="CenterOwner"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        ShowInTaskbar="False"
+        Background="#16181E"
+        Foreground="#E8E9ED"
+        FontFamily="Segoe UI Variable Display, Segoe UI">
+  <WindowChrome.WindowChrome>
+    <WindowChrome CaptionHeight="0" GlassFrameThickness="0" CornerRadius="10" UseAeroCaptionButtons="False"/>
+  </WindowChrome.WindowChrome>
+  <Border BorderBrush="#40C9A36A" BorderThickness="1" CornerRadius="10" Background="#16181E">
+    <Grid>
+      <Border Width="4" HorizontalAlignment="Left" Background="#C9A36A" CornerRadius="10,0,0,10"/>
+      <DockPanel Margin="28,24,24,22">
+        <StackPanel DockPanel.Dock="Bottom">
+          <Border x:Name="BarWell" Height="4" Background="#22FFFFFF" CornerRadius="2" Margin="0,0,0,14" Visibility="Collapsed">
+            <Border x:Name="BarFill" Width="0" Height="4" HorizontalAlignment="Left" CornerRadius="2" Background="#C9A36A"/>
+          </Border>
+          <TextBlock x:Name="Status" Style="{StaticResource Caption}" Margin="0,0,0,12" TextWrapping="Wrap"/>
+          <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button x:Name="SkipBtn" Content="Skip" Style="{StaticResource QuietBtn}" Click="SkipClick" Margin="0,0,8,0"/>
+            <Button x:Name="LaterBtn" Content="Later" Style="{StaticResource QuietBtn}" Click="LaterClick" Margin="0,0,8,0"/>
+            <Button x:Name="GoBtn" Content="Update" Style="{StaticResource AccentBtn}" Click="UpdateClick"/>
+          </StackPanel>
+        </StackPanel>
+        <StackPanel>
+          <TextBlock Text="CUEBOX" FontSize="11" FontWeight="Bold" Foreground="#8E96A6"/>
+          <TextBlock x:Name="TitleText" Text="Update available" FontSize="22" FontWeight="SemiBold" Margin="0,8,0,6"/>
+          <TextBlock x:Name="KindText" Style="{StaticResource Caption}" TextWrapping="Wrap"/>
+          <TextBlock x:Name="NotesText" Margin="0,14,0,0" TextWrapping="Wrap" FontSize="13" LineHeight="20"/>
+        </StackPanel>
+      </DockPanel>
+    </Grid>
+  </Border>
+</Window>

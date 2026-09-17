@@ -38,15 +38,18 @@ public partial class SettingsView : UserControl
         Bypass.IsChecked = c.Audio.BypassProcessing;
         Tone.IsChecked = c.Advanced.TestToneOnStart;
         ClientId.Text = c.Spotify.ClientId ?? "";
+        RedirectBox.Text = SpotifyClient.RedirectHelp();
         FindCmd.Text = SpotifyClientIdFinder.Command;
         SpStatus.Text = _session.Spotify.IsConnected
-            ? $"Connected as {_session.Spotify.DisplayName}"
-            : "Not connected. The app works without Spotify.";
+            ? $"Connected as {_session.Spotify.DisplayName}. Spotify Premium required for play, pause, and skip."
+            : "Not connected. You need Spotify Premium for play, pause, and skip.";
         ProfileBox.ItemsSource = _session.Profiles.ToArray();
         ProfileBox.SelectedItem = c.ActiveProfile;
         WinStart.IsChecked = c.Startup.StartWithWindows;
         MinStart.IsChecked = c.Startup.StartMinimized;
         AutoEngine.IsChecked = c.Startup.StartEngineAutomatically;
+        CheckUpdates.IsChecked = c.Updates.CheckOnStart;
+        UpdateStatus.Text = "Cuebox " + AppInfo.Version;
         Err.Text = _session.LastError ?? "";
         DataPath.Text = AppPaths.Root;
         HexBox.Text = string.IsNullOrWhiteSpace(c.Appearance.AccentHex)
@@ -153,6 +156,7 @@ public partial class SettingsView : UserControl
         c.Startup.StartWithWindows = WinStart.IsChecked == true;
         c.Startup.StartMinimized = MinStart.IsChecked == true;
         c.Startup.StartEngineAutomatically = AutoEngine.IsChecked == true;
+        c.Updates.CheckOnStart = CheckUpdates.IsChecked == true;
         _session.MixerChanged();
         _session.ScheduleSave();
     }
@@ -177,7 +181,7 @@ public partial class SettingsView : UserControl
         var id = SpotifyClientIdFinder.Find();
         if (string.IsNullOrEmpty(id))
         {
-            SpStatus.Text = "None found. Create an app at developer.spotify.com/dashboard. Redirect: http://127.0.0.1:43821/callback";
+            SpStatus.Text = "None found. Create an app at developer.spotify.com/dashboard and add both redirect URIs from Settings.";
             try { System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo("https://developer.spotify.com/dashboard") { UseShellExecute = true }); } catch { }
             return;
         }
@@ -192,10 +196,38 @@ public partial class SettingsView : UserControl
 
     private void Restart(object sender, RoutedEventArgs e) => _session?.RestartEngine();
 
+    private void CopyRedirect(object sender, RoutedEventArgs e)
+    {
+        Clipboard.SetText(SpotifyClient.RedirectHelp());
+        _session?.Notify("Redirect URIs copied.");
+    }
+
+    private void OpenDashboard(object sender, RoutedEventArgs e)
+    {
+        SpotifyClient.OpenDashboard();
+        _session?.Notify("Add both redirect URIs, Save, then Connect.");
+    }
+
     private async void ConnectSp(object sender, RoutedEventArgs e)
     {
         if (_session is null) return;
         _session.Config.Spotify.ClientId = ClientId.Text.Trim();
+        _session.Config.Spotify.RedirectUri = SpotifyClient.RedirectUri;
+        Clipboard.SetText(SpotifyClient.RedirectHelp());
+        if (!_session.Spotify.IsConnected)
+        {
+            var go = MessageBox.Show(
+                "You need Spotify Premium for play, pause, and skip.\n\n" +
+                "Spotify must have these Redirect URIs on your app (copied):\n\n" +
+                SpotifyClient.RedirectHelp() +
+                "\n\nOpen the dashboard, paste them, click Save, then sign in.\n\nOpen the dashboard now?",
+                "Connect Spotify",
+                MessageBoxButton.YesNo,
+                MessageBoxImage.Information);
+            if (go == MessageBoxResult.Yes)
+                SpotifyClient.OpenDashboard();
+        }
+        SpStatus.Text = "Waiting for Spotify login...";
         var r = await _session.ConnectSpotify();
         if (!r.Success)
             _session.SetError(r.Error ?? "Spotify login failed.", r.Details);
@@ -267,6 +299,15 @@ public partial class SettingsView : UserControl
     {
         Clipboard.SetText(_session?.Diagnostics() ?? "");
         _session?.Notify("Diagnostic info copied. Secrets are stripped.");
+    }
+
+    private async void CheckNow(object sender, RoutedEventArgs e)
+    {
+        if (Window.GetWindow(this) is not MainWindow main)
+            return;
+        UpdateStatus.Text = "Checking GitHub...";
+        await main.CheckForUpdate(true);
+        UpdateStatus.Text = "Cuebox " + AppInfo.Version;
     }
 
     private void Details(object sender, RoutedEventArgs e)

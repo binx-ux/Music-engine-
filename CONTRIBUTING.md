@@ -34,7 +34,7 @@ Cuebox versions look like `1.2.33`.
 - minor: second number goes up, the rest stay (`1.2.33` -> `1.3.33`)
 - fix: last two numbers go up (`1.2.33` -> `1.2.34`)
 
-Current release is `1.1.1`.
+Current release is `1.3.1`.
 
 ## Pull requests
 

@@ -6,7 +6,7 @@
 
 *ੈ✩‧₊˚༺☆༻*ੈ✩‧₊˚
 
-1.1.1
+1.3.1
 
 docs: [cuebox on github pages](https://binx-ux.github.io/Music-engine-/)
 

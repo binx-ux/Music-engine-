@@ -30,6 +30,10 @@ public sealed class SpotifyNowPlaying
 
 public sealed class SpotifyClient
 {
+    public const string RedirectUri = "http://127.0.0.1:43821/callback";
+    public const string RedirectUriAllowAnyPort = "http://127.0.0.1/callback";
+    public const string DashboardUrl = "https://developer.spotify.com/dashboard";
+    private const int PreferredPort = 43821;
     private const string AuthorizeUrl = "https://accounts.spotify.com/authorize";
     private const string TokenUrl = "https://accounts.spotify.com/api/token";
     private const string ApiRoot = "https://api.spotify.com/v1";
@@ -51,26 +55,25 @@ public sealed class SpotifyClient
 
     public void LoadTokens(SpotifyTokens? tokens) => _tokens = tokens;
 
-    public async Task<Result> ConnectAsync(string clientId, string redirectUri, CancellationToken ct)
+    public async Task<Result> ConnectAsync(string clientId, CancellationToken ct)
     {
         if (string.IsNullOrWhiteSpace(clientId))
             return Result.Fail("Add your Spotify Client ID in Settings first.");
-        _clientId = clientId;
+        _clientId = clientId.Trim();
 
         var verifier = Base64Url(RandomNumberGenerator.GetBytes(32));
         var challenge = Base64Url(SHA256.HashData(Encoding.ASCII.GetBytes(verifier)));
         var state = Base64Url(RandomNumberGenerator.GetBytes(16));
 
-        var listener = new HttpListener();
+        HttpListener? listener = null;
+        string redirectUri;
         try
         {
-            var root = new Uri(redirectUri).GetLeftPart(UriPartial.Authority) + "/";
-            listener.Prefixes.Add(root);
-            listener.Start();
+            (listener, redirectUri) = BindCallback();
         }
         catch (Exception ex)
         {
-            listener.Close();
+            listener?.Close();
             return Result.Fail("Could not open the local login callback.", ex.Message);
         }
 
@@ -136,10 +139,52 @@ public sealed class SpotifyClient
         }
         finally
         {
-            listener.Stop();
-            listener.Close();
+            listener?.Stop();
+            listener?.Close();
         }
     }
+
+    private static (HttpListener Listener, string RedirectUri) BindCallback()
+    {
+        var ports = new List<int> { PreferredPort };
+        var probe = new System.Net.Sockets.TcpListener(System.Net.IPAddress.Loopback, 0);
+        probe.Start();
+        ports.Add(((System.Net.IPEndPoint)probe.LocalEndpoint).Port);
+        probe.Stop();
+
+        Exception? last = null;
+        foreach (var port in ports)
+        {
+            var listener = new HttpListener();
+            try
+            {
+                listener.Prefixes.Add($"http://127.0.0.1:{port}/");
+                listener.Start();
+                return (listener, $"http://127.0.0.1:{port}/callback");
+            }
+            catch (Exception ex)
+            {
+                last = ex;
+                listener.Close();
+            }
+        }
+
+        throw last ?? new InvalidOperationException("No free loopback port.");
+    }
+
+    public static void OpenDashboard()
+    {
+        try
+        {
+            System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(DashboardUrl) { UseShellExecute = true });
+        }
+        catch
+        {
+        }
+    }
+
+    public static string RedirectHelp()
+        => RedirectUri + Environment.NewLine + RedirectUriAllowAnyPort;
 
     public void Disconnect()
     {
@@ -216,7 +261,7 @@ public sealed class SpotifyClient
         if (res.IsSuccessStatusCode || res.StatusCode == HttpStatusCode.NoContent)
             return Result.Ok();
         if ((int)res.StatusCode == 403)
-            return Result.Fail("Spotify playback control needs an active Spotify player and a Premium account for some actions.");
+            return Result.Fail("You need Spotify Premium, and Spotify has to be open on a device.");
         if ((int)res.StatusCode == 404)
             return Result.Fail("No active Spotify device. Open Spotify on your PC or phone first.");
         return Result.Fail("Spotify did not accept that command.", $"{(int)res.StatusCode}");

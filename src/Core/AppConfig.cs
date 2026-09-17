@@ -16,6 +16,7 @@ public sealed class AppConfig
     public StorageSettings Storage { get; set; } = new();
     public AdvancedSettings Advanced { get; set; } = new();
     public StartupSettings Startup { get; set; } = new();
+    public UpdateSettings Updates { get; set; } = new();
 }
 
 public sealed class AudioSettings
@@ -183,6 +184,12 @@ public sealed class StartupSettings
     public bool StartWithWindows { get; set; }
     public bool StartMinimized { get; set; }
     public bool StartEngineAutomatically { get; set; } = true;
+}
+
+public sealed class UpdateSettings
+{
+    public bool CheckOnStart { get; set; } = true;
+    public string? SkippedVersion { get; set; }
 }
 
 public sealed class UserProfile

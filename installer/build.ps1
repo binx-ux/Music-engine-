@@ -23,18 +23,19 @@ $zip = Join-Path $out "Cuebox.zip"
 if (Test-Path $zip) { Remove-Item $zip -Force }
 Compress-Archive -Path (Join-Path $pub '*') -DestinationPath $zip -CompressionLevel Optimal
 
-$iss = Get-Command iscc -ErrorAction SilentlyContinue
-if (-not $iss) {
-    $guess = @(
+$iscc = $null
+$cmd = Get-Command iscc -ErrorAction SilentlyContinue
+if ($cmd) { $iscc = $cmd.Source }
+if (-not $iscc) {
+    $iscc = @(
         "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe",
         "$env:ProgramFiles\Inno Setup 6\ISCC.exe",
         "$env:LOCALAPPDATA\Programs\Inno Setup 6\ISCC.exe"
     ) | Where-Object { Test-Path $_ } | Select-Object -First 1
-    if ($guess) { $iss = Get-Item $guess }
 }
 
-if ($iss) {
-    & $iss.Source (Join-Path $PSScriptRoot "Cuebox.iss")
+if ($iscc) {
+    & $iscc (Join-Path $PSScriptRoot "Cuebox.iss")
     if ($LASTEXITCODE -ne 0) { throw "Inno Setup failed." }
 } else {
     Write-Host "Inno Setup (iscc) is not installed. Zip is in $zip"

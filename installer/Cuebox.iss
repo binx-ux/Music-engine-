@@ -1,8 +1,8 @@
-; Cuebox 1.1.1
+; Cuebox 1.3.1
 ; Pick the app folder and a separate data folder.
 
 #define MyAppName "Cuebox"
-#define MyAppVersion "1.1.1"
+#define MyAppVersion "1.3.1"
 #define MyAppExeName "Cuebox.exe"
 
 [Setup]
@@ -11,10 +11,16 @@ AppName={#MyAppName}
 AppVersion={#MyAppVersion}
 AppPublisher=Kynvyr
 AppPublisherURL=https://github.com/binx-ux/Music-engine-
+AppCopyright=Copyright (c) 2026 Kynvyr
+VersionInfoVersion={#MyAppVersion}
+VersionInfoProductName=Cuebox
+VersionInfoProductVersion={#MyAppVersion}
+VersionInfoCompany=Kynvyr
 DefaultDirName={localappdata}\Cuebox
 DefaultGroupName=Cuebox
 DisableDirPage=no
 DisableProgramGroupPage=yes
+DisableWelcomePage=no
 UsePreviousAppDir=yes
 AllowRootDirectory=no
 AlwaysShowDirOnReadyPage=yes
@@ -29,6 +35,9 @@ PrivilegesRequiredOverridesAllowed=dialog
 WizardStyle=modern
 WizardSizePercent=120
 SetupIconFile=..\src\UI\Assets\cuebox.ico
+WizardImageFile=art\wizard.bmp
+WizardSmallImageFile=art\wizard-small.bmp
+UninstallDisplayName=Cuebox
 UninstallDisplayIcon={app}\{#MyAppExeName}
 LicenseFile=..\LICENSE
 InfoBeforeFile=info.txt
@@ -39,6 +48,10 @@ RestartApplications=no
 [Languages]
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
+[Messages]
+SetupAppTitle=Cuebox Setup
+SetupWindowTitle=Cuebox Setup {#MyAppVersion}
+
 [Tasks]
 Name: "desktopicon"; Description: "Desktop shortcut"; GroupDescription: "Shortcuts:"; Flags: checkedonce
 Name: "startmenu"; Description: "Start menu shortcut"; GroupDescription: "Shortcuts:"; Flags: checkedonce
@@ -46,10 +59,11 @@ Name: "startmenu"; Description: "Start menu shortcut"; GroupDescription: "Shortc
 [Files]
 Source: "publish\*"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "info.txt"; DestDir: "{app}"; Flags: ignoreversion
+Source: "art\cuebox.ico"; DestDir: "{app}"; DestName: "cuebox.ico"; Flags: ignoreversion
 
 [Icons]
-Name: "{group}\Cuebox"; Filename: "{app}\{#MyAppExeName}"; Tasks: startmenu
-Name: "{autodesktop}\Cuebox"; Filename: "{app}\{#MyAppExeName}"; Tasks: desktopicon
+Name: "{group}\Cuebox"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\cuebox.ico"; Tasks: startmenu
+Name: "{autodesktop}\Cuebox"; Filename: "{app}\{#MyAppExeName}"; IconFilename: "{app}\cuebox.ico"; Tasks: desktopicon
 
 [Run]
 Filename: "{app}\{#MyAppExeName}"; Description: "Open Cuebox"; Flags: nowait postinstall skipifsilent

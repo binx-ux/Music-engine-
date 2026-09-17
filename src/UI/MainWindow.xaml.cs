@@ -99,12 +99,49 @@ public partial class MainWindow : Window
         };
         _session.Notifications.CollectionChanged += (_, _) => Dispatcher.BeginInvoke(ShowToast);
         ApplyScale();
+        SideVer.Text = "v" + AppInfo.Version;
         RefreshChrome();
         CopySpotifyFinder();
         _ = LoadInstantPresets();
+        _ = CheckForUpdate(false);
         UiMotion.Fade(this, 0, 1, 260);
         if (_session.Config.Startup.StartMinimized)
             WindowState = WindowState.Minimized;
+    }
+
+    public async Task CheckForUpdate(bool force)
+    {
+        if (!force && !_session.Config.Updates.CheckOnStart)
+            return;
+        try
+        {
+            var offer = await UpdateService.FindAsync(_session.Config.Updates.SkippedVersion, force, CancellationToken.None);
+            if (offer is null)
+            {
+                if (force)
+                    _session.Notify("You're on Cuebox " + AppInfo.Version);
+                return;
+            }
+            var win = new UpdateWindow(offer) { Owner = this };
+            win.ShowDialog();
+            if (win.Skipped)
+            {
+                _session.Config.Updates.SkippedVersion = offer.Version;
+                _session.ScheduleSave();
+                _session.Notify("Skipped Cuebox " + offer.Version);
+            }
+            else if (win.Install)
+            {
+                _session.Config.Updates.SkippedVersion = null;
+                _session.Persist();
+            }
+        }
+        catch (Exception ex)
+        {
+            _session.Log.Warning("update", "Update check failed.", ex.Message);
+            if (force)
+                _session.Notify("Could not check for updates.");
+        }
     }
 
     private void TitleDrag(object sender, System.Windows.Input.MouseButtonEventArgs e)
@@ -222,21 +259,28 @@ public partial class MainWindow : Window
 
         SetPlayIcon(_session.Engine.Music.IsPlaying);
         TickChromeSeek();
-        ChromeShuffle.Opacity = _session.Config.Music.Shuffle ? 1 : 0.5;
-        ChromeLoop.Content = _session.Config.Music.Loop == LoopMode.One ? "Loop 1" : "Loop";
-        ChromeLoop.Opacity = _session.Config.Music.Loop == LoopMode.Off ? 0.5 : 1;
+        ChromeShuffle.Opacity = _session.Config.Music.Shuffle ? 1 : 0.38;
+        ChromeLoop.Opacity = _session.Config.Music.Loop == LoopMode.Off ? 0.38 : 1;
+        LoopOne.Visibility = _session.Config.Music.Loop == LoopMode.One ? Visibility.Visible : Visibility.Collapsed;
 
         var virt = _session.Engine.VirtualStatus();
         if (virt.Connected != _virtConnected)
         {
             _virtConnected = virt.Connected;
             VirtDot.Fill = virt.Connected ? VirtOn : VirtOff;
+            SideDot.Fill = virt.Connected ? VirtOn : VirtOff;
         }
         var virtText = string.IsNullOrEmpty(virt.RenderName)
             ? virt.Message
             : virt.RenderName + "  ·  " + virt.Message;
         if (VirtText.Text != virtText)
             VirtText.Text = virtText;
+        SideEngine.Text = _session.Engine.IsRunning ? "Engine on" : "Engine off";
+        var sideVirt = string.IsNullOrEmpty(virt.RenderName)
+            ? (string.IsNullOrWhiteSpace(virt.Message) ? "No cable" : virt.Message)
+            : virt.RenderName;
+        if (SideVirt.Text != sideVirt)
+            SideVirt.Text = sideVirt;
         MicLive.Text = _session.Engine.MicrophoneActive ? "Mic on" : "";
         MicLivePill.Visibility = _session.Engine.MicrophoneActive ? Visibility.Visible : Visibility.Collapsed;
         var lat = _session.Engine.Latency;

@@ -32,14 +32,14 @@ public partial class App : Application
 
         try
         {
-            await splash.Step("Reading settings", 0.22);
+            await splash.Step("Reading settings", 0.24);
             Session = new AppSession();
             Theme.Apply(Session.Config.Appearance);
 
-            await splash.Step("Starting audio", 0.58);
+            await splash.Step("Starting engine", 0.62);
             Session.StartEngineIfNeeded();
 
-            await splash.Step("Opening Cuebox", 0.88);
+            await splash.Step("Opening Cuebox", 0.9);
             var main = new MainWindow();
             MainWindow = main;
             main.Show();
