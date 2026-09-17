@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% if page.title and page.title != "Home" %}{{ page.title }} · {% endif %}Cuebox</title>
+  <meta name="description" content="{{ site.description }}">
+  <link rel="icon" href="{{ '/assets/cuebox.png' | relative_url }}">
+  <link rel="stylesheet" href="{{ '/assets/css/site.css' | relative_url }}">
+</head>
+<body>
+  <div class="rail"></div>
+  <header class="top">
+    <a class="brand" href="{{ '/' | relative_url }}">
+      <img src="{{ '/assets/cuebox.png' | relative_url }}" width="36" height="36" alt="">
+      <span>
+        <small>CUEBOX</small>
+        Cuebox
+      </span>
+    </a>
+    <a class="get" href="https://github.com/binx-ux/Music-engine-/releases/latest">Download 1.1.1</a>
+  </header>
+  <nav class="nav">
+    <a href="{{ '/' | relative_url }}"{% if page.url == "/" %} class="on"{% endif %}>Home</a>
+    <a href="{{ '/install/' | relative_url }}"{% if page.url == "/install/" %} class="on"{% endif %}>Install</a>
+    <a href="{{ '/games/' | relative_url }}"{% if page.url == "/games/" %} class="on"{% endif %}>Games</a>
+    <a href="{{ '/voice/' | relative_url }}"{% if page.url == "/voice/" %} class="on"{% endif %}>Voice</a>
+    <a href="{{ '/music/' | relative_url }}"{% if page.url == "/music/" %} class="on"{% endif %}>Music</a>
+    <a href="{{ '/spotify/' | relative_url }}"{% if page.url == "/spotify/" %} class="on"{% endif %}>Spotify</a>
+    <a href="{{ '/help/' | relative_url }}"{% if page.url == "/help/" %} class="on"{% endif %}>Help</a>
+  </nav>
+  <main class="page">
+    {{ content }}
+  </main>
+  <footer class="foot">
+    <p>Cuebox {{ site.time | date: "%Y" }} · MIT · made by <a href="https://github.com/binx-ux">kynvyr</a></p>
+    <p>
+      <a href="https://github.com/binx-ux/Music-engine-">source</a>
+      · <a href="https://instagram.com/kynvyr/">ig</a>
+      · <a href="https://buymeacoffee.com/kynvyr">coffee</a>
+      · discord kynvyr
+    </p>
+  </footer>
+</body>
+</html>

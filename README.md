@@ -8,6 +8,8 @@
 
 1.1.1
 
+docs: [cuebox on github pages](https://binx-ux.github.io/Music-engine-/)
+
 mic + music + soundboard on windows. dumps the mix into a virtual cable so roblox / discord / games just see another mic.
 
 no injection. no ripping spotify.

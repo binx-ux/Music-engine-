@@ -1,0 +1,10 @@
+title: Cuebox
+description: Mic, music, and pads into a virtual cable on Windows.
+url: https://binx-ux.github.io
+baseurl: "/Music-engine-"
+markdown: kramdown
+kramdown:
+  input: GFM
+permalink: pretty
+exclude:
+  - README.md
