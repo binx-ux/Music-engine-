@@ -26,6 +26,7 @@ public sealed class AppSession : IDisposable
     public SpotifyClient Spotify { get; }
     public HotkeyService Hotkeys { get; }
     public YtDlpClient Downloader { get; }
+    public GitHubPlaylist GitHub { get; }
     public AppConfig Config { get; private set; }
     public SoundboardLayout Layout { get; private set; }
     public ObservableCollection<string> Profiles { get; } = [];
@@ -53,6 +54,7 @@ public sealed class AppSession : IDisposable
         Spotify = new SpotifyClient(Log);
         Hotkeys = new HotkeyService(Log);
         Downloader = new YtDlpClient(Log);
+        GitHub = new GitHubPlaylist(Log, Downloader);
         Config = ConfigStore.Load();
         Layout = SoundboardStore.Load(Config.Soundboard.ActiveLayout);
         LuaPads.Load(Path.Combine(AppContext.BaseDirectory, "scripts", "pads.lua"));
@@ -257,6 +259,10 @@ public sealed class AppSession : IDisposable
             (uri.Scheme != Uri.UriSchemeHttp && uri.Scheme != Uri.UriSchemeHttps))
             return (false, "Paste a link or a file path.", tracks);
 
+        if (GitHubPlaylist.LooksLike(text) && (uri.Host.Contains("github.com", StringComparison.OrdinalIgnoreCase)
+            || uri.Host.Contains("githubusercontent.com", StringComparison.OrdinalIgnoreCase)))
+            return await ImportGitHub(text);
+
         var check = await _urls.ValidateAsync(text, CancellationToken.None);
         if (check.Ok)
         {
@@ -282,14 +288,49 @@ public sealed class AppSession : IDisposable
 
     public async Task<(bool Ok, string Message, List<TrackInfo> Tracks)> FindCleanRap()
     {
-        Notify("Finding clean rap for Roblox...");
+        Notify("Finding clean rap...");
         var got = await Downloader.FindCleanRapAsync(CancellationToken.None);
         var tracks = new List<TrackInfo>();
         if (!got.Success || got.Value is null || got.Value.Count == 0)
             return (false, got.Error ?? "Could not find clean rap.", tracks);
+
+        var existing = new HashSet<string>(Engine.Music.Queue.Select(t => t.Path), StringComparer.OrdinalIgnoreCase);
         foreach (var file in got.Value)
+        {
+            if (!existing.Add(file))
+                continue;
             tracks.Add(AudioFileSupport.ReadMetadata(file));
+        }
+        if (tracks.Count == 0)
+            return (true, "Clean rap is already in your queue.", tracks);
         return (true, $"Added {tracks.Count} clean rap tracks.", tracks);
+    }
+
+    public async Task<(bool Ok, string Message, List<TrackInfo> Tracks)> ImportGitHub(string text)
+    {
+        text = (text ?? "").Trim();
+        var tracks = new List<TrackInfo>();
+        if (string.IsNullOrWhiteSpace(text))
+            return (false, "Paste a GitHub repo URL.", tracks);
+
+        Notify("Connecting to GitHub...");
+        var got = await GitHub.LoadAsync(text, CancellationToken.None);
+        if (!got.Success || got.Value is null || got.Value.Count == 0)
+            return (false, got.Error ?? "Could not load that GitHub playlist.", tracks);
+
+        var existing = new HashSet<string>(Engine.Music.Queue.Select(t => t.Path), StringComparer.OrdinalIgnoreCase);
+        foreach (var t in got.Value)
+        {
+            if (!existing.Add(t.Path))
+                continue;
+            tracks.Add(t);
+        }
+
+        Config.Music.GitHubRepo = text;
+        ScheduleSave();
+        if (tracks.Count == 0)
+            return (true, "That GitHub playlist is already in your queue.", tracks);
+        return (true, $"Added {tracks.Count} tracks from GitHub.", tracks);
     }
 
     public string ShareCurrent()
@@ -330,6 +371,8 @@ public sealed class AppSession : IDisposable
         if (Engine.Music.ConsumeEnded())
         {
             Engine.Music.Next();
+            Config.Music.QueueIndex = Engine.Music.Index;
+            ScheduleSave();
             Push();
         }
     }
@@ -425,7 +468,7 @@ public sealed class AppSession : IDisposable
         }
     }
 
-    private void Push() => Changed?.Invoke();
+    public void Push() => Changed?.Invoke();
 
     public void Dispose()
     {

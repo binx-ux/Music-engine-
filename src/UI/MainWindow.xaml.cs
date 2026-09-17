@@ -17,8 +17,8 @@ namespace Mixline.App;
 
 public partial class MainWindow : Window
 {
-    private static readonly Geometry PlayGeo = FreezeGeo("M 8,7 L 8,17 L 16,12 Z");
-    private static readonly Geometry PauseGeo = FreezeGeo("M 8,8 L 8,16 L 11,16 L 11,8 Z M 13,8 L 13,16 L 16,16 L 16,8 Z");
+    private static readonly Geometry PlayGeo = FreezeGeo("M 8,4 L 20,12 L 8,20 Z");
+    private static readonly Geometry PauseGeo = FreezeGeo("M 6,4 L 10,4 L 10,20 L 6,20 Z M 14,4 L 18,4 L 18,20 L 14,20 Z");
     private static readonly SolidColorBrush VirtOn = FreezeBrush(125, 206, 160);
     private static readonly SolidColorBrush VirtOff = FreezeBrush(120, 120, 120);
 
@@ -26,18 +26,19 @@ public partial class MainWindow : Window
     private readonly DispatcherTimer _meterTimer = new() { Interval = TimeSpan.FromMilliseconds(50) };
     private readonly DispatcherTimer _spotifyTimer = new() { Interval = TimeSpan.FromSeconds(2) };
     private readonly HomeView _home = new();
-    private readonly MixerView _mixer = new();
-    private readonly SoundboardView _board = new();
-    private readonly MusicView _music = new();
-    private readonly VoiceView _voice = new();
-    private readonly DevicesView _devices = new();
-    private readonly SettingsView _settings = new();
+    private MixerView? _mixer;
+    private SoundboardView? _board;
+    private MusicView? _music;
+    private VoiceView? _voice;
+    private DevicesView? _devices;
+    private SettingsView? _settings;
     private readonly DispatcherTimer _toastTimer = new() { Interval = TimeSpan.FromSeconds(4) };
     private byte[]? _artBytes;
     private string? _artUrl;
     private bool _playIconPlaying;
     private bool _virtConnected;
     private string? _nowKey;
+    private int _toastGen;
     private object? _chromeTrack;
 
     public MainWindow()
@@ -77,14 +78,8 @@ public partial class MainWindow : Window
         src?.AddHook(WndProc);
         _session.Hotkeys.Attach(new WindowInteropHelper(this).Handle);
         _session.RegisterHotkeys();
-        Host.Content = _home;
         _home.Bind(_session);
-        _mixer.Bind(_session);
-        _board.Bind(_session);
-        _music.Bind(_session);
-        _voice.Bind(_session);
-        _devices.Bind(_session);
-        _settings.Bind(_session);
+        Host.Content = _home;
         _session.Changed += () => Dispatcher.BeginInvoke(RefreshChrome);
         _session.Meters += OnMeters;
         _session.SpotifyUpdated += OnSpotify;
@@ -95,13 +90,19 @@ public partial class MainWindow : Window
         _toastTimer.Tick += (_, _) =>
         {
             _toastTimer.Stop();
-            ToastText.Text = "";
+            var gen = _toastGen;
+            UiMotion.Fade(ToastText, ToastText.Opacity, 0, 160, () =>
+            {
+                if (gen == _toastGen)
+                    ToastText.Text = "";
+            });
         };
         _session.Notifications.CollectionChanged += (_, _) => Dispatcher.BeginInvoke(ShowToast);
         ApplyScale();
         RefreshChrome();
         CopySpotifyFinder();
         _ = LoadInstantPresets();
+        UiMotion.Fade(this, 0, 1, 260);
         if (_session.Config.Startup.StartMinimized)
             WindowState = WindowState.Minimized;
     }
@@ -169,21 +170,29 @@ public partial class MainWindow : Window
     {
         if (!IsLoaded)
             return;
-        if (NavMixer.IsChecked == true) Show(_mixer);
-        else if (NavBoard.IsChecked == true) Show(_board);
-        else if (NavMusic.IsChecked == true) Show(_music);
-        else if (NavVoice.IsChecked == true) Show(_voice);
-        else if (NavDevices.IsChecked == true) Show(_devices);
-        else if (NavSettings.IsChecked == true) Show(_settings);
+        if (NavMixer.IsChecked == true) Show(_mixer ??= new MixerView());
+        else if (NavBoard.IsChecked == true) Show(_board ??= new SoundboardView());
+        else if (NavMusic.IsChecked == true) Show(_music ??= new MusicView());
+        else if (NavVoice.IsChecked == true) Show(_voice ??= new VoiceView());
+        else if (NavDevices.IsChecked == true) Show(_devices ??= new DevicesView());
+        else if (NavSettings.IsChecked == true) Show(_settings ??= new SettingsView());
         else Show(_home);
     }
 
     private void Show(UserControl page)
     {
+        if (page is HomeView home) home.Bind(_session);
+        else if (page is MixerView mixer) mixer.Bind(_session);
+        else if (page is SoundboardView board) board.Bind(_session);
+        else if (page is MusicView music) music.Bind(_session);
+        else if (page is VoiceView voice) voice.Bind(_session);
+        else if (page is DevicesView devices) devices.Bind(_session);
+        else if (page is SettingsView settings) settings.Bind(_session);
+
         if (Host.Content == page)
             return;
         Host.Content = page;
-        Host.BeginAnimation(OpacityProperty, new DoubleAnimation(0, 1, TimeSpan.FromMilliseconds(90)));
+        UiMotion.Enter(Host, HostSlide);
     }
 
     private void RefreshChrome()
@@ -213,6 +222,9 @@ public partial class MainWindow : Window
 
         SetPlayIcon(_session.Engine.Music.IsPlaying);
         TickChromeSeek();
+        ChromeShuffle.Opacity = _session.Config.Music.Shuffle ? 1 : 0.5;
+        ChromeLoop.Content = _session.Config.Music.Loop == LoopMode.One ? "Loop 1" : "Loop";
+        ChromeLoop.Opacity = _session.Config.Music.Loop == LoopMode.Off ? 0.5 : 1;
 
         var virt = _session.Engine.VirtualStatus();
         if (virt.Connected != _virtConnected)
@@ -237,9 +249,9 @@ public partial class MainWindow : Window
     {
         var page = Host.Content;
         if (page == _home) _home.UpdateMeters(meters);
-        else if (page == _mixer) _mixer.UpdateMeters(meters);
-        else if (page == _voice) _voice.UpdateLive(meters);
-        else if (page == _music) _music.TickPosition();
+        else if (_mixer is not null && page == _mixer) _mixer.UpdateMeters(meters);
+        else if (_voice is not null && page == _voice) _voice.UpdateLive(meters);
+        else if (_music is not null && page == _music) _music.TickPosition();
         SetPlayIcon(_session.Engine.Music.IsPlaying);
         TickChromeSeek();
         var track = _session.Engine.Music.Current;
@@ -256,6 +268,7 @@ public partial class MainWindow : Window
             return;
         _playIconPlaying = playing;
         PlayIcon.Data = playing ? PauseGeo : PlayGeo;
+        PlayBtn.ToolTip = playing ? "Pause" : "Play";
     }
 
     private void TickChromeSeek()
@@ -263,8 +276,17 @@ public partial class MainWindow : Window
         var music = _session.Engine.Music;
         var dur = music.Duration.TotalSeconds;
         var frac = dur <= 0 ? 0 : Math.Clamp(music.Position.TotalSeconds / dur, 0, 1);
-        ChromeSeekFill.Width = ChromeSeekWell.ActualWidth * frac;
+        ChromeSeekFill.BeginAnimation(FrameworkElement.WidthProperty, null);
+        var target = ChromeSeekWell.ActualWidth * frac;
+        if (Math.Abs(target - ChromeSeekFill.Width) > 24)
+            UiMotion.WidthTo(ChromeSeekFill, target, 160);
+        else
+            ChromeSeekFill.Width = target;
+        ChromePos.Text = FormatTime(music.Position);
+        ChromeDur.Text = dur <= 0 ? "0:00" : FormatTime(music.Duration);
     }
+
+    private static string FormatTime(TimeSpan t) => $"{(int)t.TotalMinutes}:{t.Seconds:00}";
 
     private void ChromeSeekClick(object sender, System.Windows.Input.MouseButtonEventArgs e)
     {
@@ -281,7 +303,10 @@ public partial class MainWindow : Window
     {
         if (_session.Notifications.Count == 0)
             return;
+        ToastText.BeginAnimation(OpacityProperty, null);
         ToastText.Text = _session.Notifications[0];
+        _toastGen++;
+        UiMotion.Fade(ToastText, 0, 1, 140);
         _toastTimer.Stop();
         _toastTimer.Start();
     }
@@ -324,6 +349,11 @@ public partial class MainWindow : Window
             img.EndInit();
             img.Freeze();
             ArtImage.Source = img;
+            UiMotion.Fade(ArtImage, 0, 1, 220);
+            ArtScale.BeginAnimation(ScaleTransform.ScaleXProperty,
+                new DoubleAnimation(0.92, 1, TimeSpan.FromMilliseconds(240)) { EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut } });
+            ArtScale.BeginAnimation(ScaleTransform.ScaleYProperty,
+                new DoubleAnimation(0.92, 1, TimeSpan.FromMilliseconds(240)) { EasingFunction = new QuarticEase { EasingMode = EasingMode.EaseOut } });
         }
         catch
         {
@@ -353,18 +383,47 @@ public partial class MainWindow : Window
             _session.Engine.Music.Pause();
         else
             _session.Engine.Music.Play();
+        UiMotion.Punch(PlayBtn);
         RefreshChrome();
     }
 
     private void PrevClick(object sender, RoutedEventArgs e)
     {
         _session.Engine.Music.Previous();
+        if (sender is UIElement el)
+            UiMotion.Punch(el);
         RefreshChrome();
     }
 
     private void NextClick(object sender, RoutedEventArgs e)
     {
         _session.Engine.Music.Next();
+        if (sender is UIElement el)
+            UiMotion.Punch(el);
+        RefreshChrome();
+    }
+
+    private void ShuffleClick(object sender, RoutedEventArgs e)
+    {
+        _session.Config.Music.Shuffle = !_session.Config.Music.Shuffle;
+        _session.Engine.Music.SetShuffle(_session.Config.Music.Shuffle);
+        _session.ScheduleSave();
+        _session.Push();
+        RefreshChrome();
+    }
+
+    private void LoopClick(object sender, RoutedEventArgs e)
+    {
+        var next = _session.Config.Music.Loop switch
+        {
+            LoopMode.Off => LoopMode.All,
+            LoopMode.All => LoopMode.One,
+            _ => LoopMode.Off
+        };
+        _session.Config.Music.Loop = next;
+        _session.Engine.Music.SetLoop(next);
+        _session.ScheduleSave();
+        _session.Push();
         RefreshChrome();
     }
 

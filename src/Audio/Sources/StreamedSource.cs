@@ -11,9 +11,9 @@ public sealed class StreamedSource : IAudioSource
 {
     private readonly AppLog _log;
     private readonly int _engineRate;
-    private readonly FloatRingBuffer _ring = new(1 << 18);
+    private readonly FloatRingBuffer _ring = new(1 << 19);
     private readonly object _gate = new();
-    private readonly float[] _pumpBuf = new float[8192];
+    private readonly float[] _pumpBuf = new float[16384];
     private WaveStream? _stream;
     private ISampleProvider? _provider;
     private Thread? _thread;
@@ -57,7 +57,7 @@ public sealed class StreamedSource : IAudioSource
                 if (sample.WaveFormat.Channels == 1)
                     sample = new MonoToStereoSampleProvider(sample);
                 if (sample.WaveFormat.SampleRate != _engineRate)
-                    sample = new WdlResamplingSampleProvider(sample, _engineRate);
+                    sample = new HqResampleProvider(sample, _engineRate);
                 _provider = sample;
                 Track = isUrl
                     ? new TrackInfo
@@ -204,13 +204,26 @@ public sealed class StreamedSource : IAudioSource
         }
     }
 
+    private static readonly MediaFoundationReader.MediaFoundationReaderSettings MfFloat = new()
+    {
+        RequestFloatOutput = true,
+        RepositionInRead = true
+    };
+
     private static WaveStream OpenStream(string pathOrUrl, bool isUrl)
     {
         if (!isUrl && Path.GetExtension(pathOrUrl).Equals(".ogg", StringComparison.OrdinalIgnoreCase))
             return new VorbisWaveReader(pathOrUrl);
 
         if (isUrl)
-            return new MediaFoundationReader(pathOrUrl);
+            return new MediaFoundationReader(pathOrUrl, MfFloat);
+
+        var ext = Path.GetExtension(pathOrUrl);
+        if (ext.Equals(".mp3", StringComparison.OrdinalIgnoreCase)
+            || ext.Equals(".m4a", StringComparison.OrdinalIgnoreCase)
+            || ext.Equals(".aac", StringComparison.OrdinalIgnoreCase)
+            || ext.Equals(".wma", StringComparison.OrdinalIgnoreCase))
+            return new MediaFoundationReader(pathOrUrl, MfFloat);
 
         return new AudioFileReader(pathOrUrl);
     }

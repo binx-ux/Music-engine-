@@ -54,14 +54,31 @@ public sealed class MusicPlayer
 
     public Result PlayIndex(int index)
     {
-        if (index < 0 || index >= _queue.Count)
+        if (_queue.Count == 0)
             return Result.Fail("Nothing is queued.");
-        _index = index;
-        var track = _queue[index];
-        var opened = _source.Open(track.Path, track.IsUrl, _loop == LoopMode.One);
-        if (opened.Success)
-            TrackChanged?.Invoke(_source.Track);
-        return opened;
+
+        var start = Math.Clamp(index, 0, _queue.Count - 1);
+        var i = start;
+        for (var n = 0; n < _queue.Count; n++)
+        {
+            _index = i;
+            var track = _queue[i];
+            var opened = _source.Open(track.Path, track.IsUrl, _loop == LoopMode.One);
+            if (opened.Success)
+            {
+                TrackChanged?.Invoke(_source.Track);
+                return opened;
+            }
+            i++;
+            if (i >= _queue.Count)
+                i = 0;
+            if (i == start)
+                break;
+        }
+
+        _source.Close();
+        TrackChanged?.Invoke(null);
+        return Result.Fail("Could not play that track.");
     }
 
     public Result Play()

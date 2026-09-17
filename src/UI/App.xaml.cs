@@ -10,7 +10,7 @@ public partial class App : Application
     private Mutex? _mutex;
     private bool _ownsMutex;
 
-    private void Boot(object sender, StartupEventArgs e)
+    private async void Boot(object sender, StartupEventArgs e)
     {
         _mutex = new Mutex(true, AppInfo.MutexName, out _ownsMutex);
         if (!_ownsMutex)
@@ -29,24 +29,35 @@ public partial class App : Application
 
         var splash = new SplashWindow();
         splash.Show();
-        splash.Tick("loading", 0.16);
 
-        Session = new AppSession();
-        Theme.Apply(Session.Config.Appearance);
-        splash.Tick("loading", 0.52);
-        Session.StartEngineIfNeeded();
-        splash.Tick("loading", 0.9);
+        try
+        {
+            await splash.Step("Reading settings", 0.22);
+            Session = new AppSession();
+            Theme.Apply(Session.Config.Appearance);
 
-        var main = new MainWindow();
-        MainWindow = main;
-        main.Show();
-        splash.Close();
+            await splash.Step("Starting audio", 0.58);
+            Session.StartEngineIfNeeded();
+
+            await splash.Step("Opening Cuebox", 0.88);
+            var main = new MainWindow();
+            MainWindow = main;
+            main.Show();
+            await splash.Finish();
+        }
+        catch (Exception ex)
+        {
+            try { splash.Close(); } catch { }
+            Session?.Log.Error("ui", "Cuebox failed to start.", ex);
+            MessageBox.Show("Cuebox could not start.\n" + ex.Message, AppInfo.Name);
+            Shutdown();
+        }
     }
 
     private void OnUiException(object sender, DispatcherUnhandledExceptionEventArgs e)
     {
-        Session.Log.Error("ui", "The window hit an error. Audio should keep running.", e.Exception);
-        Session.SetError("Something went wrong in the window.", e.Exception.Message);
+        Session?.Log.Error("ui", "The window hit an error. Audio should keep running.", e.Exception);
+        Session?.SetError("Something went wrong in the window.", e.Exception.Message);
         e.Handled = true;
     }
 

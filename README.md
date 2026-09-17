@@ -6,6 +6,8 @@
 
 *ੈ✩‧₊˚༺☆༻*ੈ✩‧₊˚
 
+1.1.0
+
 mic + music + soundboard on windows. dumps the mix into a virtual cable so roblox / discord / games just see another mic.
 
 no injection. no ripping spotify.
@@ -83,6 +85,14 @@ use the issue forms. do not dump a blank issue.
 https://github.com/binx-ux/Music-engine-/issues/new/choose
 
 security: [SECURITY.md](SECURITY.md)
+
+──── ୨୧ ────
+
+## discord
+
+official server. **git** gets every push. **versions** gets GitHub releases.
+
+discord: **kynvyr**
 
 ──── ୨୧ ────
 

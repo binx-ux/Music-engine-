@@ -9,3 +9,6 @@ contact_links:
   - name: Latest download
     url: https://github.com/binx-ux/Music-engine-/releases/latest
     about: Grab Cuebox.zip from Releases.
+  - name: Discord
+    url: https://github.com/binx-ux/Music-engine-#discord
+    about: Official server. Git updates and version posts land there. User kynvyr.

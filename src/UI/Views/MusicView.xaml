@@ -5,88 +5,129 @@
   <Grid>
     <Grid.ColumnDefinitions>
       <ColumnDefinition Width="*"/>
-      <ColumnDefinition Width="280"/>
+      <ColumnDefinition Width="300"/>
     </Grid.ColumnDefinitions>
-    <Grid Margin="0,0,12,0">
+
+    <Grid Margin="0,0,16,0">
       <Grid.RowDefinitions>
         <RowDefinition Height="Auto"/>
-        <RowDefinition Height="*"/>
         <RowDefinition Height="Auto"/>
+        <RowDefinition Height="*"/>
       </Grid.RowDefinitions>
-      <DockPanel Margin="0,0,0,8">
-        <TextBlock Text="Music" Style="{StaticResource Title}"/>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+
+      <DockPanel Margin="0,0,0,14">
+        <StackPanel>
+          <TextBlock Text="Music" Style="{StaticResource Title}"/>
+          <TextBlock x:Name="QueueCount" Text="0 in queue" Style="{StaticResource Caption}" Margin="0,3,0,0"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+          <CheckBox x:Name="Shuffle" Content="Shuffle" VerticalAlignment="Center" Margin="0,0,12,0" Checked="Flags" Unchecked="Flags"/>
+          <ComboBox x:Name="Loop" Width="96" Margin="0,0,12,0" SelectionChanged="LoopChanged">
+            <ComboBoxItem Content="Off"/>
+            <ComboBoxItem Content="One"/>
+            <ComboBoxItem Content="All"/>
+          </ComboBox>
           <Button Content="Files" Style="{StaticResource QuietBtn}" Click="AddFiles" Margin="0,0,6,0"/>
           <Button Content="Folder" Style="{StaticResource QuietBtn}" Click="AddFolder"/>
         </StackPanel>
       </DockPanel>
-      <Grid Grid.Row="1">
-        <ListBox x:Name="QueueList" MouseDoubleClick="QueuePlay" MouseLeftButtonUp="QueueClick">
+
+      <Border x:Name="NowCard" Grid.Row="1" Style="{StaticResource Glass}" Padding="16" Margin="0,0,0,14" Visibility="Collapsed">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="Auto"/>
+          </Grid.ColumnDefinitions>
+          <Border Width="88" Height="88" CornerRadius="10" Background="#22FFFFFF" ClipToBounds="True" Margin="0,0,16,0">
+            <Image x:Name="NowArt" Stretch="UniformToFill"/>
+          </Border>
+          <StackPanel Grid.Column="1" VerticalAlignment="Center">
+            <TextBlock Text="PLAYING" Style="{StaticResource Kicker}"/>
+            <TextBlock x:Name="NowName" FontSize="22" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" Margin="0,6,0,0"/>
+            <TextBlock x:Name="NowWho" Style="{StaticResource Caption}" FontSize="13" TextTrimming="CharacterEllipsis" Margin="0,4,0,0"/>
+          </StackPanel>
+          <TextBlock x:Name="NowTime" Grid.Column="2" Style="{StaticResource Caption}" VerticalAlignment="Bottom" Margin="16,0,0,4"/>
+        </Grid>
+      </Border>
+
+      <Grid Grid.Row="2">
+        <ListBox x:Name="QueueList" MouseDoubleClick="QueuePlay">
           <ListBox.ItemTemplate>
             <DataTemplate>
-              <Grid>
+              <Grid Height="52">
                 <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="36"/>
                   <ColumnDefinition Width="*"/>
-                  <ColumnDefinition Width="Auto"/>
+                  <ColumnDefinition Width="52"/>
                 </Grid.ColumnDefinitions>
-                <StackPanel Margin="0,0,12,0">
-                  <TextBlock Text="{Binding Title}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis"/>
-                  <TextBlock Text="{Binding Artist}" Style="{StaticResource Caption}" TextTrimming="CharacterEllipsis"/>
+                <TextBlock Text="{Binding Number}" FontSize="12" FontWeight="SemiBold" Foreground="{DynamicResource MutedBrush}" VerticalAlignment="Center"/>
+                <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="0,0,14,0">
+                  <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="14" TextTrimming="CharacterEllipsis"/>
+                  <TextBlock Text="{Binding Artist}" Style="{StaticResource Caption}" TextTrimming="CharacterEllipsis" Margin="0,2,0,0"/>
                 </StackPanel>
-                <TextBlock Grid.Column="1" Text="{Binding Length}" Style="{StaticResource Caption}" VerticalAlignment="Center"/>
+                <TextBlock Grid.Column="2" Text="{Binding Length}" Style="{StaticResource Caption}" VerticalAlignment="Center" HorizontalAlignment="Right"/>
               </Grid>
             </DataTemplate>
           </ListBox.ItemTemplate>
         </ListBox>
-        <TextBlock x:Name="EmptyQueue" Text="Drop files here, or paste a link on the right."
+        <TextBlock x:Name="EmptyQueue" Text="Drop files, paste a link, or connect a GitHub repo on the right."
                    Style="{StaticResource Caption}" HorizontalAlignment="Center" VerticalAlignment="Center"
                    TextWrapping="Wrap" TextAlignment="Center" Margin="24" IsHitTestVisible="False"/>
       </Grid>
-      <StackPanel Grid.Row="2" Margin="0,10,0,0">
-        <Slider x:Name="Seek" Minimum="0" Maximum="1" PreviewMouseUp="Seeked"/>
-        <DockPanel Margin="0,6,0,0">
-          <TextBlock x:Name="PosText" Style="{StaticResource Caption}" VerticalAlignment="Center"/>
-          <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
-            <Button Content="Play" Style="{StaticResource AccentBtn}" Click="Play" Margin="0,0,6,0"/>
-            <Button Content="Pause" Style="{StaticResource QuietBtn}" Click="Pause" Margin="0,0,6,0"/>
-            <Button Content="Stop" Style="{StaticResource QuietBtn}" Click="Stop" Margin="0,0,8,0"/>
-            <CheckBox x:Name="Shuffle" Content="Shuffle" VerticalAlignment="Center" Margin="0,0,8,0" Checked="Flags" Unchecked="Flags"/>
-            <ComboBox x:Name="Loop" Width="108" SelectionChanged="LoopChanged">
-              <ComboBoxItem Content="Off"/>
-              <ComboBoxItem Content="One"/>
-              <ComboBoxItem Content="All"/>
-            </ComboBox>
-          </StackPanel>
-        </DockPanel>
-      </StackPanel>
     </Grid>
-    <Border Grid.Column="1" Style="{StaticResource Glass}" Padding="12">
-      <DockPanel>
-        <StackPanel DockPanel.Dock="Top">
-          <TextBlock Text="CLEAN RAP" Style="{StaticResource Caption}"/>
-          <TextBlock Text="Radio edits for game voice chat." TextWrapping="Wrap" Margin="0,6,0,8"/>
-          <Button Content="Find clean rap" Style="{StaticResource AccentBtn}" Click="CleanRap" HorizontalAlignment="Left"/>
-          <TextBlock Text="LINK" Style="{StaticResource Caption}" Margin="0,18,0,6"/>
-          <Grid Margin="0,0,0,8">
-            <TextBox x:Name="UrlBox" KeyDown="UrlKey" TextChanged="UrlChanged"/>
-            <TextBlock x:Name="UrlHint" Text="Paste a YouTube or mp3 link" Style="{StaticResource Caption}"
-                       Margin="12,8,0,0" IsHitTestVisible="False"/>
-          </Grid>
-          <StackPanel Orientation="Horizontal" Margin="0,0,0,8">
-            <Button Content="Add link" Style="{StaticResource QuietBtn}" Click="LoadUrl" Margin="0,0,6,0"/>
-            <Button Content="Share" Style="{StaticResource QuietBtn}" Click="Share"/>
+
+    <ScrollViewer Grid.Column="1" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+      <StackPanel>
+        <Border Style="{StaticResource Glass}" Padding="16" Margin="0,0,0,12">
+          <StackPanel>
+            <TextBlock Text="CLEAN RAP" Style="{StaticResource Kicker}"/>
+            <TextBlock Text="Radio edits for game voice chat." TextWrapping="Wrap" Margin="0,8,0,12" Foreground="{DynamicResource MutedBrush}"/>
+            <Button Content="Find clean rap" Style="{StaticResource AccentBtn}" Click="CleanRap" HorizontalAlignment="Stretch"/>
           </StackPanel>
-          <TextBlock x:Name="UrlStatus" Style="{StaticResource Caption}" TextWrapping="Wrap"/>
-        </StackPanel>
-        <StackPanel VerticalAlignment="Bottom">
-          <TextBlock Text="SPOTIFY" Style="{StaticResource Caption}"/>
-          <TextBlock Text="Metadata only. Encrypted audio cannot go to the virtual mic." TextWrapping="Wrap" Margin="0,6,0,10"/>
-          <StackPanel Orientation="Horizontal">
-            <Button Content="Play" Style="{StaticResource QuietBtn}" Click="SpPlay" Margin="0,0,6,0"/>
-            <Button Content="Pause" Style="{StaticResource QuietBtn}" Click="SpPause"/>
+        </Border>
+        <Border Style="{StaticResource Glass}" Padding="16" Margin="0,0,0,12">
+          <StackPanel>
+            <TextBlock Text="GITHUB" Style="{StaticResource Kicker}"/>
+            <TextBlock Text="Connect a public repo with cuebox.json, playlist.m3u, or audio files." TextWrapping="Wrap" Margin="0,8,0,10" Foreground="{DynamicResource MutedBrush}"/>
+            <Grid Margin="0,0,0,10">
+              <TextBox x:Name="GitHubBox" KeyDown="GitHubKey" TextChanged="GitHubChanged"/>
+              <TextBlock x:Name="GitHubHint" Text="github.com/you/playlist" Style="{StaticResource Caption}"
+                         Margin="12,8,0,0" IsHitTestVisible="False"/>
+            </Grid>
+            <StackPanel Orientation="Horizontal">
+              <Button Content="Connect" Style="{StaticResource AccentBtn}" Click="GitHubConnect" Margin="0,0,6,0"/>
+              <Button Content="Export" Style="{StaticResource QuietBtn}" Click="ExportPlaylist"/>
+            </StackPanel>
+            <TextBlock x:Name="GitHubStatus" Style="{StaticResource Caption}" TextWrapping="Wrap" Margin="0,10,0,0"/>
           </StackPanel>
-        </StackPanel>
-      </DockPanel>
-    </Border>
+        </Border>
+        <Border Style="{StaticResource Glass}" Padding="16" Margin="0,0,0,12">
+          <StackPanel>
+            <TextBlock Text="LINK" Style="{StaticResource Kicker}"/>
+            <Grid Margin="0,10,0,10">
+              <TextBox x:Name="UrlBox" KeyDown="UrlKey" TextChanged="UrlChanged"/>
+              <TextBlock x:Name="UrlHint" Text="Paste a YouTube, GitHub, or mp3 link" Style="{StaticResource Caption}"
+                         Margin="12,8,0,0" IsHitTestVisible="False"/>
+            </Grid>
+            <StackPanel Orientation="Horizontal">
+              <Button Content="Add link" Style="{StaticResource QuietBtn}" Click="LoadUrl" Margin="0,0,6,0"/>
+              <Button Content="Share" Style="{StaticResource QuietBtn}" Click="Share"/>
+            </StackPanel>
+            <TextBlock x:Name="UrlStatus" Style="{StaticResource Caption}" TextWrapping="Wrap" Margin="0,10,0,0"/>
+          </StackPanel>
+        </Border>
+        <Border Style="{StaticResource Glass}" Padding="16">
+          <StackPanel>
+            <TextBlock Text="SPOTIFY" Style="{StaticResource Kicker}"/>
+            <TextBlock Text="Metadata only. Encrypted audio stays in Spotify." TextWrapping="Wrap" Margin="0,8,0,12" Foreground="{DynamicResource MutedBrush}"/>
+            <StackPanel Orientation="Horizontal">
+              <Button Content="Play" Style="{StaticResource QuietBtn}" Click="SpPlay" Margin="0,0,6,0"/>
+              <Button Content="Pause" Style="{StaticResource QuietBtn}" Click="SpPause"/>
+            </StackPanel>
+          </StackPanel>
+        </Border>
+      </StackPanel>
+    </ScrollViewer>
   </Grid>
 </UserControl>

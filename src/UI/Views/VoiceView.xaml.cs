@@ -8,6 +8,7 @@ namespace Mixline.App.Views;
 
 public partial class VoiceView : UserControl
 {
+    private static readonly string[] Notes = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
     private AppSession? _session;
     private bool _suppress;
     private bool _bound;
@@ -22,7 +23,7 @@ public partial class VoiceView : UserControl
             _bound = true;
             foreach (var n in EqPresets.Names)
                 EqPreset.Items.Add(n);
-            foreach (var k in new[] { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" })
+            foreach (var k in Notes)
                 TuneKey.Items.Add(k);
             TuneScale.Items.Add("Chromatic");
             TuneScale.Items.Add("Major");
@@ -39,6 +40,28 @@ public partial class VoiceView : UserControl
             ? (meters.GateOpen ? "Mic live  ·  gate open" : "Mic live  ·  gate closed")
             : "Mic idle";
         Gr.Text = $"Gain reduction  {meters.GainReductionDb:0.0} dB";
+
+        var on = _session.Config.Voice.Autotune != AutotuneMode.Off;
+        if (!on)
+        {
+            TuneNote.Text = "Off";
+            TuneHz.Text = "Turn on a style to pitch-correct";
+            TuneLive.Text = "";
+            return;
+        }
+
+        if (meters.TuneHz >= 70f)
+        {
+            TuneNote.Text = NoteName(meters.TuneHz);
+            TuneHz.Text = $"{meters.TuneHz:0} Hz";
+            TuneLive.Text = "Locked";
+        }
+        else
+        {
+            TuneNote.Text = "—";
+            TuneHz.Text = _session.Engine.MicrophoneActive ? "Listening" : "Waiting for voice";
+            TuneLive.Text = "";
+        }
     }
 
     private void Load()
@@ -67,7 +90,16 @@ public partial class VoiceView : UserControl
         DeEss.IsChecked = v.DeEsser;
         Sat.IsChecked = v.Saturation;
         Lim.IsChecked = v.Limiter;
+        Labels();
         _suppress = false;
+    }
+
+    private void Labels()
+    {
+        if (TuneAmtLabel is null || TuneSpeedLabel is null)
+            return;
+        TuneAmtLabel.Text = $"{TuneAmt.Value * 100:0}%";
+        TuneSpeedLabel.Text = TuneSpeed.Value < 0.34 ? "Slow" : TuneSpeed.Value < 0.7 ? "Medium" : "Fast";
     }
 
     private void PresetChanged(object sender, SelectionChangedEventArgs e)
@@ -80,7 +112,13 @@ public partial class VoiceView : UserControl
         _session.VoiceChanged();
     }
 
-    private void SliderChanged(object sender, RoutedPropertyChangedEventArgs<double> e) => Changed(sender, e);
+    private void SliderChanged(object sender, RoutedPropertyChangedEventArgs<double> e)
+    {
+        if (TuneAmtLabel is not null)
+            Labels();
+        Changed(sender, e);
+    }
+
     private void ComboChanged(object sender, SelectionChangedEventArgs e) => Changed(sender, e);
 
     private void Changed(object sender, RoutedEventArgs e)
@@ -108,5 +146,14 @@ public partial class VoiceView : UserControl
         v.Saturation = Sat.IsChecked == true;
         v.Limiter = Lim.IsChecked == true;
         _session.VoiceChanged();
+    }
+
+    private static string NoteName(float hz)
+    {
+        var midi = 69 + 12 * MathF.Log2(hz / 440f);
+        var n = (int)MathF.Round(midi);
+        var pc = ((n % 12) + 12) % 12;
+        var oct = n / 12 - 1;
+        return Notes[pc] + oct;
     }
 }

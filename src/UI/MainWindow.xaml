@@ -4,33 +4,36 @@
         Title="Cuebox"
         Height="860" Width="1320" MinHeight="700" MinWidth="1080"
         WindowStartupLocation="CenterScreen"
+        WindowStyle="None"
         ResizeMode="CanResize"
         Background="Transparent"
         Foreground="{DynamicResource TextBrush}"
         FontFamily="Segoe UI Variable Display, Segoe UI"
         FontSize="13"
+        Opacity="0"
         StateChanged="WinState">
   <WindowChrome.WindowChrome>
     <WindowChrome CaptionHeight="0" ResizeBorderThickness="6" GlassFrameThickness="0" CornerRadius="8" UseAeroCaptionButtons="False"/>
   </WindowChrome.WindowChrome>
-  <Border BorderBrush="{DynamicResource WindowEdge}" BorderThickness="1" CornerRadius="8" Background="#1A000000">
+  <Border BorderBrush="{DynamicResource WindowEdge}" BorderThickness="1" CornerRadius="8" Background="Transparent">
     <Grid>
       <Grid.RowDefinitions>
-        <RowDefinition Height="56"/>
+        <RowDefinition Height="42"/>
         <RowDefinition Height="*"/>
-        <RowDefinition Height="32"/>
+        <RowDefinition Height="92"/>
+        <RowDefinition Height="26"/>
       </Grid.RowDefinitions>
       <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="168"/>
+        <ColumnDefinition Width="188"/>
         <ColumnDefinition Width="*"/>
       </Grid.ColumnDefinitions>
 
-      <Border Grid.RowSpan="3" Grid.ColumnSpan="2" Background="{DynamicResource WindowSheen}" IsHitTestVisible="False"/>
-      <Border Grid.RowSpan="3" Grid.ColumnSpan="2" Background="{StaticResource GrainBrush}" Opacity="0.04" IsHitTestVisible="False"/>
+      <Border Grid.RowSpan="4" Grid.ColumnSpan="2" Background="{DynamicResource WindowSheen}" Opacity="0.16" IsHitTestVisible="False"/>
+      <Border Grid.RowSpan="4" Grid.ColumnSpan="2" Background="{StaticResource GrainBrush}" Opacity="0.012" IsHitTestVisible="False"/>
 
-      <Grid Grid.ColumnSpan="2" Panel.ZIndex="20" Background="#12000000" MouseLeftButtonDown="TitleDrag">
+      <Grid Grid.ColumnSpan="2" Panel.ZIndex="20" Background="#06FFFFFF" MouseLeftButtonDown="TitleDrag">
         <Grid.ColumnDefinitions>
-          <ColumnDefinition Width="168"/>
+          <ColumnDefinition Width="188"/>
           <ColumnDefinition Width="*"/>
           <ColumnDefinition Width="Auto"/>
         </Grid.ColumnDefinitions>
@@ -38,73 +41,95 @@
           <Border Width="20" Height="20" CornerRadius="5" ClipToBounds="True" Margin="0,0,8,0">
             <Image Source="Assets/cuebox.png" Stretch="UniformToFill"/>
           </Border>
-          <TextBlock Text="Cuebox" FontWeight="SemiBold" FontSize="14" VerticalAlignment="Center"/>
+          <TextBlock Text="Cuebox" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center"/>
         </StackPanel>
-
-        <Border Grid.Column="1" Style="{StaticResource GlassTight}" Padding="6,4,6,5" Margin="4,6,10,6"
-                WindowChrome.IsHitTestVisibleInChrome="True">
-          <Grid>
-            <Grid.RowDefinitions>
-              <RowDefinition Height="*"/>
-              <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-              <ColumnDefinition Width="Auto"/>
-              <ColumnDefinition Width="*"/>
-              <ColumnDefinition Width="Auto"/>
-            </Grid.ColumnDefinitions>
-            <Border Width="28" Height="28" CornerRadius="5" Background="#22000000" ClipToBounds="True">
-              <Image x:Name="ArtImage" Stretch="UniformToFill"/>
-            </Border>
-            <StackPanel Grid.Column="1" VerticalAlignment="Center" Margin="8,0,10,0">
-              <TextBlock x:Name="NowTitle" Text="Nothing playing" FontWeight="SemiBold" FontSize="12" TextTrimming="CharacterEllipsis"/>
-              <TextBlock x:Name="NowArtist" Text="Queue a file or paste a link" Style="{StaticResource Caption}" TextTrimming="CharacterEllipsis"/>
-            </StackPanel>
-            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
-              <Button Style="{StaticResource IconBtn}" Click="PrevClick" ToolTip="Previous" Margin="0,0,5,0"
-                      WindowChrome.IsHitTestVisibleInChrome="True">
-                <Path Fill="{DynamicResource TextBrush}" Data="M 4,8 L 4,16 L 6,16 L 6,8 Z M 7,12 L 15,7 L 15,17 Z"/>
-              </Button>
-              <Button x:Name="PlayBtn" Style="{StaticResource PlayBtn}" Click="PlayClick" ToolTip="Play"
-                      WindowChrome.IsHitTestVisibleInChrome="True">
-                <Path x:Name="PlayIcon" Fill="{DynamicResource AccentDarkBrush}" Data="M 8,7 L 8,17 L 16,12 Z"/>
-              </Button>
-              <Button Style="{StaticResource IconBtn}" Click="NextClick" ToolTip="Next" Margin="5,0,0,0"
-                      WindowChrome.IsHitTestVisibleInChrome="True">
-                <Path Fill="{DynamicResource TextBrush}" Data="M 5,7 L 13,12 L 5,17 Z M 14,8 L 16,8 L 16,16 L 14,16 Z"/>
-              </Button>
-            </StackPanel>
-            <Border x:Name="ChromeSeekWell" Grid.Row="1" Grid.ColumnSpan="3" Height="3" Margin="0,5,0,0"
-                    Background="#22000000" CornerRadius="1" Cursor="Hand" MouseLeftButtonDown="ChromeSeekClick"
-                    WindowChrome.IsHitTestVisibleInChrome="True">
-              <Border x:Name="ChromeSeekFill" Width="0" Height="3" HorizontalAlignment="Left" CornerRadius="1"
-                      Background="{DynamicResource AccentBrush}" IsHitTestVisible="False"/>
-            </Border>
-          </Grid>
-        </Border>
-
-        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,6,0">
+        <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center" Margin="0,0,4,0">
           <Button Content="—" Style="{StaticResource GhostBtn}" Click="MinClick"/>
           <Button x:Name="MaxBtn" Content="▢" Style="{StaticResource GhostBtn}" Click="MaxClick"/>
           <Button Content="✕" Style="{StaticResource CloseBtn}" Click="CloseClick"/>
         </StackPanel>
       </Grid>
 
-      <Border Grid.Row="1" BorderBrush="#14FFFFFF" BorderThickness="0,0,1,0" Background="#0A000000">
-        <StackPanel Margin="6,8,6,10">
+      <Border Grid.Row="1" Background="#06FFFFFF" BorderBrush="#12FFFFFF" BorderThickness="0,0,1,0">
+        <StackPanel Margin="8,10,8,10">
+          <TextBlock Text="MIX" Style="{StaticResource Kicker}" Margin="12,0,0,6"/>
           <RadioButton x:Name="NavHome" Content="Home" Style="{StaticResource NavBtn}" Checked="NavChanged" IsChecked="True"/>
           <RadioButton x:Name="NavMixer" Content="Mixer" Style="{StaticResource NavBtn}" Checked="NavChanged"/>
           <RadioButton x:Name="NavBoard" Content="Board" Style="{StaticResource NavBtn}" Checked="NavChanged"/>
+          <TextBlock Text="AUDIO" Style="{StaticResource Kicker}" Margin="12,16,0,6"/>
           <RadioButton x:Name="NavMusic" Content="Music" Style="{StaticResource NavBtn}" Checked="NavChanged"/>
           <RadioButton x:Name="NavVoice" Content="Voice" Style="{StaticResource NavBtn}" Checked="NavChanged"/>
+          <TextBlock Text="APP" Style="{StaticResource Kicker}" Margin="12,16,0,6"/>
           <RadioButton x:Name="NavDevices" Content="Devices" Style="{StaticResource NavBtn}" Checked="NavChanged"/>
           <RadioButton x:Name="NavSettings" Content="Settings" Style="{StaticResource NavBtn}" Checked="NavChanged"/>
         </StackPanel>
       </Border>
 
-      <ContentControl x:Name="Host" Grid.Row="1" Grid.Column="1" Margin="14,8,14,8"/>
+      <Grid Grid.Row="1" Grid.Column="1" ClipToBounds="True" Margin="16,12,16,10">
+        <ContentControl x:Name="Host" RenderTransformOrigin="0,0">
+          <ContentControl.RenderTransform>
+            <TranslateTransform x:Name="HostSlide" X="0" Y="0"/>
+          </ContentControl.RenderTransform>
+        </ContentControl>
+      </Grid>
 
-      <Border Grid.Row="2" Grid.ColumnSpan="2" BorderBrush="#14FFFFFF" BorderThickness="0,1,0,0" Background="#10000000">
+      <Border Grid.Row="2" Grid.ColumnSpan="2" Background="{StaticResource BarGlass}" BorderBrush="#14FFFFFF" BorderThickness="0,1,0,0"
+              WindowChrome.IsHitTestVisibleInChrome="True">
+        <Grid Margin="16,10,16,10">
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="260"/>
+            <ColumnDefinition Width="*"/>
+            <ColumnDefinition Width="92"/>
+          </Grid.ColumnDefinitions>
+
+          <DockPanel>
+            <Border Width="64" Height="64" CornerRadius="10" Background="#22FFFFFF" ClipToBounds="True" DockPanel.Dock="Left">
+              <Image x:Name="ArtImage" Stretch="UniformToFill" RenderTransformOrigin="0.5,0.5">
+                <Image.RenderTransform>
+                  <ScaleTransform x:Name="ArtScale" ScaleX="1" ScaleY="1"/>
+                </Image.RenderTransform>
+              </Image>
+            </Border>
+            <StackPanel VerticalAlignment="Center" Margin="12,0,10,0">
+              <TextBlock x:Name="NowTitle" Text="Nothing playing" FontWeight="SemiBold" FontSize="15" TextTrimming="CharacterEllipsis"/>
+              <TextBlock x:Name="NowArtist" Text="Queue a file or paste a link" Style="{StaticResource Caption}" TextTrimming="CharacterEllipsis" Margin="0,3,0,0"/>
+            </StackPanel>
+          </DockPanel>
+
+          <StackPanel Grid.Column="1" VerticalAlignment="Center" MaxWidth="520" HorizontalAlignment="Stretch">
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,0,0,8">
+              <Button Style="{StaticResource SkipBtn}" Click="PrevClick" ToolTip="Previous">
+                <Path Fill="{DynamicResource TextBrush}" Stretch="Uniform" Width="20" Height="16"
+                      Data="M 0,0 L 0,16 L 3.2,16 L 3.2,0 Z M 5,8 L 20,1 L 20,15 Z"/>
+              </Button>
+              <Button x:Name="PlayBtn" Style="{StaticResource PlayBtn}" Click="PlayClick" ToolTip="Play" Margin="12,0">
+                <Path x:Name="PlayIcon" Fill="{DynamicResource AccentDarkBrush}" Stretch="Uniform" Width="18" Height="18"
+                      Data="M 8,4 L 20,12 L 8,20 Z"/>
+              </Button>
+              <Button Style="{StaticResource SkipBtn}" Click="NextClick" ToolTip="Next">
+                <Path Fill="{DynamicResource TextBrush}" Stretch="Uniform" Width="20" Height="16"
+                      Data="M 0,1 L 15,8 L 0,15 Z M 16.8,0 L 20,0 L 20,16 L 16.8,16 Z"/>
+              </Button>
+            </StackPanel>
+            <DockPanel>
+              <TextBlock x:Name="ChromePos" DockPanel.Dock="Left" Text="0:00" Style="{StaticResource Caption}" Width="40" VerticalAlignment="Center"/>
+              <TextBlock x:Name="ChromeDur" DockPanel.Dock="Right" Text="0:00" Style="{StaticResource Caption}" Width="40" TextAlignment="Right" VerticalAlignment="Center"/>
+              <Border x:Name="ChromeSeekWell" Height="6" Margin="10,0" Background="#28FFFFFF" CornerRadius="3" Cursor="Hand"
+                      MouseLeftButtonDown="ChromeSeekClick" VerticalAlignment="Center">
+                <Border x:Name="ChromeSeekFill" Width="0" Height="6" HorizontalAlignment="Left" CornerRadius="3"
+                        Background="{DynamicResource AccentBrush}" IsHitTestVisible="False"/>
+              </Border>
+            </DockPanel>
+          </StackPanel>
+
+          <StackPanel Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Right">
+            <Button x:Name="ChromeShuffle" Content="Shuffle" Style="{StaticResource QuietBtn}" Click="ShuffleClick" Padding="10,5" FontSize="11" Margin="0,0,0,6"/>
+            <Button x:Name="ChromeLoop" Content="Loop" Style="{StaticResource QuietBtn}" Click="LoopClick" Padding="10,5" FontSize="11"/>
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <Border Grid.Row="3" Grid.ColumnSpan="2" Background="#04FFFFFF" BorderBrush="#12FFFFFF" BorderThickness="0,1,0,0">
         <Grid Margin="14,0">
           <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto"/>
@@ -119,7 +144,7 @@
             </Border>
           </StackPanel>
           <TextBlock x:Name="ToastText" Grid.Column="1" Margin="16,0" VerticalAlignment="Center" FontSize="11"
-                     Foreground="{DynamicResource MutedBrush}" TextTrimming="CharacterEllipsis" TextAlignment="Center"/>
+                     Foreground="{DynamicResource MutedBrush}" TextTrimming="CharacterEllipsis" TextAlignment="Center" Opacity="0"/>
           <TextBlock x:Name="LatencyText" Grid.Column="2" VerticalAlignment="Center" Style="{StaticResource Caption}"/>
         </Grid>
       </Border>

@@ -138,6 +138,7 @@ public sealed class MusicSettings
     public List<string> RecentFolders { get; set; } = [];
     public List<string> Queue { get; set; } = [];
     public int QueueIndex { get; set; }
+    public string? GitHubRepo { get; set; }
 }
 
 public sealed class SoundboardSettings

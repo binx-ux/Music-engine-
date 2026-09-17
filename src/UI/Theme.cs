@@ -116,10 +116,10 @@ public static class Theme
     private static LinearGradientBrush Sheen(Color accent)
     {
         var b = new LinearGradientBrush { StartPoint = new Point(0, 0), EndPoint = new Point(1, 1) };
-        b.GradientStops.Add(new GradientStop(Color.FromArgb(0x14, 255, 255, 255), 0));
-        b.GradientStops.Add(new GradientStop(Color.FromArgb(0x05, 255, 255, 255), 0.4));
-        b.GradientStops.Add(new GradientStop(Colors.Transparent, 0.62));
-        b.GradientStops.Add(new GradientStop(Color.FromArgb(0x18, accent.R, accent.G, accent.B), 1));
+        b.GradientStops.Add(new GradientStop(Color.FromArgb(0x08, 255, 255, 255), 0));
+        b.GradientStops.Add(new GradientStop(Color.FromArgb(0x02, 255, 255, 255), 0.4));
+        b.GradientStops.Add(new GradientStop(Colors.Transparent, 0.58));
+        b.GradientStops.Add(new GradientStop(Color.FromArgb(0x08, accent.R, accent.G, accent.B), 1));
         b.Freeze();
         return b;
     }

@@ -18,6 +18,7 @@ public sealed class VoiceChain
 
     public bool GateOpen => _gate.IsOpen;
     public float GainReductionDb => _comp.GainReductionDb;
+    public float LastTuneHz => _tune.LastHz;
 
     public void Configure(int sampleRate, VoiceSettings settings)
     {

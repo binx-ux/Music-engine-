@@ -38,8 +38,8 @@ public sealed class VirtualDeviceManager
                 {
                     Available = false,
                     Connected = false,
-                    Message = "No virtual cable found. Install VB-Audio Cable so games get a Cuebox microphone.",
-                    Hint = "Install VB-Audio Cable, then restart Cuebox. Games should use CABLE Output."
+                    Message = "No virtual mic driver found.",
+                    Hint = "Install VB-Audio Cable, restart Cuebox, then pick CABLE Output as the mic in games. Cuebox never injects into games."
                 };
             }
 
@@ -47,7 +47,7 @@ public sealed class VirtualDeviceManager
             {
                 Available = true,
                 Connected = false,
-                Message = "Select CABLE Input as virtual output so games can hear you.",
+                Message = "Select CABLE Input as the virtual output so games can hear Cuebox.",
                 Hint = VirtualDeviceCatalog.CaptureHint(candidates[0].Name)
             };
         }

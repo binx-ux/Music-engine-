@@ -26,6 +26,16 @@ dotnet test Mixline.sln
 
 Hardware-dependent WASAPI tests are not run in CI. Use the in-app test tone to check routing on a real machine.
 
+## Version
+
+Cuebox versions look like `1.2.33`.
+
+- major: first number goes up, the rest reset to 0 (`1.2.33` -> `2.0.0`)
+- minor: second number goes up, the rest stay (`1.2.33` -> `1.3.33`)
+- fix: last two numbers go up (`1.2.33` -> `1.2.34`)
+
+Current release is `1.1.0`.
+
 ## Pull requests
 
 Fork, branch off `master`, open a PR. The form asks what you changed and how you checked it (tone into headphones, virtual cable into Discord, etc.).

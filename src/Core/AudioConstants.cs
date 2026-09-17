@@ -7,7 +7,7 @@ public static class AudioConstants
     public const int MaxSampleRate = 96000;
     public const int MinSampleRate = 44100;
     public const float PeakClip = 0.999f;
-    public const float DefaultLimiterCeiling = 0.95f;
+    public const float DefaultLimiterCeiling = 0.98f;
     public const float MeterFloorDb = -60f;
     public const int MeterUiHz = 30;
     public const float MaxGain = 2f;

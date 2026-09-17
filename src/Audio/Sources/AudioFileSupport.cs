@@ -74,7 +74,7 @@ public static class ClipLoader
             if (sample.WaveFormat.Channels == 1)
                 sample = new MonoToStereoSampleProvider(sample);
             if (sample.WaveFormat.SampleRate != engineRate)
-                sample = new WdlResamplingSampleProvider(sample, engineRate);
+                sample = new HqResampleProvider(sample, engineRate);
 
             var frames = Math.Max(1, (int)Math.Ceiling(Math.Max(stream.TotalTime.TotalSeconds, 0.05) * engineRate) + 256);
             var data = new float[frames * 2];

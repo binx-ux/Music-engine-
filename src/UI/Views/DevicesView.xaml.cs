@@ -98,6 +98,7 @@ public partial class DevicesView : UserControl
         if (pick is null)
         {
             Hint.Text = "Install VB-Audio Cable first. Cuebox needs CABLE Input so games can pick CABLE Output.";
+            VirtualDeviceCatalog.OpenCableDownload();
             return;
         }
         _suppress = true;
@@ -110,6 +111,9 @@ public partial class DevicesView : UserControl
         _session.RestartEngine();
         Hint.Text = _session.Engine.VirtualStatus().Hint ?? "";
     }
+
+    private void GetCable(object sender, RoutedEventArgs e)
+        => VirtualDeviceCatalog.OpenCableDownload();
 
     private void Restart(object sender, RoutedEventArgs e)
     {

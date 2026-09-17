@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using Mixline.Audio.Devices;
 using Mixline.Audio.Mixer;
 
 namespace Mixline.App.Views;
@@ -57,22 +58,53 @@ public partial class HomeView : UserControl
         MasterMeter.Hold = meters.MasterHold;
     }
 
+    private bool _finding;
+
     private async void CleanRap(object sender, RoutedEventArgs e)
     {
-        if (_session is null) return;
-        var result = await _session.FindCleanRap();
-        if (!result.Ok)
+        if (_session is null || _finding) return;
+        _finding = true;
+        _session.Notify("Finding clean rap...");
+        try
         {
+            var result = await _session.FindCleanRap();
+            if (!result.Ok)
+            {
+                _session.Notify(result.Message);
+                return;
+            }
+            var start = _session.Engine.Music.Queue.Count;
+            foreach (var t in result.Tracks)
+                _session.Engine.Music.Add(t);
+            _session.Config.Music.Queue = _session.Engine.Music.Queue.Select(t => t.Path).ToList();
+            _session.ScheduleSave();
+            if (result.Tracks.Count > 0)
+                _session.Engine.Music.PlayIndex(start);
             _session.Notify(result.Message);
+        }
+        finally
+        {
+            _finding = false;
+        }
+    }
+
+    private void UseForGames(object sender, RoutedEventArgs e)
+    {
+        if (_session is null) return;
+        var pick = VirtualDeviceCatalog.PreferredVirtualRender(_session.Engine.Devices.RenderDevices());
+        if (pick is null)
+        {
+            _session.Notify("Install VB-Audio Cable first, then restart Cuebox.");
+            VirtualDeviceCatalog.OpenCableDownload();
             return;
         }
-        var start = _session.Engine.Music.Queue.Count;
-        foreach (var t in result.Tracks)
-            _session.Engine.Music.Add(t);
-        _session.Config.Music.Queue = _session.Engine.Music.Queue.Select(t => t.Path).ToList();
+        _session.Config.Devices.VirtualOutputId = pick.Id;
+        _session.Config.Devices.SetWindowsDefaultMic = true;
         _session.ScheduleSave();
-        if (result.Tracks.Count > 0)
-            _session.Engine.Music.PlayIndex(start);
-        _session.Notify(result.Message);
+        _session.RestartEngine();
+        Refresh();
     }
+
+    private void GetCable(object sender, RoutedEventArgs e)
+        => VirtualDeviceCatalog.OpenCableDownload();
 }

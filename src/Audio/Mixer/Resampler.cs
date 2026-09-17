@@ -2,13 +2,14 @@ namespace Mixline.Audio.Mixer;
 
 public sealed class CubicResampler
 {
-    private readonly float[] _hist = new float[8];
+    private readonly float[] _hist;
     private double _pos;
     private readonly int _channels;
 
     public CubicResampler(int channels)
     {
         _channels = Math.Max(1, channels);
+        _hist = new float[8 * _channels];
     }
 
     public int Process(ReadOnlySpan<float> input, int inFrames, Span<float> output, int outFrames, double ratio)
@@ -35,13 +36,7 @@ public sealed class CubicResampler
 
             var t = (float)_pos;
             for (var c = 0; c < _channels; c++)
-            {
-                var y0 = _hist[c];
-                var y1 = _hist[_channels + c];
-                var y2 = _hist[_channels * 2 + c];
-                var y3 = _hist[_channels * 3 + c];
-                output[produced * _channels + c] = Hermite(t, y0, y1, y2, y3);
-            }
+                output[produced * _channels + c] = Lanczos(_hist, _channels, c, t);
 
             produced++;
             _pos += ratio;
@@ -60,19 +55,35 @@ public sealed class CubicResampler
     private void PushFrame(ReadOnlySpan<float> input, int frame)
     {
         var ch = _channels;
-        Array.Copy(_hist, ch, _hist, 0, ch * 3);
+        Array.Copy(_hist, ch, _hist, 0, ch * 7);
         var src = frame * ch;
         for (var c = 0; c < ch; c++)
-            _hist[ch * 3 + c] = input[src + c];
+            _hist[ch * 7 + c] = input[src + c];
     }
 
-    private static float Hermite(float t, float y0, float y1, float y2, float y3)
+    private static float Lanczos(float[] hist, int ch, int c, float t)
     {
-        var c0 = y1;
-        var c1 = 0.5f * (y2 - y0);
-        var c2 = y0 - 2.5f * y1 + 2f * y2 - 0.5f * y3;
-        var c3 = 0.5f * (y3 - y0) + 1.5f * (y1 - y2);
-        return ((c3 * t + c2) * t + c1) * t + c0;
+        var sum = 0f;
+        var wsum = 0f;
+        for (var i = 0; i < 8; i++)
+        {
+            var x = t - (i - 3);
+            var w = Kernel(x);
+            sum += w * hist[i * ch + c];
+            wsum += w;
+        }
+        return wsum > 0.0001f ? sum / wsum : 0f;
+    }
+
+    private static float Kernel(float x)
+    {
+        var ax = MathF.Abs(x);
+        if (ax < 0.000001f)
+            return 1f;
+        if (ax >= 4f)
+            return 0f;
+        var px = MathF.PI * x;
+        return (MathF.Sin(px) / px) * (MathF.Sin(px / 4f) / (px / 4f));
     }
 
     public void Reset()

@@ -2,6 +2,7 @@ using System.Runtime.InteropServices;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
+using System.Windows.Shell;
 
 namespace Mixline.App;
 
@@ -45,6 +46,14 @@ internal static class NativeBackdrop
         DwmSetWindowAttribute(hwnd, DwmwaTextColor, ref none, sizeof(int));
         var margins = new Margins { Left = -1, Right = -1, Top = -1, Bottom = -1 };
         DwmExtendFrameIntoClientArea(hwnd, ref margins);
+
+        var chrome = WindowChrome.GetWindowChrome(window);
+        if (chrome is not null)
+        {
+            chrome.CaptionHeight = 0;
+            chrome.GlassFrameThickness = new Thickness(0);
+            chrome.UseAeroCaptionButtons = false;
+        }
 
         if (hr == 0)
         {

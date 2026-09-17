@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using NAudio.CoreAudioApi;
 using NAudio.CoreAudioApi.Interfaces;
 using Mixline.Logging;
@@ -208,6 +209,19 @@ public static class VirtualDeviceCatalog
             return captures.FirstOrDefault(c => Contains(c.Name, "VoiceMeeter Output"))
                 ?? captures.FirstOrDefault(c => Contains(c.Name, "VoiceMeeter") && !Contains(c.Name, "Input"));
         return captures.FirstOrDefault(c => Contains(c.Name, "CABLE Output"));
+    }
+
+    public const string CableDownloadUrl = "https://vb-audio.com/Cable/";
+
+    public static void OpenCableDownload()
+    {
+        try
+        {
+            Process.Start(new ProcessStartInfo(CableDownloadUrl) { UseShellExecute = true });
+        }
+        catch
+        {
+        }
     }
 
     public static string CaptureHint(string renderName)

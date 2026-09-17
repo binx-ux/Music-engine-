@@ -8,6 +8,13 @@ pub fn yin_hz(buf: &[f32], sample_rate: i32, thresh: f32) -> f32 {
     if n < 256 || sample_rate < 8000 {
         return 0.0;
     }
+    let mut energy = 0.0f32;
+    for &x in buf {
+        energy += x * x;
+    }
+    if energy / (n as f32) < 1.0e-6 {
+        return 0.0;
+    }
     let half = n / 2;
     if half < 8 {
         return 0.0;
@@ -132,15 +139,21 @@ fn wrap(x: f32, n: f32) -> f32 {
 }
 
 fn interp(d: &[f32], pos: f32) -> f32 {
-    let n = d.len();
-    if n < 2 {
+    let n = d.len() as i32;
+    if n < 4 {
         return 0.0;
     }
     let p = wrap(pos, n as f32);
-    let i0 = p.floor() as usize % n;
-    let f = p - p.floor();
-    let i1 = (i0 + 1) % n;
-    d[i0] + (d[i1] - d[i0]) * f
+    let i1 = p.floor() as i32;
+    let f = p - i1 as f32;
+    let y0 = d[((i1 - 1).rem_euclid(n)) as usize];
+    let y1 = d[i1.rem_euclid(n) as usize];
+    let y2 = d[((i1 + 1).rem_euclid(n)) as usize];
+    let y3 = d[((i1 + 2).rem_euclid(n)) as usize];
+    let a0 = y3 - y2 - y0 + y1;
+    let a1 = y0 - y1 - a0;
+    let a2 = y2 - y0;
+    ((a0 * f + a1) * f + a2) * f + y1
 }
 
 fn tap_gain(read: f32, write: usize, len: usize) -> f32 {
@@ -166,7 +179,7 @@ pub fn pitch_shift(
     let ratio = ratio.clamp(0.5, 2.0);
     let blend = amount.clamp(0.0, 1.0);
     let dl = delay_len as f32;
-    let half = dl * 0.5;
+    let third = dl / 3.0;
     let mut w = ((*write as usize) % delay_len + delay_len) % delay_len;
     let mut r = wrap(*read, dl);
 
@@ -177,14 +190,21 @@ pub fn pitch_shift(
         delay[w] = dry;
 
         r = wrap(r + ratio, dl);
-        let r2 = wrap(r + half, dl);
+        let r2 = wrap(r + third, dl);
+        let r3 = wrap(r + third * 2.0, dl);
         let g1 = tap_gain(r, w, delay_len);
         let g2 = tap_gain(r2, w, delay_len);
-        let gsum = (g1 + g2).max(1.0e-4);
-        let mut wet = (interp(delay, r) * g1 + interp(delay, r2) * g2) / gsum;
+        let g3 = tap_gain(r3, w, delay_len);
+        let gsum = (g1 + g2 + g3).max(1.0e-4);
+        let mut wet = (interp(delay, r) * g1 + interp(delay, r2) * g2 + interp(delay, r3) * g3) / gsum;
 
         if formant {
-            wet = wet * 0.82 + dry * 0.18;
+            let k = if ratio >= 1.0 {
+                (2.15 - ratio).clamp(0.42, 1.0)
+            } else {
+                (0.55 + ratio * 0.45).clamp(0.55, 1.0)
+            };
+            wet = wet * k + dry * (1.0 - k) * 0.4;
         }
 
         let o = dry + (wet - dry) * blend;

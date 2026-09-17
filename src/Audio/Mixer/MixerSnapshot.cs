@@ -113,6 +113,7 @@ public sealed class MeterState
     public float Virtual;
     public float VirtualHold;
     public float GainReductionDb;
+    public float TuneHz;
     public bool GateOpen;
     public bool MicActive;
 }

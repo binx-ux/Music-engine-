@@ -104,6 +104,7 @@ public sealed class AudioEngine : IDisposable
             Virtual = _virtualPeak.Peak,
             VirtualHold = _virtualPeak.Hold,
             GainReductionDb = _voice.GainReductionDb,
+            TuneHz = _voice.LastTuneHz,
             GateOpen = _voice.GateOpen,
             MicActive = MicrophoneActive
         };
