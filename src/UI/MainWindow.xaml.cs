@@ -216,6 +216,12 @@ public partial class MainWindow : Window
         else Show(_home);
     }
 
+    public void OpenMusic()
+    {
+        NavMusic.IsChecked = true;
+        Show(_music ??= new MusicView());
+    }
+
     private void Show(UserControl page)
     {
         if (page is HomeView home) home.Bind(_session);

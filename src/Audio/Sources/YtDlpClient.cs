@@ -114,6 +114,27 @@ public sealed class YtDlpClient
         return Result<List<string>>.Ok(files);
     }
 
+    public async Task<Result<List<SongHit>>> SearchSongsAsync(string query, int count, CancellationToken ct)
+    {
+        var ready = await EnsureAsync(ct);
+        if (!ready.Success)
+            return Result<List<SongHit>>.Fail(ready.Error ?? "yt-dlp is missing.", ready.Details);
+
+        query = (query ?? "").Trim();
+        if (string.IsNullOrWhiteSpace(query))
+            return Result<List<SongHit>>.Fail("Type a song name.");
+
+        count = Math.Clamp(count, 1, 20);
+        var q = LooksLikeSearch(query) ? query : "ytsearch" + count + ":" + query;
+        var hits = await SearchAsync(q, count, ct);
+        if (hits.Count == 0)
+            return Result<List<SongHit>>.Fail("Nothing matched. Try a different name.");
+        return Result<List<SongHit>>.Ok(hits);
+    }
+
+    public Task<string?> DownloadIdAsync(string id, CancellationToken ct)
+        => DownloadVideoAsync(id, Path.Combine(MusicDir, "Downloads"), ct);
+
     public Task<Result<List<string>>> DownloadLinkAsync(string url, CancellationToken ct)
         => DownloadAsync(url, Path.Combine(MusicDir, "Downloads"), 1, ct);
 
@@ -169,7 +190,7 @@ public sealed class YtDlpClient
         return Result<List<string>>.Ok(files);
     }
 
-    private async Task<List<SearchHit>> SearchAsync(string query, int count, CancellationToken ct)
+    private async Task<List<SongHit>> SearchAsync(string query, int count, CancellationToken ct)
     {
         var run = await RunAsync(
         [
@@ -177,21 +198,30 @@ public sealed class YtDlpClient
             "--no-warnings",
             "--no-progress",
             "--playlist-end", count.ToString(),
-            "--print", "%(id)s\t%(title)s\t%(duration)s",
+            "--print", "%(id)s\t%(title)s\t%(uploader)s\t%(duration)s",
             query
         ], ct);
 
-        var hits = new List<SearchHit>();
+        var hits = new List<SongHit>();
         foreach (var line in run.Out.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries))
         {
             var parts = line.Split('\t');
             if (parts.Length < 2 || string.IsNullOrWhiteSpace(parts[0]))
                 continue;
-            int.TryParse(parts.Length > 2 ? parts[2] : "", out var duration);
-            hits.Add(new SearchHit(parts[0].Trim(), parts[1].Trim(), duration));
+            var channel = parts.Length > 2 ? parts[2].Trim() : "";
+            if (channel is "NA" or "None")
+                channel = "";
+            int.TryParse(parts.Length > 3 ? parts[3] : "", out var duration);
+            hits.Add(new SongHit
+            {
+                Id = parts[0].Trim(),
+                Title = parts[1].Trim(),
+                Channel = channel,
+                Duration = duration
+            });
         }
         if (hits.Count == 0 && !string.IsNullOrWhiteSpace(run.Err))
-            _log.Warning("music", "Clean rap search failed.", Trim(run.Err));
+            _log.Warning("music", "Search failed.", Trim(run.Err));
         return hits;
     }
 
@@ -263,7 +293,7 @@ public sealed class YtDlpClient
     private static bool LooksLikeSearch(string text)
         => text.StartsWith("ytsearch", StringComparison.OrdinalIgnoreCase);
 
-    private static bool IsCleanSong(SearchHit hit)
+    private static bool IsCleanSong(SongHit hit)
         => IsCleanTitle(hit.Title, hit.Duration);
 
     private static bool IsCleanTitle(string title, int duration)
@@ -323,6 +353,14 @@ public sealed class YtDlpClient
         text = text.Trim();
         return text.Length > 400 ? text[..400] : text;
     }
+}
 
-    private readonly record struct SearchHit(string Id, string Title, int Duration);
+public sealed class SongHit
+{
+    public string Id { get; init; } = "";
+    public string Title { get; init; } = "";
+    public string Channel { get; init; } = "";
+    public int Duration { get; init; }
+    public string Length => Duration < 1 ? "" : $"{Duration / 60}:{Duration % 60:00}";
+    public string Subtitle => string.IsNullOrWhiteSpace(Channel) ? Length : Channel + (Length.Length == 0 ? "" : "  ·  " + Length);
 }

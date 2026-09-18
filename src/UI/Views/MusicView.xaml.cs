@@ -65,11 +65,14 @@ public partial class MusicView : UserControl
         }
         else
         {
+            var show = NowCard.Visibility != Visibility.Visible;
             NowCard.Visibility = Visibility.Visible;
             NowName.Text = cur.Title;
             NowWho.Text = string.IsNullOrWhiteSpace(cur.Artist) ? cur.FileName : cur.Artist;
             SetNowArt(cur.Artwork);
             TickPosition();
+            if (show)
+                UiMotion.Enter(NowCard, NowSlide);
         }
         Shuffle.IsChecked = _session.Config.Music.Shuffle;
         Loop.SelectedIndex = (int)_session.Config.Music.Loop;
@@ -135,37 +138,90 @@ public partial class MusicView : UserControl
         _session.ScheduleSave();
     }
 
-    private async void LoadUrl(object sender, RoutedEventArgs e) => await AddLink();
+    private async void FindGo(object sender, RoutedEventArgs e) => await FindOrLink();
 
     private async void UrlKey(object sender, System.Windows.Input.KeyEventArgs e)
     {
         if (e.Key == System.Windows.Input.Key.Enter)
         {
             e.Handled = true;
-            await AddLink();
+            await FindOrLink();
         }
     }
 
     private void UrlChanged(object sender, TextChangedEventArgs e)
         => UrlHint.Visibility = string.IsNullOrWhiteSpace(UrlBox.Text) ? Visibility.Visible : Visibility.Collapsed;
 
-    private async Task AddLink()
-    {
-        if (_session is null) return;
-        var result = await _session.ImportLink(UrlBox.Text);
-        UrlStatus.Text = result.Message;
-        if (!result.Ok)
-            return;
-        foreach (var t in result.Tracks)
-            _session.Engine.Music.Add(t);
-        PersistQueue();
-        Refresh();
-        if (result.Tracks.Count > 0)
-            _session.Engine.Music.PlayIndex(_session.Engine.Music.Queue.Count - result.Tracks.Count);
-    }
-
     private bool _finding;
     private bool _githubBusy;
+
+    private async Task FindOrLink()
+    {
+        if (_session is null || _finding) return;
+        var text = (UrlBox.Text ?? "").Trim();
+        if (text.Length == 0)
+        {
+            UrlStatus.Text = "Type a song name or paste a link.";
+            return;
+        }
+        _finding = true;
+        try
+        {
+            if (text.StartsWith("http://", StringComparison.OrdinalIgnoreCase)
+                || text.StartsWith("https://", StringComparison.OrdinalIgnoreCase)
+                || File.Exists(text))
+            {
+                UrlStatus.Text = "Getting that...";
+                var result = await _session.ImportLink(text);
+                UrlStatus.Text = result.Message;
+                if (result.Ok)
+                    Enqueue(result.Tracks);
+                return;
+            }
+
+            UrlStatus.Text = "Searching...";
+            var found = await _session.SearchSongs(text);
+            UrlStatus.Text = found.Message;
+            Hits.Items.Clear();
+            if (!found.Ok)
+            {
+                Hits.Visibility = Visibility.Collapsed;
+                return;
+            }
+            foreach (var hit in found.Hits)
+                Hits.Items.Add(hit);
+            Hits.Visibility = found.Hits.Count == 0 ? Visibility.Collapsed : Visibility.Visible;
+            if (Hits.Visibility == Visibility.Visible)
+                UiMotion.Fade(Hits, 0, 1, 180);
+        }
+        finally
+        {
+            _finding = false;
+        }
+    }
+
+    private async void HitPick(object sender, System.Windows.Input.MouseButtonEventArgs e)
+    {
+        if (_session is null || _finding) return;
+        if (e.ChangedButton != System.Windows.Input.MouseButton.Left) return;
+        if (ItemsControl.ContainerFromElement(Hits, e.OriginalSource as DependencyObject) is not ListBoxItem item)
+            return;
+        if (item.DataContext is not SongHit hit)
+            return;
+        _finding = true;
+        UrlStatus.Text = "Downloading " + hit.Title + "...";
+        try
+        {
+            var result = await _session.DownloadHit(hit);
+            UrlStatus.Text = result.Message;
+            if (result.Ok)
+                Enqueue(result.Tracks);
+        }
+        finally
+        {
+            _finding = false;
+        }
+    }
 
     private async void CleanRap(object sender, RoutedEventArgs e)
     {
@@ -196,7 +252,7 @@ public partial class MusicView : UserControl
             return;
         }
         Clipboard.SetText(text);
-        UrlStatus.Text = "Copied. Send that to a friend and they can paste it in Add link.";
+        UrlStatus.Text = "Copied. They can paste that in Search.";
     }
 
     private void GitHubChanged(object sender, TextChangedEventArgs e)

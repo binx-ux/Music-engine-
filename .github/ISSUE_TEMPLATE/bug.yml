@@ -6,7 +6,7 @@ body:
   - type: markdown
     attributes:
       value: |
-        If people in Roblox or Discord hear silence, that is usually the cable, not a crash. Read VIRTUAL_DEVICE.md first.
+        If people in Roblox or Discord hear silence, that is usually the cable, not a crash. Read docs/VIRTUAL_DEVICE.md first.
   - type: textarea
     id: happened
     attributes:

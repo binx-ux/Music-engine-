@@ -1,127 +1,69 @@
-╭══• ೋ•✧๑♡๑✧•ೋ •══╮
-           Cuebox
-╰══• ೋ•✧๑♡๑✧•ೋ •══╯
+# Cuebox
 
-≽ ^⎚ ˕ ⎚^ ≼
+Windows mixer for mic + music + soundboard. Routes the mix through a virtual cable so Roblox, Discord, and games just see another mic.
 
-*ੈ✩‧₊˚༺☆༻*ੈ✩‧₊˚
+**1.4.1** · [docs](https://binx-ux.github.io/Music-engine-/) · [releases](https://github.com/binx-ux/Music-engine-/releases/latest)
 
-1.3.1
+![Cuebox](src/UI/Assets/cuebox.png)
 
-docs: [cuebox on github pages](https://binx-ux.github.io/Music-engine-/)
+## Install
 
-mic + music + soundboard on windows. dumps the mix into a virtual cable so roblox / discord / games just see another mic.
+Grab **CueboxSetup.exe** from [Releases](https://github.com/binx-ux/Music-engine-/releases/latest). It asks where the app goes and where settings / music / logs live.
 
-no injection. no ripping spotify.
-
-<p align="center">
-  <img src="src/UI/Assets/cuebox.png" width="120" alt="Cuebox">
-</p>
-
-<p align="center">
-  <img src="https://img.shields.io/badge/Windows-10%2F11-0078D6?style=for-the-badge&logo=windows&logoColor=white" alt="Windows">
-  <img src="https://img.shields.io/badge/.NET-8-512BD4?style=for-the-badge&logo=dotnet&logoColor=white" alt=".NET 8">
-  <img src="https://img.shields.io/github/v/release/binx-ux/Music-engine-?style=for-the-badge&color=C9A36A" alt="release">
-  <img src="https://img.shields.io/github/downloads/binx-ux/Music-engine-/total?style=for-the-badge&color=7DBA96" alt="downloads">
-  <img src="https://img.shields.io/badge/license-MIT-C9A36A?style=for-the-badge" alt="MIT">
-  <img src="https://img.shields.io/github/stars/binx-ux/Music-engine-?style=for-the-badge&color=E8D4B0" alt="stars">
-</p>
-
-──── ୨୧ ────
-
-## install
-
-download **CueboxSetup.exe** from [Releases](https://github.com/binx-ux/Music-engine-/releases/latest). it asks where the app goes and where settings / music / logs live.
-
-zip works too. unpack `Cuebox.zip` anywhere. optional: a `data.path` file next to `Cuebox.exe` with one line, the data folder.
-
-or powershell (picks both folders):
+Or unzip `Cuebox.zip` anywhere. Optional: put a `data.path` file next to `Cuebox.exe` with one line (the data folder).
 
 ```
 powershell -NoP -C "irm 'https://raw.githubusercontent.com/binx-ux/Music-engine-/master/installer/install.ps1' | iex"
 ```
 
-self-contained. no extra .net install.
+Self-contained. No extra .NET install.
 
-──── ୨୧ ────
+## Features
 
-## what it actually does
+- Real mic through WASAPI
+- Search songs by name and download them (yt-dlp)
+- Paste YouTube / audio links
+- Soundboard with hotkeys
+- Voice chain if you turn pieces on
+- Headphones and virtual mic can hear different mixes
+- Spotify Premium control (now playing / play / pause). Encrypted audio stays in Spotify.
 
-- your real mic (wasapi)
-- local files / direct audio urls
-- soundboard + global hotkeys
-- voice stuff if you turn it on (eq, comp, gate, pitch)
-- headphones hear one mix, virtual mic hears another
-- spotify now playing / play pause. not the encrypted stream. that stays on spotify.
+## Games / Discord
 
-need a virtual cable if other apps should hear you. vb-audio cable is the usual one. more in [VIRTUAL_DEVICE.md](VIRTUAL_DEVICE.md).
+1. Install [VB-Audio Cable](https://vb-audio.com/Cable/)
+2. In Cuebox: mic + headphones, virtual out = `CABLE Input`
+3. Start the engine
+4. In the other app: mic = `CABLE Output`
 
-──── ୨୧ ────
+More: [docs/VIRTUAL_DEVICE.md](docs/VIRTUAL_DEVICE.md)
 
-## roblox / discord
-
-1. install a virtual cable
-2. open cuebox, pick your mic + headphones
-3. virtual out = `CABLE Input` (or whatever your cable calls playback)
-4. start the engine
-5. in the other app, mic = `CABLE Output`
-6. talk, play a song, smash a pad
-
-──── ୨୧ ────
-
-## build it yourself
+## Build
 
 ```
 dotnet restore Mixline.sln
 dotnet build Mixline.sln -c Release
-dotnet test Mixline.sln -c Release
 dotnet publish src/UI/Mixline.App.csproj -c Release -r win-x64 --self-contained true
 ```
 
-exe name is `Cuebox.exe`.
+Exe is `Cuebox.exe`.
 
-more pages if you care: [ARCHITECTURE.md](ARCHITECTURE.md) · [AUDIO.md](AUDIO.md) · [SPOTIFY.md](SPOTIFY.md) · [CONTRIBUTING.md](CONTRIBUTING.md)
+Notes: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) · [docs/AUDIO.md](docs/AUDIO.md) · [docs/spotify.md](docs/spotify.md) · [CONTRIBUTING.md](CONTRIBUTING.md)
 
-──── ୨୧ ────
+## Layout
 
-## bugs / ideas / help
+```
+src/          app code (UI, Audio, Spotify, ...)
+native/       cuebox_dsp (Rust)
+installer/    Inno Setup + scripts
+docs/         GitHub Pages + tech notes
+scripts/      helpers
+tests/        tests
+```
 
-use the issue forms. do not dump a blank issue.
+## License
 
-https://github.com/binx-ux/Music-engine-/issues/new/choose
+[MIT](LICENSE)
 
-security: [SECURITY.md](SECURITY.md)
+## kynvyr
 
-──── ୨୧ ────
-
-## discord
-
-official server. **git** gets every push. **versions** gets GitHub releases.
-
-discord: **kynvyr**
-
-──── ୨୧ ────
-
-## license
-
-[MIT](LICENSE). sell it if you want.
-
-if somebody asks for a copy you still give it to them free. no ifs, ands, or buts.
-
-──── ୨୧ ────
-
-## kyn
-
-⋆˚࿔ kynvyr 𝜗𝜚˚⋆
-
-[github](https://github.com/binx-ux) · [guns.lol](https://guns.lol/kynvyr_) · [ig](https://instagram.com/kynvyr/) · [coffee](https://buymeacoffee.com/kynvyr)
-
-discord: **kynvyr**
-
-<p>
-  <a href="https://github.com/binx-ux"><img src="https://img.shields.io/badge/GitHub-binx--ux-181717?style=for-the-badge&logo=github&logoColor=white" alt="GitHub"></a>
-  <a href="https://instagram.com/kynvyr/"><img src="https://img.shields.io/badge/Instagram-kynvyr-E4405F?style=for-the-badge&logo=instagram&logoColor=white" alt="Instagram"></a>
-  <a href="https://buymeacoffee.com/kynvyr"><img src="https://img.shields.io/badge/Buy%20Me%20A%20Coffee-kynvyr-FFDD00?style=for-the-badge&logo=buymeacoffee&logoColor=black" alt="Buy Me a Coffee"></a>
-  <a href="https://guns.lol/kynvyr_"><img src="https://img.shields.io/badge/guns.lol-kynvyr_-111111?style=for-the-badge" alt="guns.lol"></a>
-  <img src="https://img.shields.io/badge/Discord-kynvyr-5865F2?style=for-the-badge&logo=discord&logoColor=white" alt="Discord">
-</p>
+[github](https://github.com/binx-ux) · [guns.lol](https://guns.lol/kynvyr_) · [ig](https://instagram.com/kynvyr/) · [coffee](https://buymeacoffee.com/kynvyr) · discord **kynvyr**

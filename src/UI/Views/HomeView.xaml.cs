@@ -58,34 +58,10 @@ public partial class HomeView : UserControl
         MasterMeter.Hold = meters.MasterHold;
     }
 
-    private bool _finding;
-
-    private async void CleanRap(object sender, RoutedEventArgs e)
+    private void GoMusic(object sender, RoutedEventArgs e)
     {
-        if (_session is null || _finding) return;
-        _finding = true;
-        _session.Notify("Finding clean rap...");
-        try
-        {
-            var result = await _session.FindCleanRap();
-            if (!result.Ok)
-            {
-                _session.Notify(result.Message);
-                return;
-            }
-            var start = _session.Engine.Music.Queue.Count;
-            foreach (var t in result.Tracks)
-                _session.Engine.Music.Add(t);
-            _session.Config.Music.Queue = _session.Engine.Music.Queue.Select(t => t.Path).ToList();
-            _session.ScheduleSave();
-            if (result.Tracks.Count > 0)
-                _session.Engine.Music.PlayIndex(start);
-            _session.Notify(result.Message);
-        }
-        finally
-        {
-            _finding = false;
-        }
+        if (Window.GetWindow(this) is MainWindow main)
+            main.OpenMusic();
     }
 
     private void UseForGames(object sender, RoutedEventArgs e)

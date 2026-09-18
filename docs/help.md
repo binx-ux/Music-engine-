@@ -21,7 +21,7 @@ Cuebox versions look like `1.2.33`.
 - **minor**: second number goes up, the rest stay (`1.2.33` -> `1.3.33`)
 - **fix**: last two numbers go up (`1.2.33` -> `1.2.34`)
 
-Current app release is **1.3.1**.
+Current app release is **1.4.1**.
 
 Cuebox checks GitHub for a new installer when it starts. You can skip minor updates and fixes. Major updates still show the next time you open the app.
 
@@ -36,7 +36,7 @@ dotnet publish src/UI/Mixline.App.csproj -c Release -r win-x64 --self-contained 
 
 Exe name is `Cuebox.exe`. Audio code stays out of `src/UI`. No game injection, DLL hooks, or Spotify DRM workarounds.
 
-More in the repo: [ARCHITECTURE.md](https://github.com/binx-ux/Music-engine-/blob/master/ARCHITECTURE.md), [AUDIO.md](https://github.com/binx-ux/Music-engine-/blob/master/AUDIO.md), [CONTRIBUTING.md](https://github.com/binx-ux/Music-engine-/blob/master/CONTRIBUTING.md).
+More in the repo: [ARCHITECTURE.md](https://github.com/binx-ux/Music-engine-/blob/master/docs/ARCHITECTURE.md), [AUDIO.md](https://github.com/binx-ux/Music-engine-/blob/master/docs/AUDIO.md), [CONTRIBUTING.md](https://github.com/binx-ux/Music-engine-/blob/master/CONTRIBUTING.md).
 
 ## Discord
 

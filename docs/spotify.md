@@ -10,12 +10,16 @@ Cuebox talks to Spotify through the documented Web API (PKCE). You need Spotify 
 ## Setup
 
 1. Create an app on the [Spotify Developer Dashboard](https://developer.spotify.com/dashboard)
-2. Redirect URI: `http://127.0.0.1:43821/callback`
-3. Paste the Client ID into Cuebox Settings (or use Find Client ID, it asks first)
+2. Add both redirect URIs:
+   - `http://127.0.0.1:43821/callback`
+   - `http://127.0.0.1/callback`
+3. Paste the Client ID into Cuebox Settings (or use Find Client ID)
 4. Connect Spotify and sign in in the browser
-5. Keep the Spotify app playing on a real device so Cuebox has something to control
+5. Keep the Spotify app open on a real device
 
-Tokens sit in your data folder as `spotify.bin`, encrypted with Windows DPAPI for the current user. Logs strip bearer tokens.
+Tokens sit in your data folder as `spotify.bin`, encrypted with Windows DPAPI. Logs strip bearer tokens.
+
+Scopes: `user-read-currently-playing`, `user-read-playback-state`, `user-modify-playback-state`, `user-read-private`.
 
 ## What we will not do
 
@@ -25,4 +29,4 @@ Tokens sit in your data folder as `spotify.bin`, encrypted with Windows DPAPI fo
 - Bypass DRM with loopback capture
 - Mix the encrypted stream into CABLE Output
 
-Want a song in the game mic? Use the Music page with a file or a link you are allowed to play.
+Want a song in the game mic? Use Music: search a name, paste a link, or drop a file.

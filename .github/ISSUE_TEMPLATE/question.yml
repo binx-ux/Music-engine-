@@ -15,8 +15,8 @@ body:
       label: Did you read these
       options:
         - README
-        - VIRTUAL_DEVICE.md
-        - SPOTIFY.md
+        - docs/VIRTUAL_DEVICE.md
+        - docs/spotify.md
         - None yet
     validations:
       required: true

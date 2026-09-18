@@ -306,6 +306,33 @@ public sealed class AppSession : IDisposable
         return (true, $"Added {tracks.Count} clean rap tracks.", tracks);
     }
 
+    public async Task<(bool Ok, string Message, List<SongHit> Hits)> SearchSongs(string query)
+    {
+        query = (query ?? "").Trim();
+        var hits = new List<SongHit>();
+        if (string.IsNullOrWhiteSpace(query))
+            return (false, "Type a song name.", hits);
+        Notify("Searching...");
+        var got = await Downloader.SearchSongsAsync(query, 12, CancellationToken.None);
+        if (!got.Success || got.Value is null || got.Value.Count == 0)
+            return (false, got.Error ?? "Nothing matched.", hits);
+        return (true, $"Found {got.Value.Count}. Click Get on one.", got.Value);
+    }
+
+    public async Task<(bool Ok, string Message, List<TrackInfo> Tracks)> DownloadHit(SongHit hit)
+    {
+        var tracks = new List<TrackInfo>();
+        if (string.IsNullOrWhiteSpace(hit.Id))
+            return (false, "Pick a search result.", tracks);
+        Notify("Downloading " + hit.Title + "...");
+        var path = await Downloader.DownloadIdAsync(hit.Id, CancellationToken.None);
+        if (path is null)
+            return (false, "Could not download that song.", tracks);
+        var url = "https://www.youtube.com/watch?v=" + hit.Id;
+        tracks.Add(AudioFileSupport.ReadMetadata(path) with { SourceUrl = url });
+        return (true, "Added " + tracks[0].Title, tracks);
+    }
+
     public async Task<(bool Ok, string Message, List<TrackInfo> Tracks)> ImportGitHub(string text)
     {
         text = (text ?? "").Trim();
