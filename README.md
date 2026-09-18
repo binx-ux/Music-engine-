@@ -8,15 +8,15 @@ Windows mixer for mic + music + soundboard. Routes the mix through a virtual cab
 
 ## Install
 
-Grab **CueboxSetup.exe** from [Releases](https://github.com/binx-ux/Music-engine-/releases/latest). It asks where the app goes and where settings / music / logs live.
-
-Or unzip `Cuebox.zip` anywhere. Optional: put a `data.path` file next to `Cuebox.exe` with one line (the data folder).
+**CueboxSetup.exe** from [Releases](https://github.com/binx-ux/Music-engine-/releases/latest), or run this in PowerShell:
 
 ```
-powershell -NoP -C "irm 'https://raw.githubusercontent.com/binx-ux/Music-engine-/master/installer/install.ps1' | iex"
+irm https://raw.githubusercontent.com/binx-ux/Music-engine-/master/installer/install.ps1 | iex
 ```
 
-Self-contained. No extra .NET install.
+That pulls the latest setup (falls back to the zip if needed). Self-contained. No extra .NET install.
+
+Zip works too: unpack `Cuebox.zip` anywhere. Optional `data.path` next to `Cuebox.exe` with one line for the data folder.
 
 ## Features
 

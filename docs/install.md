@@ -7,23 +7,23 @@ title: Install
 
 CueboxSetup.exe asks two questions: where the app sits, and where settings, music, logs, and pads sit. Those can be different drives.
 
-[Download CueboxSetup.exe](https://github.com/binx-ux/Music-engine-/releases/latest) from the latest GitHub release.
-
-## Zip
-
-Unpack `Cuebox.zip` anywhere and run `Cuebox.exe`. Optional: a `data.path` file next to the exe with one line, the data folder. Or make a `Cuebox.data` folder next to the exe for a portable layout.
-
-You can move the data folder later in **Settings → Files**.
+[Download CueboxSetup.exe](https://github.com/binx-ux/Music-engine-/releases/latest/download/CueboxSetup.exe) from the latest GitHub release.
 
 ## PowerShell
 
-This also picks both folders:
+```
+irm https://raw.githubusercontent.com/binx-ux/Music-engine-/master/installer/install.ps1 | iex
+```
 
-```
-powershell -NoP -C "irm 'https://raw.githubusercontent.com/binx-ux/Music-engine-/master/installer/install.ps1' | iex"
-```
+Downloads the latest `CueboxSetup.exe` and runs it. If that fails, it falls back to the zip and lets you pick folders.
 
 Self-contained. You do not install .NET yourself.
+
+## Zip
+
+Unpack [Cuebox.zip](https://github.com/binx-ux/Music-engine-/releases/latest/download/Cuebox.zip) anywhere and run `Cuebox.exe`. Optional: a `data.path` file next to the exe with one line, the data folder. Or make a `Cuebox.data` folder next to the exe for a portable layout.
+
+You can move the data folder later in **Settings → Files**.
 
 ## After install
 

@@ -1,8 +1,21 @@
 $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Windows.Forms
 
-$release = 'https://github.com/binx-ux/Music-engine-/releases/latest/download/Cuebox.zip'
-$zip = Join-Path $env:TEMP 'cuebox.zip'
+$api = 'https://api.github.com/repos/binx-ux/Music-engine-/releases/latest'
+$setupUrl = 'https://github.com/binx-ux/Music-engine-/releases/latest/download/CueboxSetup.exe'
+$zipUrl = 'https://github.com/binx-ux/Music-engine-/releases/latest/download/Cuebox.zip'
+
+Write-Host 'Cuebox installer'
+Write-Host ''
+
+$tag = $null
+try {
+    $rel = Invoke-RestMethod -Uri $api -Headers @{ 'User-Agent' = 'Cuebox-Install' }
+    $tag = $rel.tag_name
+    Write-Host ("Latest release: " + $tag)
+} catch {
+    Write-Host 'Could not read GitHub API. Using /latest/download links.'
+}
 
 function Pick-Folder([string]$title, [string]$start) {
     $d = New-Object System.Windows.Forms.FolderBrowserDialog
@@ -15,11 +28,26 @@ function Pick-Folder([string]$title, [string]$start) {
     return $d.SelectedPath
 }
 
+$setup = Join-Path $env:TEMP 'CueboxSetup.exe'
+Write-Host 'Downloading CueboxSetup.exe...'
+try {
+    Invoke-WebRequest -UseBasicParsing -Uri $setupUrl -OutFile $setup
+    if ((Test-Path $setup) -and ((Get-Item $setup).Length -gt 1_000_000)) {
+        Write-Host 'Starting Cuebox Setup...'
+        Start-Process -FilePath $setup -Wait
+        Write-Host 'Done.'
+        return
+    }
+} catch {
+    Write-Host 'Setup download failed. Falling back to zip.'
+}
+
 $app = Pick-Folder 'App folder (Cuebox.exe)' (Join-Path $env:LOCALAPPDATA 'Cuebox')
 $data = Pick-Folder 'Data folder (settings, music, logs, pads)' (Join-Path $env:APPDATA 'Cuebox')
 
-Write-Host "Downloading Cuebox..."
-$bytes = (Invoke-WebRequest -UseBasicParsing -Uri $release).Content
+$zip = Join-Path $env:TEMP 'cuebox.zip'
+Write-Host 'Downloading Cuebox.zip...'
+$bytes = (Invoke-WebRequest -UseBasicParsing -Uri $zipUrl).Content
 [IO.File]::WriteAllBytes($zip, $bytes)
 
 Get-Process Cuebox -ErrorAction SilentlyContinue | Stop-Process -Force
