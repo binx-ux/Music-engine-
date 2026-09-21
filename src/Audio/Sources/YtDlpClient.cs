@@ -120,13 +120,27 @@ public sealed class YtDlpClient
         if (!ready.Success)
             return Result<List<SongHit>>.Fail(ready.Error ?? "yt-dlp is missing.", ready.Details);
 
-        query = (query ?? "").Trim();
-        if (string.IsNullOrWhiteSpace(query))
+        if (query == null)
+            query = "";
+        query = query.Trim();
+        if (query.Length == 0)
             return Result<List<SongHit>>.Fail("Type a song name.");
 
-        count = Math.Clamp(count, 1, 20);
-        var q = LooksLikeSearch(query) ? query : "ytsearch" + count + ":" + query;
+        // yt-dlp gets weird past ~20
+        if (count < 1)
+            count = 1;
+        if (count > 20)
+            count = 20;
+
+        string q;
+        if (LooksLikeSearch(query))
+            q = query;
+        else
+            q = "ytsearch" + count + ":" + query;
+
         var hits = await SearchAsync(q, count, ct);
+        if (hits == null)
+            hits = new List<SongHit>();
         if (hits.Count == 0)
             return Result<List<SongHit>>.Fail("Nothing matched. Try a different name.");
         return Result<List<SongHit>>.Ok(hits);
@@ -140,48 +154,99 @@ public sealed class YtDlpClient
 
     public async Task<Result<List<string>>> FindCleanRapAsync(CancellationToken ct)
     {
+        // tries a few search strings then falls back to whatever is already in CleanRap
         var ready = await EnsureAsync(ct);
         if (!ready.Success)
             return Result<List<string>>.Fail(ready.Error ?? "yt-dlp is missing.", ready.Details);
 
         var dest = Path.Combine(MusicDir, "CleanRap");
-        Directory.CreateDirectory(dest);
+        try
+        {
+            Directory.CreateDirectory(dest);
+        }
+        catch
+        {
+            // rare, but just keep going with whatever path we have
+        }
         CleanupParts(dest);
 
         var files = new List<string>();
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
+        var want = 8;
 
-        foreach (var query in CleanQueries)
+        for (var qi = 0; qi < CleanQueries.Length; qi++)
         {
-            if (files.Count >= 8 || ct.IsCancellationRequested)
+            if (files.Count >= want)
+                break;
+            if (ct.IsCancellationRequested)
                 break;
 
+            var query = CleanQueries[qi];
             var hits = await SearchAsync(query, 10, ct);
-            _log.Info("music", $"Clean rap search returned {hits.Count} results.");
-            foreach (var hit in hits)
+            if (hits == null)
+                continue;
+
+            _log.Info("music", "Clean rap search returned " + hits.Count + " results.");
+
+            for (var hi = 0; hi < hits.Count; hi++)
             {
-                if (files.Count >= 8 || ct.IsCancellationRequested)
+                if (files.Count >= want)
                     break;
+                if (ct.IsCancellationRequested)
+                    break;
+
+                var hit = hits[hi];
+                if (hit == null)
+                    continue;
                 if (!IsCleanSong(hit))
+                    continue;
+                if (string.IsNullOrWhiteSpace(hit.Id))
                     continue;
 
                 var path = await DownloadVideoAsync(hit.Id, dest, ct);
-                if (path is null || !seen.Add(path))
+                if (path == null)
                     continue;
+                if (!File.Exists(path))
+                    continue;
+                if (!seen.Add(path))
+                    continue;
+
                 files.Add(path);
                 _log.Info("music", "Downloaded clean rap: " + Path.GetFileName(path));
             }
         }
 
-        if (files.Count == 0)
+        // if yt-dlp flaked, use leftover files from last time
+        if (files.Count == 0 && Directory.Exists(dest))
         {
-            files = Directory.GetFiles(dest)
-                .Where(AudioFileSupport.IsSupportedFile)
-                .Where(p => new FileInfo(p).Length > 200_000)
-                .Where(p => IsCleanTitle(Path.GetFileNameWithoutExtension(p), 180))
-                .OrderByDescending(p => File.GetLastWriteTimeUtc(p))
-                .Take(8)
-                .ToList();
+            var leftovers = Directory.GetFiles(dest);
+            var picked = new List<string>();
+            for (var i = 0; i < leftovers.Length; i++)
+            {
+                var p = leftovers[i];
+                if (!AudioFileSupport.IsSupportedFile(p))
+                    continue;
+                try
+                {
+                    if (new FileInfo(p).Length <= 200_000)
+                        continue;
+                }
+                catch
+                {
+                    continue;
+                }
+                var name = Path.GetFileNameWithoutExtension(p);
+                if (!IsCleanTitle(name, 180))
+                    continue;
+                picked.Add(p);
+            }
+
+            picked.Sort((a, b) => File.GetLastWriteTimeUtc(b).CompareTo(File.GetLastWriteTimeUtc(a)));
+            var take = want;
+            if (picked.Count < take)
+                take = picked.Count;
+            for (var i = 0; i < take; i++)
+                files.Add(picked[i]);
         }
 
         if (files.Count == 0)
@@ -192,6 +257,16 @@ public sealed class YtDlpClient
 
     private async Task<List<SongHit>> SearchAsync(string query, int count, CancellationToken ct)
     {
+        // flat playlist print is way faster than downloading for seach
+        var hits = new List<SongHit>();
+        if (string.IsNullOrWhiteSpace(query))
+            return hits;
+
+        if (count < 1)
+            count = 1;
+        if (count > 25)
+            count = 25;
+
         var run = await RunAsync(
         [
             "--flat-playlist",
@@ -202,26 +277,56 @@ public sealed class YtDlpClient
             query
         ], ct);
 
-        var hits = new List<SongHit>();
-        foreach (var line in run.Out.Split(['\r', '\n'], StringSplitOptions.RemoveEmptyEntries))
+        var lines = run.Out.Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+        for (var i = 0; i < lines.Length; i++)
         {
-            var parts = line.Split('\t');
-            if (parts.Length < 2 || string.IsNullOrWhiteSpace(parts[0]))
+            var line = lines[i];
+            if (string.IsNullOrWhiteSpace(line))
                 continue;
-            var channel = parts.Length > 2 ? parts[2].Trim() : "";
-            if (channel is "NA" or "None")
+
+            var parts = line.Split('\t');
+            if (parts.Length < 2)
+                continue;
+
+            var id = parts[0].Trim();
+            if (id.Length == 0)
+                continue;
+
+            var title = parts[1].Trim();
+            var channel = "";
+            if (parts.Length > 2)
+                channel = parts[2].Trim();
+
+            // yt-dlp puts NA when its missing
+            if (channel == "NA" || channel == "None" || channel == "null")
                 channel = "";
-            int.TryParse(parts.Length > 3 ? parts[3] : "", out var duration);
+
+            var duration = 0;
+            if (parts.Length > 3)
+            {
+                var raw = parts[3].Trim();
+                int.TryParse(raw, out duration);
+            }
+
+            // skip weird blanks
+            if (string.IsNullOrWhiteSpace(title))
+                title = id;
+
             hits.Add(new SongHit
             {
-                Id = parts[0].Trim(),
-                Title = parts[1].Trim(),
+                Id = id,
+                Title = title,
                 Channel = channel,
                 Duration = duration
             });
         }
-        if (hits.Count == 0 && !string.IsNullOrWhiteSpace(run.Err))
-            _log.Warning("music", "Search failed.", Trim(run.Err));
+
+        if (hits.Count == 0)
+        {
+            if (!string.IsNullOrWhiteSpace(run.Err))
+                _log.Warning("music", "Search failed.", Trim(run.Err));
+        }
+
         return hits;
     }
 

@@ -21,6 +21,7 @@ public static class UpdateService
 
     public static async Task<UpdateOffer?> FindAsync(string? skipped, bool ignoreSkip, CancellationToken ct)
     {
+        // hits github releases/latest, returns null if we are current or offline
         try
         {
             using var req = new HttpRequestMessage(HttpMethod.Get, AppInfo.ReleasesApi);
@@ -29,24 +30,43 @@ public static class UpdateService
             using var res = await Http.SendAsync(req, ct);
             if (!res.IsSuccessStatusCode)
                 return null;
+
             await using var stream = await res.Content.ReadAsStreamAsync(ct);
             using var doc = await JsonDocument.ParseAsync(stream, cancellationToken: ct);
             var root = doc.RootElement;
-            var tag = root.TryGetProperty("tag_name", out var t) ? t.GetString() ?? "" : "";
+
+            var tag = "";
+            if (root.TryGetProperty("tag_name", out var t))
+            {
+                var raw = t.GetString();
+                if (raw != null)
+                    tag = raw;
+            }
+
             if (!AppVersion.TryParse(tag, out var maj, out var min, out var pat))
                 return null;
+
             var version = AppVersion.Canonical(maj, min, pat);
             var kind = AppVersion.Kind(AppInfo.Version, version);
             if (kind == UpdateKind.None)
                 return null;
-            if (!ignoreSkip && kind != UpdateKind.Major
-                && string.Equals(skipped, version, StringComparison.OrdinalIgnoreCase))
-                return null;
+
+            // major always shows, minor/fix can be skipped
+            if (!ignoreSkip && kind != UpdateKind.Major)
+            {
+                if (skipped != null && string.Equals(skipped, version, StringComparison.OrdinalIgnoreCase))
+                    return null;
+            }
+
             var url = SetupUrl(root);
-            if (string.IsNullOrEmpty(url))
+            if (url == null || url.Length == 0)
                 return null;
-            var body = root.TryGetProperty("body", out var b) ? b.GetString() : null;
-            return new UpdateOffer
+
+            string? body = null;
+            if (root.TryGetProperty("body", out var b))
+                body = b.GetString();
+
+            var offer = new UpdateOffer
             {
                 Version = version,
                 Tag = tag,
@@ -54,6 +74,7 @@ public static class UpdateService
                 SetupUrl = url,
                 Kind = kind
             };
+            return offer;
         }
         catch
         {

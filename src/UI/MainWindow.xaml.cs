@@ -240,8 +240,11 @@ public partial class MainWindow : Window
 
     private void RefreshChrome()
     {
-        var track = _session.Engine.Music.Current;
-        if (track is null)
+        // bottom player + sidebar status, this gets hit a lot from timers
+        var music = _session.Engine.Music;
+        var track = music.Current;
+
+        if (track == null)
         {
             if (_nowKey != "")
             {
@@ -258,41 +261,94 @@ public partial class MainWindow : Window
             {
                 _nowKey = key;
                 NowTitle.Text = track.Title;
-                NowArtist.Text = string.IsNullOrWhiteSpace(track.Artist) ? track.FileName : track.Artist;
+                if (string.IsNullOrWhiteSpace(track.Artist))
+                    NowArtist.Text = track.FileName;
+                else
+                    NowArtist.Text = track.Artist;
                 SetArt(track.Artwork);
             }
         }
 
-        SetPlayIcon(_session.Engine.Music.IsPlaying);
+        SetPlayIcon(music.IsPlaying);
         TickChromeSeek();
-        ChromeShuffle.Opacity = _session.Config.Music.Shuffle ? 1 : 0.38;
-        ChromeLoop.Opacity = _session.Config.Music.Loop == LoopMode.Off ? 0.38 : 1;
-        LoopOne.Visibility = _session.Config.Music.Loop == LoopMode.One ? Visibility.Visible : Visibility.Collapsed;
+
+        // dim when off, looks better than hiding them
+        if (_session.Config.Music.Shuffle)
+            ChromeShuffle.Opacity = 1;
+        else
+            ChromeShuffle.Opacity = 0.38;
+
+        if (_session.Config.Music.Loop == LoopMode.Off)
+            ChromeLoop.Opacity = 0.38;
+        else
+            ChromeLoop.Opacity = 1;
+
+        if (_session.Config.Music.Loop == LoopMode.One)
+            LoopOne.Visibility = Visibility.Visible;
+        else
+            LoopOne.Visibility = Visibility.Collapsed;
 
         var virt = _session.Engine.VirtualStatus();
         if (virt.Connected != _virtConnected)
         {
             _virtConnected = virt.Connected;
-            VirtDot.Fill = virt.Connected ? VirtOn : VirtOff;
-            SideDot.Fill = virt.Connected ? VirtOn : VirtOff;
+            if (virt.Connected)
+            {
+                VirtDot.Fill = VirtOn;
+                SideDot.Fill = VirtOn;
+            }
+            else
+            {
+                VirtDot.Fill = VirtOff;
+                SideDot.Fill = VirtOff;
+            }
         }
-        var virtText = string.IsNullOrEmpty(virt.RenderName)
-            ? virt.Message
-            : virt.RenderName + "  ·  " + virt.Message;
+
+        string virtText;
+        if (string.IsNullOrEmpty(virt.RenderName))
+            virtText = virt.Message;
+        else
+            virtText = virt.RenderName + "  ·  " + virt.Message;
+
         if (VirtText.Text != virtText)
             VirtText.Text = virtText;
-        SideEngine.Text = _session.Engine.IsRunning ? "Engine on" : "Engine off";
-        var sideVirt = string.IsNullOrEmpty(virt.RenderName)
-            ? (string.IsNullOrWhiteSpace(virt.Message) ? "No cable" : virt.Message)
-            : virt.RenderName;
+
+        if (_session.Engine.IsRunning)
+            SideEngine.Text = "Engine on";
+        else
+            SideEngine.Text = "Engine off";
+
+        string sideVirt;
+        if (!string.IsNullOrEmpty(virt.RenderName))
+            sideVirt = virt.RenderName;
+        else if (!string.IsNullOrWhiteSpace(virt.Message))
+            sideVirt = virt.Message;
+        else
+            sideVirt = "No cable";
+
         if (SideVirt.Text != sideVirt)
             SideVirt.Text = sideVirt;
-        MicLive.Text = _session.Engine.MicrophoneActive ? "Mic on" : "";
-        MicLivePill.Visibility = _session.Engine.MicrophoneActive ? Visibility.Visible : Visibility.Collapsed;
+
+        if (_session.Engine.MicrophoneActive)
+        {
+            MicLive.Text = "Mic on";
+            MicLivePill.Visibility = Visibility.Visible;
+        }
+        else
+        {
+            MicLive.Text = "";
+            MicLivePill.Visibility = Visibility.Collapsed;
+        }
+
         var lat = _session.Engine.Latency;
-        LatencyText.Text = _session.Engine.IsRunning
-            ? $"In {lat.InputMs} ms  ·  DSP {lat.ProcessingMs} ms  ·  Out {lat.OutputMs} ms  ·  ~{lat.TotalMs} ms"
-            : "Engine stopped";
+        if (_session.Engine.IsRunning)
+        {
+            LatencyText.Text = "In " + lat.InputMs + " ms  ·  DSP " + lat.ProcessingMs + " ms  ·  Out " + lat.OutputMs + " ms  ·  ~" + lat.TotalMs + " ms";
+        }
+        else
+        {
+            LatencyText.Text = "Engine stopped";
+        }
     }
 
     private void OnMeters(MeterState meters)

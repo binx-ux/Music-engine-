@@ -28,26 +28,56 @@ public partial class HomeView : UserControl
 
     public void Refresh()
     {
-        if (_session is null) return;
+        if (_session is null)
+            return;
+
         var running = _session.Engine.IsRunning;
-        MicName.Text = _session.Engine.InputName ?? "No microphone";
-        OutName.Text = _session.Engine.OutputName ?? "No headphones";
-        EngineState.Text = running ? "Running" : "Stopped";
-        EnginePill.Background = running
-            ? (Brush)FindResource("AccentGhostBrush")
-            : (Brush)FindResource("MutedBrush");
-        EnginePill.Opacity = running ? 1 : 0.25;
-        Notice.Text = _session.LastError ?? "";
+        var mic = _session.Engine.InputName;
+        if (string.IsNullOrWhiteSpace(mic))
+            mic = "No microphone";
+        MicName.Text = mic;
+
+        var outs = _session.Engine.OutputName;
+        if (string.IsNullOrWhiteSpace(outs))
+            outs = "No headphones";
+        OutName.Text = outs;
+
+        if (running)
+            EngineState.Text = "Running";
+        else
+            EngineState.Text = "Stopped";
+
+        if (running)
+        {
+            EnginePill.Background = (Brush)FindResource("AccentGhostBrush");
+            EnginePill.Opacity = 1;
+        }
+        else
+        {
+            EnginePill.Background = (Brush)FindResource("MutedBrush");
+            EnginePill.Opacity = 0.25;
+        }
+
+        var err = _session.LastError;
+        if (err == null)
+            err = "";
+        Notice.Text = err;
+
         var virt = _session.Engine.VirtualStatus();
-        VirtHint.Text = string.IsNullOrWhiteSpace(virt.Hint)
-            ? virt.Message
-            : virt.Message + Environment.NewLine + virt.Hint;
+        if (string.IsNullOrWhiteSpace(virt.Hint))
+            VirtHint.Text = virt.Message;
+        else
+            VirtHint.Text = virt.Message + Environment.NewLine + virt.Hint;
+
         _mixerStrip.Load();
     }
 
     public void UpdateMeters(MeterState meters)
     {
-        _mixerStrip.UpdateMeters(meters);
+        // home meters + the strip under them, both need the same snapshot
+        if (_mixerStrip != null)
+            _mixerStrip.UpdateMeters(meters);
+
         MicMeter.Level = meters.Mic;
         MicMeter.Hold = meters.MicHold;
         MusicMeter.Level = meters.Music;

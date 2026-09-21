@@ -308,29 +308,63 @@ public sealed class AppSession : IDisposable
 
     public async Task<(bool Ok, string Message, List<SongHit> Hits)> SearchSongs(string query)
     {
-        query = (query ?? "").Trim();
+        // wraps yt-dlp search, returns the list for the music page
         var hits = new List<SongHit>();
-        if (string.IsNullOrWhiteSpace(query))
+        if (query == null)
+            query = "";
+        query = query.Trim();
+
+        if (query.Length == 0)
             return (false, "Type a song name.", hits);
+
+        // i used to cap this at 10 then bumped it
+        var howMany = 12;
+        if (howMany < 1)
+            howMany = 1;
+
         Notify("Searching...");
-        var got = await Downloader.SearchSongsAsync(query, 12, CancellationToken.None);
-        if (!got.Success || got.Value is null || got.Value.Count == 0)
+        var got = await Downloader.SearchSongsAsync(query, howMany, CancellationToken.None);
+        if (!got.Success)
             return (false, got.Error ?? "Nothing matched.", hits);
-        return (true, $"Found {got.Value.Count}. Click Get on one.", got.Value);
+        if (got.Value == null || got.Value.Count == 0)
+            return (false, got.Error ?? "Nothing matched.", hits);
+
+        // copy into our list so the caller can mutate if they want
+        for (var i = 0; i < got.Value.Count; i++)
+            hits.Add(got.Value[i]);
+
+        var msg = "Found " + hits.Count + ". Click Get on one.";
+        return (true, msg, hits);
     }
 
     public async Task<(bool Ok, string Message, List<TrackInfo> Tracks)> DownloadHit(SongHit hit)
     {
         var tracks = new List<TrackInfo>();
+        if (hit == null)
+            return (false, "Pick a search result.", tracks);
         if (string.IsNullOrWhiteSpace(hit.Id))
             return (false, "Pick a search result.", tracks);
-        Notify("Downloading " + hit.Title + "...");
+
+        var label = hit.Title;
+        if (string.IsNullOrWhiteSpace(label))
+            label = hit.Id;
+
+        Notify("Downloading " + label + "...");
+
         var path = await Downloader.DownloadIdAsync(hit.Id, CancellationToken.None);
-        if (path is null)
+        if (path == null || !File.Exists(path))
             return (false, "Could not download that song.", tracks);
+
+        // youtube watch url so share / github export still works later
         var url = "https://www.youtube.com/watch?v=" + hit.Id;
-        tracks.Add(AudioFileSupport.ReadMetadata(path) with { SourceUrl = url });
-        return (true, "Added " + tracks[0].Title, tracks);
+        var meta = AudioFileSupport.ReadMetadata(path);
+        meta = meta with { SourceUrl = url };
+        tracks.Add(meta);
+
+        var name = tracks[0].Title;
+        if (string.IsNullOrWhiteSpace(name))
+            name = label;
+        return (true, "Added " + name, tracks);
     }
 
     public async Task<(bool Ok, string Message, List<TrackInfo> Tracks)> ImportGitHub(string text)
