@@ -28,7 +28,7 @@ public sealed class AudioEngine : IDisposable
     private readonly FloatRingBuffer _virtualRing = new(1 << 17);
     private readonly FloatRingBuffer _monitorRing = new(1 << 17);
     private readonly VoiceChain _voice = new();
-    private readonly Limiter _masterLimiter = new();
+    private Limiter _masterLimiter = new(AudioConstants.DefaultLimiterCeiling, 140f, 5f);
     private readonly object _startLock = new();
     private readonly object _voiceLock = new();
     private readonly object _paramLock = new();
@@ -163,8 +163,13 @@ public sealed class AudioEngine : IDisposable
             Stop();
             try
             {
-                _sampleRate = AudioConstants.DefaultSampleRate;
+                var output = ResolveRender(config.Devices.OutputId, true);
+                if (output is null)
+                    return Result.Fail("No playback device is available. Plug in headphones or speakers.");
+
+                _sampleRate = PickRate(output);
                 _bufferMs = config.Audio.BufferMilliseconds();
+                _masterLimiter = new Limiter(AudioConstants.DefaultLimiterCeiling, 140f, 5f, _sampleRate);
                 _micPeak = new PeakTracker(_sampleRate);
                 _musicPeak = new PeakTracker(_sampleRate);
                 _soundPeak = new PeakTracker(_sampleRate);
@@ -177,10 +182,6 @@ public sealed class AudioEngine : IDisposable
                 var share = config.Audio.ShareMode == ShareModeSetting.Exclusive
                     ? AudioClientShareMode.Exclusive
                     : AudioClientShareMode.Shared;
-
-                var output = ResolveRender(config.Devices.OutputId, true);
-                if (output is null)
-                    return Result.Fail("No playback device is available. Plug in headphones or speakers.");
 
                 _outputName = output.FriendlyName;
                 _monitorProvider = new MonitorProvider(this, _sampleRate);
@@ -338,6 +339,39 @@ public sealed class AudioEngine : IDisposable
             _log.Info("audio", $"Windows microphone set to {pair.Name} for games.");
         else
             _log.Warning("audio", $"Could not set Windows microphone. In games pick {pair.Name}.");
+    }
+
+    private static int PickRate(MMDevice device)
+    {
+        var rate = AudioConstants.DefaultSampleRate;
+        try
+        {
+            rate = device.AudioClient.MixFormat.SampleRate;
+        }
+        catch
+        {
+            return AudioConstants.DefaultSampleRate;
+        }
+
+        if (rate < AudioConstants.MinSampleRate)
+            rate = AudioConstants.MinSampleRate;
+        if (rate > AudioConstants.MaxSampleRate)
+            rate = AudioConstants.MaxSampleRate;
+
+        int[] common = [44100, 48000, 88200, 96000];
+        var best = AudioConstants.DefaultSampleRate;
+        var dist = int.MaxValue;
+        for (var i = 0; i < common.Length; i++)
+        {
+            var d = Math.Abs(common[i] - rate);
+            if (d < dist)
+            {
+                dist = d;
+                best = common[i];
+            }
+        }
+
+        return dist <= 200 ? best : rate;
     }
 
     private MMDevice? ResolveRender(string? id, bool fallbackDefault)

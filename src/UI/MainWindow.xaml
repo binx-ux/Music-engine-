@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         Title="Cuebox"
         Icon="Assets/cuebox.ico"
-        Height="860" Width="1320" MinHeight="700" MinWidth="1080"
+        Height="900" Width="1360" MinHeight="720" MinWidth="1100"
         WindowStartupLocation="CenterScreen"
         WindowStyle="None"
         ResizeMode="CanResize"
@@ -21,11 +21,11 @@
       <Grid.RowDefinitions>
         <RowDefinition Height="42"/>
         <RowDefinition Height="*"/>
-        <RowDefinition Height="88"/>
+        <RowDefinition Height="104"/>
         <RowDefinition Height="28"/>
       </Grid.RowDefinitions>
       <Grid.ColumnDefinitions>
-        <ColumnDefinition Width="228"/>
+        <ColumnDefinition Width="240"/>
         <ColumnDefinition Width="*"/>
       </Grid.ColumnDefinitions>
 
@@ -41,7 +41,7 @@
               </Border>
               <StackPanel VerticalAlignment="Center">
                 <TextBlock Text="Cuebox" FontWeight="SemiBold" FontSize="15"/>
-                <TextBlock x:Name="SideVer" Text="1.4.3" Style="{StaticResource Caption}" Margin="0,2,0,0"/>
+                <TextBlock x:Name="SideVer" Text="1.5.0" Style="{StaticResource Caption}" Margin="0,2,0,0"/>
               </StackPanel>
             </StackPanel>
           </Border>
@@ -56,55 +56,68 @@
           </Border>
           <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="8,4,8,4">
             <StackPanel>
-              <TextBlock Text="MIX" Style="{StaticResource Kicker}" Margin="10,4,0,4"/>
+              <TextBlock Text="MIX" Style="{StaticResource Kicker}" Margin="12,6,0,6"/>
               <RadioButton x:Name="NavHome" Style="{StaticResource NavBtn}" Checked="NavChanged" IsChecked="True">
                 <StackPanel Orientation="Horizontal">
-                  <Path Width="16" Height="16" Stretch="Uniform" Margin="0,0,10,0" Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"
-                        Data="M 3,11 L 12,3 L 21,11 L 21,21 L 14,21 L 14,14 L 10,14 L 10,21 L 3,21 Z"/>
+                  <Path Width="18" Height="18" Stretch="Uniform" Margin="0,0,10,0" Fill="{x:Null}"
+                        Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"
+                        StrokeThickness="1.6" StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                        Data="M 4,11 L 12,4.5 L 20,11 V 20 H 15.2 V 14.2 H 8.8 V 20 H 4 Z"/>
                   <TextBlock Text="Home" VerticalAlignment="Center"/>
                 </StackPanel>
               </RadioButton>
               <RadioButton x:Name="NavMixer" Style="{StaticResource NavBtn}" Checked="NavChanged">
                 <StackPanel Orientation="Horizontal">
-                  <Path Width="16" Height="16" Stretch="Uniform" Margin="0,0,10,0" Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"
-                        Data="M 5,4 H 8 V 20 H 5 Z M 11,9 H 14 V 20 H 11 Z M 17,6 H 20 V 20 H 17 Z"/>
+                  <Path Width="18" Height="18" Stretch="Uniform" Margin="0,0,10,0" Fill="{x:Null}"
+                        Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"
+                        StrokeThickness="1.6" StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                        Data="M 6,3 V 21 M 6,9 H 3.6 M 6,9 H 8.4 M 12,3 V 21 M 12,15 H 9.6 M 12,15 H 14.4 M 18,3 V 21 M 18,8 H 15.6 M 18,8 H 20.4"/>
                   <TextBlock Text="Mixer" VerticalAlignment="Center"/>
                 </StackPanel>
               </RadioButton>
               <RadioButton x:Name="NavBoard" Style="{StaticResource NavBtn}" Checked="NavChanged">
                 <StackPanel Orientation="Horizontal">
-                  <Path Width="16" Height="16" Stretch="Uniform" Margin="0,0,10,0" Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"
-                        Data="M 3,3 H 10 V 10 H 3 Z M 14,3 H 21 V 10 H 14 Z M 3,14 H 10 V 21 H 3 Z M 14,14 H 21 V 21 H 14 Z"/>
+                  <Path Width="18" Height="18" Stretch="Uniform" Margin="0,0,10,0" Fill="{x:Null}"
+                        Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"
+                        StrokeThickness="1.6" StrokeLineJoin="Round"
+                        Data="M 3.5,3.5 H 10 V 10 H 3.5 Z M 14,3.5 H 20.5 V 10 H 14 Z M 3.5,14 H 10 V 20.5 H 3.5 Z M 14,14 H 20.5 V 20.5 H 14 Z"/>
                   <TextBlock Text="Board" VerticalAlignment="Center"/>
                 </StackPanel>
               </RadioButton>
-              <TextBlock Text="AUDIO" Style="{StaticResource Kicker}" Margin="10,16,0,4"/>
+              <TextBlock Text="AUDIO" Style="{StaticResource Kicker}" Margin="12,18,0,6"/>
               <RadioButton x:Name="NavMusic" Style="{StaticResource NavBtn}" Checked="NavChanged">
                 <StackPanel Orientation="Horizontal">
-                  <Path Width="16" Height="16" Stretch="Uniform" Margin="0,0,10,0" Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"
-                        Data="M 8,4 L 19,2 V 8 L 8,10 V 18 A 3.2,3.2 0 1 1 8,18 Z"/>
+                  <Path Width="18" Height="18" Stretch="Uniform" Margin="0,0,10,0"
+                        Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"
+                        Data="M 8,4.2 L 17.5,2.2 V 8.2 L 8,10.2 V 16.6 A 2.6,2.6 0 1 1 5.6,14.2 V 4.2 Z"/>
                   <TextBlock Text="Music" VerticalAlignment="Center"/>
                 </StackPanel>
               </RadioButton>
               <RadioButton x:Name="NavVoice" Style="{StaticResource NavBtn}" Checked="NavChanged">
                 <StackPanel Orientation="Horizontal">
-                  <Path Width="16" Height="16" Stretch="Uniform" Margin="0,0,10,0" Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"
-                        Data="M 12,3 A 3.4,5 0 0 1 12,13 A 3.4,5 0 0 1 12,3 M 7.2,11.2 A 4.8,4.8 0 0 0 16.8,11.2 V 12.2 A 4.8,4.8 0 0 1 7.2,12.2 Z M 11,16.5 V 21 H 13 V 16.5 Z"/>
+                  <Path Width="18" Height="18" Stretch="Uniform" Margin="0,0,10,0" Fill="{x:Null}"
+                        Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"
+                        StrokeThickness="1.6" StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                        Data="M 12,3.2 A 2.6,4.2 0 0 1 12,11.6 A 2.6,4.2 0 0 1 12,3.2 M 8,10.4 A 4.2,4.2 0 0 0 16,10.4 M 12,14.6 V 20 M 9.2,20 H 14.8"/>
                   <TextBlock Text="Voice" VerticalAlignment="Center"/>
                 </StackPanel>
               </RadioButton>
-              <TextBlock Text="APP" Style="{StaticResource Kicker}" Margin="10,16,0,4"/>
+              <TextBlock Text="APP" Style="{StaticResource Kicker}" Margin="12,18,0,6"/>
               <RadioButton x:Name="NavDevices" Style="{StaticResource NavBtn}" Checked="NavChanged">
                 <StackPanel Orientation="Horizontal">
-                  <Path Width="16" Height="16" Stretch="Uniform" Margin="0,0,10,0" Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"
-                        Data="M 5,12 A 7,7 0 0 1 19,12 V 13 H 16 V 19 H 19 V 21 H 14 V 13 H 10 V 21 H 5 V 19 H 8 V 13 H 5 Z"/>
+                  <Path Width="18" Height="18" Stretch="Uniform" Margin="0,0,10,0" Fill="{x:Null}"
+                        Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"
+                        StrokeThickness="1.6" StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                        Data="M 5,11 A 7,7 0 0 1 19,11 M 5,11 V 15.2 A 2.2,2.2 0 0 0 7.2,17.4 H 8.2 V 11 M 19,11 V 15.2 A 2.2,2.2 0 0 1 16.8,17.4 H 15.8 V 11"/>
                   <TextBlock Text="Devices" VerticalAlignment="Center"/>
                 </StackPanel>
               </RadioButton>
               <RadioButton x:Name="NavSettings" Style="{StaticResource NavBtn}" Checked="NavChanged">
                 <StackPanel Orientation="Horizontal">
-                  <Path Width="16" Height="16" Stretch="Uniform" Margin="0,0,10,0" Fill="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"
-                        Data="M 10,3 H 14 L 15,6.4 L 18.2,7.6 L 18.2,12.4 L 15,13.6 L 14,17 H 10 L 9,13.6 L 5.8,12.4 V 7.6 L 9,6.4 Z M 12,8.4 A 2.4,2.4 0 1 1 12,13.2 A 2.4,2.4 0 1 1 12,8.4 Z"/>
+                  <Path Width="18" Height="18" Stretch="Uniform" Margin="0,0,10,0" Fill="{x:Null}"
+                        Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=RadioButton}}"
+                        StrokeThickness="1.6" StrokeLineJoin="Round"
+                        Data="M 12,8.2 A 3.2,3.2 0 1 1 12,14.6 A 3.2,3.2 0 1 1 12,8.2 M 12,3.2 V 5.2 M 12,17.6 V 19.6 M 5.8,6.4 L 7.2,7.8 M 16.8,17 L 18.2,18.4 M 3.2,12 H 5.2 M 17.6,12 H 19.6 M 5.8,17.6 L 7.2,16.2 M 16.8,7 L 18.2,5.6"/>
                   <TextBlock Text="Settings" VerticalAlignment="Center"/>
                 </StackPanel>
               </RadioButton>
@@ -114,11 +127,26 @@
       </Border>
 
       <Grid Grid.Column="1" Panel.ZIndex="20" Background="#08FFFFFF" MouseLeftButtonDown="TitleDrag">
-        <TextBlock Text="Cuebox" FontWeight="SemiBold" FontSize="13" VerticalAlignment="Center" Margin="16,0,0,0" Opacity="0.55"/>
-        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,4,0">
-          <Button Content="-" Style="{StaticResource GhostBtn}" Click="MinClick"/>
-          <Button x:Name="MaxBtn" Content="[]" Style="{StaticResource GhostBtn}" Click="MaxClick"/>
-          <Button Content="X" Style="{StaticResource CloseBtn}" Click="CloseClick"/>
+        <StackPanel VerticalAlignment="Center" Margin="18,0,0,0">
+          <TextBlock x:Name="PageTitle" Text="Home" FontWeight="SemiBold" FontSize="14"/>
+          <TextBlock Text="Cuebox" Style="{StaticResource Caption}" Margin="0,1,0,0"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,6,0">
+          <Button Style="{StaticResource GhostBtn}" Click="MinClick" ToolTip="Minimize">
+            <Path Width="12" Height="12" Stretch="Uniform" StrokeThickness="1.7" StrokeStartLineCap="Round"
+                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                  Data="M 2,7 H 12"/>
+          </Button>
+          <Button x:Name="MaxBtn" Style="{StaticResource GhostBtn}" Click="MaxClick" ToolTip="Maximize">
+            <Path Width="12" Height="12" Stretch="Uniform" Fill="{x:Null}" StrokeThickness="1.5" StrokeLineJoin="Round"
+                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                  Data="M 3,3 H 13 V 13 H 3 Z"/>
+          </Button>
+          <Button Style="{StaticResource CloseBtn}" Click="CloseClick" ToolTip="Close">
+            <Path Width="12" Height="12" Stretch="Uniform" StrokeThickness="1.7" StrokeStartLineCap="Round"
+                  Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
+                  Data="M 3,3 L 11,11 M 11,3 L 3,11"/>
+          </Button>
         </StackPanel>
       </Grid>
 
@@ -140,7 +168,7 @@
           </Grid.ColumnDefinitions>
 
           <DockPanel>
-            <Border Width="64" Height="64" CornerRadius="10" Background="#22FFFFFF" ClipToBounds="True" DockPanel.Dock="Left">
+            <Border Width="72" Height="72" CornerRadius="12" Background="#22FFFFFF" ClipToBounds="True" DockPanel.Dock="Left">
               <Image x:Name="ArtImage" Stretch="UniformToFill" RenderTransformOrigin="0.5,0.5">
                 <Image.RenderTransform>
                   <ScaleTransform x:Name="ArtScale" ScaleX="1" ScaleY="1"/>

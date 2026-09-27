@@ -209,18 +209,19 @@ public partial class MainWindow : Window
     {
         if (!IsLoaded)
             return;
-        if (NavMixer.IsChecked == true) Show(_mixer ??= new MixerView());
-        else if (NavBoard.IsChecked == true) Show(_board ??= new SoundboardView());
-        else if (NavMusic.IsChecked == true) Show(_music ??= new MusicView());
-        else if (NavVoice.IsChecked == true) Show(_voice ??= new VoiceView());
-        else if (NavDevices.IsChecked == true) Show(_devices ??= new DevicesView());
-        else if (NavSettings.IsChecked == true) Show(_settings ??= new SettingsView());
-        else Show(_home);
+        if (NavMixer.IsChecked == true) { PageTitle.Text = "Mixer"; Show(_mixer ??= new MixerView()); }
+        else if (NavBoard.IsChecked == true) { PageTitle.Text = "Board"; Show(_board ??= new SoundboardView()); }
+        else if (NavMusic.IsChecked == true) { PageTitle.Text = "Music"; Show(_music ??= new MusicView()); }
+        else if (NavVoice.IsChecked == true) { PageTitle.Text = "Voice"; Show(_voice ??= new VoiceView()); }
+        else if (NavDevices.IsChecked == true) { PageTitle.Text = "Devices"; Show(_devices ??= new DevicesView()); }
+        else if (NavSettings.IsChecked == true) { PageTitle.Text = "Settings"; Show(_settings ??= new SettingsView()); }
+        else { PageTitle.Text = "Home"; Show(_home); }
     }
 
     public void OpenMusic()
     {
         NavMusic.IsChecked = true;
+        PageTitle.Text = "Music";
         Show(_music ??= new MusicView());
     }
 

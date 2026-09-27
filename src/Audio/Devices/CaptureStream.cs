@@ -1,6 +1,7 @@
 using NAudio.CoreAudioApi;
 using NAudio.Wave;
 using Mixline.Audio.Mixer;
+using Mixline.Audio.Sources;
 using Mixline.Core;
 using Mixline.Logging;
 
@@ -12,7 +13,7 @@ public sealed class CaptureStream : IDisposable
     private readonly FloatRingBuffer _ring;
     private readonly int _engineRate;
     private WasapiCapture? _capture;
-    private CubicResampler? _resampler;
+    private HqBlockResampler? _resampler;
     private float[] _convert = [];
     private float[] _stereo = [];
     private float[] _resampled = [];
@@ -45,7 +46,7 @@ public sealed class CaptureStream : IDisposable
             _format = _capture.WaveFormat;
             DeviceSampleRate = _format.SampleRate;
             DeviceChannels = _format.Channels;
-            _resampler = new CubicResampler(2);
+            _resampler = new HqBlockResampler(_format.SampleRate, _engineRate, 2);
             _convert = new float[Math.Max(4096, _engineRate)];
             _stereo = new float[Math.Max(4096, _engineRate * 2)];
             _resampled = new float[Math.Max(8192, _engineRate * 2)];
@@ -79,11 +80,12 @@ public sealed class CaptureStream : IDisposable
             if (_stereo.Length < frames * 2)
                 return;
             ChannelConvert.ToStereo(floats, _format.Channels, _stereo, frames);
-            var ratio = (double)_format.SampleRate / _engineRate;
-            var outFrames = Math.Max(1, (int)Math.Round(frames / ratio));
-            if (_resampled.Length < outFrames * 2)
-                return;
-            var produced = _resampler!.Process(_stereo, frames, _resampled, outFrames, ratio);
+            var outGuess = _format.SampleRate == _engineRate
+                ? frames
+                : Math.Max(1, (int)Math.Ceiling(frames * (_engineRate / (double)_format.SampleRate)) + 32);
+            if (_resampled.Length < outGuess * 2)
+                Array.Resize(ref _resampled, outGuess * 2);
+            var produced = _resampler!.Process(_stereo, frames, _resampled);
             _ring.Write(_resampled.AsSpan(0, produced * 2));
         }
         catch

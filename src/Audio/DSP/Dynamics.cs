@@ -58,12 +58,15 @@ public sealed class Limiter
 {
     private float _gain = 1f;
     private readonly float _ceiling;
+    private readonly float _attack;
     private readonly float _release;
 
-    public Limiter(float ceiling = AudioConstants.DefaultLimiterCeiling, float releaseMs = 50f, int sampleRate = AudioConstants.DefaultSampleRate)
+    public Limiter(float ceiling = AudioConstants.DefaultLimiterCeiling, float releaseMs = 140f, float attackMs = 5f, int sampleRate = AudioConstants.DefaultSampleRate)
     {
         _ceiling = ceiling;
-        _release = 1f - MathF.Exp(-1f / (releaseMs / 1000f * sampleRate));
+        var rate = Math.Max(8000, sampleRate);
+        _attack = 1f - MathF.Exp(-1f / (MathF.Max(0.5f, attackMs) / 1000f * rate));
+        _release = 1f - MathF.Exp(-1f / (MathF.Max(8f, releaseMs) / 1000f * rate));
     }
 
     public void ProcessStereo(Span<float> buffer, int frames)
@@ -72,10 +75,10 @@ public sealed class Limiter
         {
             var peak = MathF.Max(MathF.Abs(buffer[i * 2]), MathF.Abs(buffer[i * 2 + 1]));
             var needed = peak > _ceiling ? _ceiling / peak : 1f;
-            if (needed < _gain)
-                _gain = needed;
-            else
-                _gain += _release * (1f - _gain);
+            var coeff = needed < _gain ? _attack : _release;
+            _gain += coeff * (needed - _gain);
+            if (_gain > 1f)
+                _gain = 1f;
 
             buffer[i * 2] = Math.Clamp(buffer[i * 2] * _gain, -AudioConstants.PeakClip, AudioConstants.PeakClip);
             buffer[i * 2 + 1] = Math.Clamp(buffer[i * 2 + 1] * _gain, -AudioConstants.PeakClip, AudioConstants.PeakClip);

@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.IO.Compression;
 using System.Text;
 using Mixline.Core;
 using Mixline.Logging;
@@ -8,6 +9,7 @@ namespace Mixline.Audio.Sources;
 public sealed class YtDlpClient
 {
     private const string Release = "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp.exe";
+    private const string FfmpegZip = "https://github.com/yt-dlp/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip";
     private static readonly string Curl = Path.Combine(Environment.SystemDirectory, "curl.exe");
     private static readonly string[] CleanQueries =
     [
@@ -21,6 +23,7 @@ public sealed class YtDlpClient
     public YtDlpClient(AppLog log) => _log = log;
 
     public string ExePath => Path.Combine(AppPaths.Root, "tools", "yt-dlp.exe");
+    public string FfmpegPath => Path.Combine(AppPaths.Root, "tools", "ffmpeg.exe");
     public string MusicDir => Path.Combine(AppPaths.Root, "Music");
 
     public async Task<Result> EnsureAsync(CancellationToken ct)
@@ -69,6 +72,78 @@ public sealed class YtDlpClient
         }
     }
 
+    private bool FfmpegReady()
+        => File.Exists(FfmpegPath) && new FileInfo(FfmpegPath).Length > 1_000_000;
+
+    private async Task EnsureFfmpegAsync(CancellationToken ct)
+    {
+        if (FfmpegReady())
+            return;
+        var zip = FfmpegPath + ".zip";
+        try
+        {
+            Directory.CreateDirectory(Path.GetDirectoryName(FfmpegPath)!);
+            var psi = new ProcessStartInfo
+            {
+                FileName = File.Exists(Curl) ? Curl : "curl.exe",
+                CreateNoWindow = true,
+                UseShellExecute = false
+            };
+            psi.ArgumentList.Add("-sL");
+            psi.ArgumentList.Add("-o");
+            psi.ArgumentList.Add(zip);
+            psi.ArgumentList.Add("--max-time");
+            psi.ArgumentList.Add("300");
+            psi.ArgumentList.Add(FfmpegZip);
+            using var proc = Process.Start(psi);
+            if (proc is null)
+                return;
+            await proc.WaitForExitAsync(ct);
+            if (proc.ExitCode != 0 || !File.Exists(zip) || new FileInfo(zip).Length < 1_000_000)
+            {
+                TryDelete(zip);
+                return;
+            }
+
+            using (var archive = ZipFile.OpenRead(zip))
+            {
+                var entry = archive.Entries.FirstOrDefault(e =>
+                    e.Name.Equals("ffmpeg.exe", StringComparison.OrdinalIgnoreCase));
+                if (entry is null)
+                    return;
+                entry.ExtractToFile(FfmpegPath, true);
+            }
+        }
+        catch (Exception ex)
+        {
+            _log.Warning("music", "ffmpeg install failed.", ex.Message);
+        }
+        finally
+        {
+            TryDelete(zip);
+        }
+    }
+
+    private void AddQualityArgs(List<string> args)
+    {
+        if (FfmpegReady())
+        {
+            args.Add("--ffmpeg-location");
+            args.Add(Path.GetDirectoryName(FfmpegPath)!);
+            args.Add("-f");
+            args.Add("bestaudio/best");
+            args.Add("-x");
+            args.Add("--audio-format");
+            args.Add("flac");
+            args.Add("--audio-quality");
+            args.Add("0");
+            return;
+        }
+
+        args.Add("-f");
+        args.Add("bestaudio[ext=m4a]/bestaudio[acodec^=mp4a]/140");
+    }
+
     public async Task<Result<List<string>>> DownloadAsync(string urlOrQuery, string destDir, int maxFiles, CancellationToken ct)
     {
         var ready = await EnsureAsync(ct);
@@ -77,11 +152,11 @@ public sealed class YtDlpClient
 
         Directory.CreateDirectory(destDir);
         CleanupParts(destDir);
+        await EnsureFfmpegAsync(ct);
         var before = Directory.GetFiles(destDir).ToHashSet(StringComparer.OrdinalIgnoreCase);
         var template = Path.Combine(destDir, "%(title).80B.%(ext)s");
         var args = new List<string>
         {
-            "-f", "140/bestaudio[ext=m4a]/bestaudio[ext=mp3]/bestaudio",
             "--ignore-errors",
             "--no-warnings",
             "--no-progress",
@@ -90,6 +165,7 @@ public sealed class YtDlpClient
             "--playlist-end", Math.Clamp(maxFiles, 1, 20).ToString(),
             "-o", template
         };
+        AddQualityArgs(args);
         if (!LooksLikeSearch(urlOrQuery))
             args.Add("--no-playlist");
         args.Add(urlOrQuery);
@@ -335,18 +411,20 @@ public sealed class YtDlpClient
         var url = "https://www.youtube.com/watch?v=" + id;
         var template = Path.Combine(destDir, "%(title).80B.%(ext)s");
         var before = Directory.GetFiles(destDir).ToHashSet(StringComparer.OrdinalIgnoreCase);
-        var run = await RunAsync(
-        [
-            "-f", "140/bestaudio[ext=m4a]/bestaudio[ext=mp3]/bestaudio",
+        await EnsureFfmpegAsync(ct);
+        var args = new List<string>
+        {
             "--no-playlist",
             "--ignore-errors",
             "--no-warnings",
             "--no-progress",
             "--windows-filenames",
             "--print", "after_move:filepath",
-            "-o", template,
-            url
-        ], ct);
+            "-o", template
+        };
+        AddQualityArgs(args);
+        args.Add(url);
+        var run = await RunAsync(args, ct);
 
         var printed = ParsePrintedFiles(run.Out).FirstOrDefault(p => File.Exists(p) && AudioFileSupport.IsSupportedFile(p));
         if (printed is not null && new FileInfo(printed).Length > 80_000)

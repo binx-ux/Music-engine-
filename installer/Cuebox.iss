@@ -1,8 +1,8 @@
-; Cuebox 1.4.3
+; Cuebox 1.5.0
 ; Pick the app folder and a separate data folder.
 
 #define MyAppName "Cuebox"
-#define MyAppVersion "1.4.3"
+#define MyAppVersion "1.5.0"
 #define MyAppExeName "Cuebox.exe"
 
 [Setup]

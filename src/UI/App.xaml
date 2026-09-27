@@ -54,7 +54,7 @@
       <Setter Property="Background" Value="{DynamicResource GlassFill}"/>
       <Setter Property="BorderBrush" Value="{DynamicResource GlassEdge}"/>
       <Setter Property="BorderThickness" Value="1"/>
-      <Setter Property="CornerRadius" Value="10"/>
+      <Setter Property="CornerRadius" Value="14"/>
       <Setter Property="Padding" Value="14"/>
       <Setter Property="SnapsToDevicePixels" Value="True"/>
     </Style>
