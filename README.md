@@ -2,7 +2,7 @@
 
 Windows mixer for mic + music + soundboard. Routes the mix through a virtual cable so Roblox, Discord, and games just see another mic.
 
-**1.5.0** · [docs](https://binx-ux.github.io/Music-engine-/) · [releases](https://github.com/binx-ux/Music-engine-/releases/latest)
+**1.5.1** · [docs](https://binx-ux.github.io/Music-engine-/) · [releases](https://github.com/binx-ux/Music-engine-/releases/latest)
 
 ![Cuebox](src/UI/Assets/cuebox.png)
 

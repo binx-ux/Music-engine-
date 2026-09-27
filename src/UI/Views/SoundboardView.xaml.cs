@@ -29,8 +29,8 @@ public partial class SoundboardView : UserControl
             _bound = true;
             session.LayoutChanged += () => Dispatcher.BeginInvoke(Rebuild);
             session.PadNamesChanged += () => Dispatcher.BeginInvoke(SyncNames);
+            Rebuild();
         }
-        Rebuild();
     }
 
     private void Rebuild()

@@ -32,8 +32,8 @@ public partial class MusicView : UserControl
         {
             _bound = true;
             session.Changed += () => Dispatcher.BeginInvoke(Refresh);
+            Refresh();
         }
-        Refresh();
     }
 
     public void TickPosition()

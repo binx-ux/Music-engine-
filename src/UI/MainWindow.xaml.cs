@@ -227,6 +227,9 @@ public partial class MainWindow : Window
 
     private void Show(UserControl page)
     {
+        if (ReferenceEquals(Host.Content, page))
+            return;
+
         if (page is HomeView home) home.Bind(_session);
         else if (page is MixerView mixer) mixer.Bind(_session);
         else if (page is SoundboardView board) board.Bind(_session);
@@ -235,10 +238,13 @@ public partial class MainWindow : Window
         else if (page is DevicesView devices) devices.Bind(_session);
         else if (page is SettingsView settings) settings.Bind(_session);
 
-        if (Host.Content == page)
-            return;
+        Host.BeginAnimation(UIElement.OpacityProperty, null);
+        HostSlide.BeginAnimation(TranslateTransform.XProperty, null);
+        HostSlide.BeginAnimation(TranslateTransform.YProperty, null);
+        Host.Opacity = 1;
+        HostSlide.X = 0;
+        HostSlide.Y = 0;
         Host.Content = page;
-        UiMotion.Enter(Host, HostSlide);
     }
 
     private void RefreshChrome()

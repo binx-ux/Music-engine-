@@ -22,8 +22,8 @@ public partial class HomeView : UserControl
             _mixerStrip.Bind(session);
             _miniBoard.Bind(session);
             session.Changed += () => Dispatcher.BeginInvoke(Refresh);
+            Refresh();
         }
-        Refresh();
     }
 
     public void Refresh()

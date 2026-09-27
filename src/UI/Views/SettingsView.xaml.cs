@@ -24,8 +24,8 @@ public partial class SettingsView : UserControl
         {
             _bound = true;
             session.Changed += () => Dispatcher.BeginInvoke(Load);
+            Load();
         }
-        Load();
     }
 
     private void Load()

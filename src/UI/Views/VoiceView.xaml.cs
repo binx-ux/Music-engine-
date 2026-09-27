@@ -30,8 +30,8 @@ public partial class VoiceView : UserControl
             TuneScale.Items.Add("Major");
             TuneScale.Items.Add("Minor");
             session.Changed += () => Dispatcher.BeginInvoke(Load);
+            Load();
         }
-        Load();
     }
 
     public void UpdateLive(MeterState meters)

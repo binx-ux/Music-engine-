@@ -12,16 +12,24 @@ public static class UiMotion
 
     public static void Enter(UIElement el, TranslateTransform slide)
     {
-        el.BeginAnimation(UIElement.OpacityProperty, Anim(0, 1, 180));
-        slide.BeginAnimation(TranslateTransform.XProperty, Anim(18, 0, 220, Out()));
-        slide.BeginAnimation(TranslateTransform.YProperty, Anim(4, 0, 200, Out()));
+        el.BeginAnimation(UIElement.OpacityProperty, null);
+        slide.BeginAnimation(TranslateTransform.XProperty, null);
+        slide.BeginAnimation(TranslateTransform.YProperty, null);
+        el.Opacity = 1;
+        slide.X = 0;
+        slide.Y = 0;
     }
 
     public static void Fade(UIElement el, double from, double to, int ms, Action? done = null)
     {
         var a = Anim(from, to, ms);
-        if (done is not null)
-            a.Completed += (_, _) => done();
+        a.Completed += (_, _) =>
+        {
+            el.BeginAnimation(UIElement.OpacityProperty, null);
+            el.Opacity = to;
+            done?.Invoke();
+        };
+        el.Opacity = from;
         el.BeginAnimation(UIElement.OpacityProperty, a);
     }
 
@@ -39,23 +47,53 @@ public static class UiMotion
         var from = el.Width;
         if (double.IsNaN(from) || from < 0)
             from = el.ActualWidth;
-        el.BeginAnimation(FrameworkElement.WidthProperty, Anim(from, to, ms, Out()));
+        var a = Anim(from, to, ms, Out());
+        a.Completed += (_, _) =>
+        {
+            el.BeginAnimation(FrameworkElement.WidthProperty, null);
+            el.Width = to;
+        };
+        el.BeginAnimation(FrameworkElement.WidthProperty, a);
     }
 
     public static void ScaleX(ScaleTransform sc, double to, int ms)
     {
-        sc.BeginAnimation(ScaleTransform.ScaleXProperty, Anim(sc.ScaleX, to, ms, Out()));
+        var a = Anim(sc.ScaleX, to, ms, Out());
+        a.Completed += (_, _) =>
+        {
+            sc.BeginAnimation(ScaleTransform.ScaleXProperty, null);
+            sc.ScaleX = to;
+        };
+        sc.BeginAnimation(ScaleTransform.ScaleXProperty, a);
     }
 
     public static void ScaleY(ScaleTransform sc, double to, int ms)
     {
-        sc.BeginAnimation(ScaleTransform.ScaleYProperty, Anim(sc.ScaleY, to, ms, Out()));
+        var a = Anim(sc.ScaleY, to, ms, Out());
+        a.Completed += (_, _) =>
+        {
+            sc.BeginAnimation(ScaleTransform.ScaleYProperty, null);
+            sc.ScaleY = to;
+        };
+        sc.BeginAnimation(ScaleTransform.ScaleYProperty, a);
     }
 
     public static void ScaleTo(ScaleTransform sc, double from, double to, int ms)
     {
-        sc.BeginAnimation(ScaleTransform.ScaleXProperty, Anim(from, to, ms, Back()));
-        sc.BeginAnimation(ScaleTransform.ScaleYProperty, Anim(from, to, ms, Back()));
+        var x = Anim(from, to, ms, Back());
+        var y = Anim(from, to, ms, Back());
+        x.Completed += (_, _) =>
+        {
+            sc.BeginAnimation(ScaleTransform.ScaleXProperty, null);
+            sc.ScaleX = to;
+        };
+        y.Completed += (_, _) =>
+        {
+            sc.BeginAnimation(ScaleTransform.ScaleYProperty, null);
+            sc.ScaleY = to;
+        };
+        sc.BeginAnimation(ScaleTransform.ScaleXProperty, x);
+        sc.BeginAnimation(ScaleTransform.ScaleYProperty, y);
     }
 
     public static void Punch(UIElement el)
@@ -70,8 +108,20 @@ public static class UiMotion
         var up = Anim(1, 1.08, 70);
         up.Completed += (_, _) =>
         {
-            sc.BeginAnimation(ScaleTransform.ScaleXProperty, Anim(1.08, 1, 140, Back()));
-            sc.BeginAnimation(ScaleTransform.ScaleYProperty, Anim(1.08, 1, 140, Back()));
+            var downX = Anim(1.08, 1, 120, Back());
+            var downY = Anim(1.08, 1, 120, Back());
+            downX.Completed += (_, _) =>
+            {
+                sc.BeginAnimation(ScaleTransform.ScaleXProperty, null);
+                sc.ScaleX = 1;
+            };
+            downY.Completed += (_, _) =>
+            {
+                sc.BeginAnimation(ScaleTransform.ScaleYProperty, null);
+                sc.ScaleY = 1;
+            };
+            sc.BeginAnimation(ScaleTransform.ScaleXProperty, downX);
+            sc.BeginAnimation(ScaleTransform.ScaleYProperty, downY);
         };
         sc.BeginAnimation(ScaleTransform.ScaleXProperty, up);
         sc.BeginAnimation(ScaleTransform.ScaleYProperty, Anim(1, 1.08, 70));
@@ -82,7 +132,7 @@ public static class UiMotion
         return new DoubleAnimation(from, to, TimeSpan.FromMilliseconds(ms))
         {
             EasingFunction = ease ?? Out(),
-            FillBehavior = FillBehavior.HoldEnd
+            FillBehavior = FillBehavior.Stop
         };
     }
 }

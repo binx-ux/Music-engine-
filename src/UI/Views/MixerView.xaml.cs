@@ -21,8 +21,8 @@ public partial class MixerView : UserControl
             _bound = true;
             Strip.Bind(session);
             session.Changed += () => Dispatcher.BeginInvoke(Load);
+            Load();
         }
-        Load();
     }
 
     public void UpdateMeters(MeterState meters) => Strip.UpdateMeters(meters);

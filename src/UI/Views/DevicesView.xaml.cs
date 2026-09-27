@@ -20,8 +20,8 @@ public partial class DevicesView : UserControl
             _bound = true;
             session.Engine.Devices.DevicesChanged += (_, _) => Dispatcher.BeginInvoke(Reload);
             session.Changed += () => Dispatcher.BeginInvoke(Reload);
+            Reload();
         }
-        Reload();
     }
 
     private void Refresh(object sender, RoutedEventArgs e) => Reload();
