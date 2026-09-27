@@ -38,6 +38,8 @@ public partial class MainWindow : Window
     private bool _playIconPlaying;
     private bool _virtConnected;
     private string? _nowKey;
+    private string _chromePos = "";
+    private string _chromeDur = "";
     private int _toastGen;
     private object? _chromeTrack;
 
@@ -382,14 +384,26 @@ public partial class MainWindow : Window
         var music = _session.Engine.Music;
         var dur = music.Duration.TotalSeconds;
         var frac = dur <= 0 ? 0 : Math.Clamp(music.Position.TotalSeconds / dur, 0, 1);
-        ChromeSeekFill.BeginAnimation(FrameworkElement.WidthProperty, null);
         var target = ChromeSeekWell.ActualWidth * frac;
-        if (Math.Abs(target - ChromeSeekFill.Width) > 24)
-            UiMotion.WidthTo(ChromeSeekFill, target, 160);
-        else
+        if (double.IsNaN(target) || target < 0)
+            target = 0;
+        if (Math.Abs(ChromeSeekFill.Width - target) > 0.6)
+        {
+            ChromeSeekFill.BeginAnimation(FrameworkElement.WidthProperty, null);
             ChromeSeekFill.Width = target;
-        ChromePos.Text = FormatTime(music.Position);
-        ChromeDur.Text = dur <= 0 ? "0:00" : FormatTime(music.Duration);
+        }
+        var pos = FormatTime(music.Position);
+        var end = dur <= 0 ? "0:00" : FormatTime(music.Duration);
+        if (pos != _chromePos)
+        {
+            _chromePos = pos;
+            ChromePos.Text = pos;
+        }
+        if (end != _chromeDur)
+        {
+            _chromeDur = end;
+            ChromeDur.Text = end;
+        }
     }
 
     private static string FormatTime(TimeSpan t) => $"{(int)t.TotalMinutes}:{t.Seconds:00}";

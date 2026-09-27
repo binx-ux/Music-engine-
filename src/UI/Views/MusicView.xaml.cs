@@ -45,10 +45,9 @@ public partial class MusicView : UserControl
         if (NowCard.Visibility != Visibility.Visible)
             return;
 
-        // kinda ugly but it works
-        var pos = Format(p.Position);
-        var dur = Format(p.Duration);
-        NowTime.Text = pos + " / " + dur;
+        var text = Format(p.Position) + " / " + Format(p.Duration);
+        if (NowTime.Text != text)
+            NowTime.Text = text;
     }
 
     private void Refresh()

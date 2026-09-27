@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using Mixline.Audio.Mixer;
+using Mixline.App;
 
 namespace Mixline.App.Views;
 
@@ -35,10 +36,10 @@ public partial class MixerView : UserControl
         MusicMon.IsChecked = m.MusicMonitor;
         BoardMon.IsChecked = m.SoundboardMonitor;
         MasterMon.IsChecked = m.MasterMonitor;
-        MonVol.Value = m.MonitorVolume;
-        MicVirt.Value = m.Mic.VirtualSend;
-        MusicVirt.Value = m.Music.VirtualSend;
-        BoardVirt.Value = m.Soundboard.VirtualSend;
+        UiMotion.SetSlider(MonVol, m.MonitorVolume);
+        UiMotion.SetSlider(MicVirt, m.Mic.VirtualSend);
+        UiMotion.SetSlider(MusicVirt, m.Music.VirtualSend);
+        UiMotion.SetSlider(BoardVirt, m.Soundboard.VirtualSend);
         Strip.Load();
         _suppress = false;
     }

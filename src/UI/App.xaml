@@ -585,20 +585,20 @@
     </Style>
 
     <ControlTemplate x:Key="HSlider" TargetType="Slider">
-      <Grid>
-        <Border Height="4" Background="#22000000" CornerRadius="2" BorderBrush="#22FFFFFF" BorderThickness="1" VerticalAlignment="Center" Margin="8,0"/>
+      <Grid Margin="8,0" Height="18" VerticalAlignment="Center">
+        <Border Height="4" Background="#22000000" CornerRadius="2" BorderBrush="#22FFFFFF" BorderThickness="1" VerticalAlignment="Center"/>
         <Track x:Name="PART_Track">
           <Track.DecreaseRepeatButton>
-            <RepeatButton Command="Slider.DecreaseLarge">
+            <RepeatButton Command="Slider.DecreaseLarge" Delay="500" Interval="120" Focusable="False">
               <RepeatButton.Template>
                 <ControlTemplate TargetType="RepeatButton">
-                  <Border Height="4" Background="{DynamicResource AccentBrush}" CornerRadius="2" Margin="8,0,0,0" VerticalAlignment="Center"/>
+                  <Border Height="4" Background="{DynamicResource AccentBrush}" CornerRadius="2" VerticalAlignment="Center"/>
                 </ControlTemplate>
               </RepeatButton.Template>
             </RepeatButton>
           </Track.DecreaseRepeatButton>
           <Track.IncreaseRepeatButton>
-            <RepeatButton Command="Slider.IncreaseLarge">
+            <RepeatButton Command="Slider.IncreaseLarge" Delay="500" Interval="120" Focusable="False">
               <RepeatButton.Template>
                 <ControlTemplate TargetType="RepeatButton">
                   <Border Background="Transparent"/>
@@ -607,7 +607,7 @@
             </RepeatButton>
           </Track.IncreaseRepeatButton>
           <Track.Thumb>
-            <Thumb Width="14" Height="14" Panel.ZIndex="2">
+            <Thumb Width="16" Height="16" Focusable="False">
               <Thumb.Template>
                 <ControlTemplate TargetType="Thumb">
                   <Ellipse Fill="{DynamicResource AccentSoftBrush}" Stroke="{DynamicResource AccentDarkBrush}" StrokeThickness="1"/>
@@ -620,11 +620,11 @@
     </ControlTemplate>
 
     <ControlTemplate x:Key="VSlider" TargetType="Slider">
-      <Grid>
-        <Border Width="6" Background="#22000000" CornerRadius="3" BorderBrush="#22FFFFFF" BorderThickness="1" HorizontalAlignment="Center" Margin="0,10"/>
+      <Grid Margin="0,8" Width="28" HorizontalAlignment="Center">
+        <Border Width="6" Background="#22000000" CornerRadius="3" BorderBrush="#22FFFFFF" BorderThickness="1" HorizontalAlignment="Center"/>
         <Track x:Name="PART_Track" Orientation="Vertical" IsDirectionReversed="True">
           <Track.DecreaseRepeatButton>
-            <RepeatButton Command="Slider.DecreaseLarge">
+            <RepeatButton Command="Slider.DecreaseLarge" Delay="500" Interval="120" Focusable="False">
               <RepeatButton.Template>
                 <ControlTemplate TargetType="RepeatButton">
                   <Border Background="Transparent"/>
@@ -633,16 +633,16 @@
             </RepeatButton>
           </Track.DecreaseRepeatButton>
           <Track.IncreaseRepeatButton>
-            <RepeatButton Command="Slider.IncreaseLarge">
+            <RepeatButton Command="Slider.IncreaseLarge" Delay="500" Interval="120" Focusable="False">
               <RepeatButton.Template>
                 <ControlTemplate TargetType="RepeatButton">
-                  <Border Width="6" Background="{DynamicResource AccentBrush}" CornerRadius="3" HorizontalAlignment="Center" Margin="0,0,0,10"/>
+                  <Border Width="6" Background="{DynamicResource AccentBrush}" CornerRadius="3" HorizontalAlignment="Center"/>
                 </ControlTemplate>
               </RepeatButton.Template>
             </RepeatButton>
           </Track.IncreaseRepeatButton>
           <Track.Thumb>
-            <Thumb Width="22" Height="12" Panel.ZIndex="2">
+            <Thumb Width="22" Height="16" Focusable="False">
               <Thumb.Template>
                 <ControlTemplate TargetType="Thumb">
                   <Border CornerRadius="3" Background="{DynamicResource AccentSoftBrush}" BorderBrush="{DynamicResource AccentDarkBrush}" BorderThickness="1">
@@ -659,6 +659,8 @@
     <Style TargetType="Slider">
       <Setter Property="OverridesDefaultStyle" Value="True"/>
       <Setter Property="FocusVisualStyle" Value="{x:Null}"/>
+      <Setter Property="IsMoveToPointEnabled" Value="True"/>
+      <Setter Property="Stylus.IsPressAndHoldEnabled" Value="False"/>
       <Setter Property="Template" Value="{StaticResource HSlider}"/>
       <Style.Triggers>
         <Trigger Property="Orientation" Value="Vertical">

@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Microsoft.Win32;
+using Mixline.App;
 using Mixline.Soundboard;
 
 namespace Mixline.App.Views;
@@ -36,7 +37,7 @@ public partial class SoundboardView : UserControl
     {
         if (_session is null) return;
         _suppress = true;
-        Master.Value = _session.Config.Soundboard.MasterVolume;
+        UiMotion.SetSlider(Master, _session.Config.Soundboard.MasterVolume);
         var folders = _session.Layout.Pads
             .Select(p => string.IsNullOrWhiteSpace(p.Folder) ? "General" : p.Folder)
             .Distinct()
@@ -109,12 +110,12 @@ public partial class SoundboardView : UserControl
         _suppress = true;
         NameBox.Text = pad.Name;
         FileBox.Text = pad.FilePath ?? "";
-        Vol.Value = pad.Volume;
-        Pitch.Value = pad.Pitch;
-        Speed.Value = pad.Speed;
+        UiMotion.SetSlider(Vol, pad.Volume);
+        UiMotion.SetSlider(Pitch, pad.Pitch);
+        UiMotion.SetSlider(Speed, pad.Speed);
         Loop.IsChecked = pad.Loop;
-        FadeIn.Value = pad.FadeIn;
-        FadeOut.Value = pad.FadeOut;
+        UiMotion.SetSlider(FadeIn, pad.FadeIn);
+        UiMotion.SetSlider(FadeOut, pad.FadeOut);
         HotkeyBox.Text = pad.Hotkey ?? "";
         _suppress = false;
         _session?.PrefetchPad(pad);

@@ -3,6 +3,7 @@ using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
 using Microsoft.Win32;
+using Mixline.App;
 using Mixline.Core;
 using Mixline.Spotify;
 
@@ -33,7 +34,7 @@ public partial class SettingsView : UserControl
         _suppress = true;
         var c = _session.Config;
         Buffer.SelectedIndex = (int)c.Audio.BufferPreset;
-        CustomMs.Value = c.Audio.CustomBufferMs;
+        UiMotion.SetSlider(CustomMs, c.Audio.CustomBufferMs);
         Exclusive.IsChecked = c.Audio.ShareMode == ShareModeSetting.Exclusive;
         Bypass.IsChecked = c.Audio.BypassProcessing;
         Tone.IsChecked = c.Advanced.TestToneOnStart;
@@ -58,7 +59,7 @@ public partial class SettingsView : UserControl
         var scale = c.Appearance.UiScale;
         if (scale < 0.9 || scale > 1.2)
             scale = 1;
-        UiScale.Value = scale;
+        UiMotion.SetSlider(UiScale, scale);
         BuildThemes();
         MarkThemes();
         _suppress = false;

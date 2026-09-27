@@ -1,6 +1,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using Mixline.Audio.Mixer;
+using Mixline.App;
 
 namespace Mixline.App.Views;
 
@@ -22,10 +23,10 @@ public partial class MixerStrip : UserControl
         if (_session is null) return;
         _suppress = true;
         var m = _session.Config.Mixer;
-        MicVol.Value = m.Mic.Volume;
-        MusicVol.Value = m.Music.Volume;
-        BoardVol.Value = m.Soundboard.Volume;
-        MasterVol.Value = m.Master.Volume;
+        UiMotion.SetSlider(MicVol, m.Mic.Volume);
+        UiMotion.SetSlider(MusicVol, m.Music.Volume);
+        UiMotion.SetSlider(BoardVol, m.Soundboard.Volume);
+        UiMotion.SetSlider(MasterVol, m.Master.Volume);
         MicMute.IsChecked = m.Mic.Mute;
         MusicMute.IsChecked = m.Music.Mute;
         BoardMute.IsChecked = m.Soundboard.Mute;

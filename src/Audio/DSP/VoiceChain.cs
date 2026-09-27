@@ -13,8 +13,11 @@ public sealed class VoiceChain
     private readonly PitchCorrector _tune = new();
     private readonly Saturation _sat = new();
     private readonly Limiter _limiter = new();
+    private readonly object _applyLock = new();
     private VoiceSettings _settings = new();
-    private int _sampleRate = AudioConstants.DefaultSampleRate;
+    private VoiceSettings _pending = new();
+    private int _pendingRate;
+    private bool _dirty;
 
     public bool GateOpen => _gate.IsOpen;
     public float GainReductionDb => _comp.GainReductionDb;
@@ -22,21 +25,17 @@ public sealed class VoiceChain
 
     public void Configure(int sampleRate, VoiceSettings settings)
     {
-        _sampleRate = sampleRate;
-        _settings = settings;
-        var voice = settings.VoiceEnhance ? Enhanced(settings) : settings;
-        _hpf.Configure(sampleRate, voice.HighPassHz);
-        _gate.Configure(sampleRate, voice.GateSettings);
-        _nr.Configure(voice.NoiseReductionAmount);
-        _eq.Configure(sampleRate, voice.EqSettings);
-        _comp.Configure(sampleRate, voice.CompressorSettings);
-        _de.Configure(sampleRate, voice.DeEsserAmount);
-        _tune.Configure(sampleRate, voice.Autotune, voice.AutotuneSettings);
-        _sat.Configure(voice.SaturationAmount);
+        lock (_applyLock)
+        {
+            _pending = settings;
+            _pendingRate = sampleRate;
+            _dirty = true;
+        }
     }
 
     public void Process(Span<float> stereo, int frames, bool bypass)
     {
+        ApplyPending();
         if (bypass)
             return;
 
@@ -59,6 +58,31 @@ public sealed class VoiceChain
             _sat.ProcessStereo(stereo, frames);
         if (s.Limiter || s.VoiceEnhance)
             _limiter.ProcessStereo(stereo, frames);
+    }
+
+    private void ApplyPending()
+    {
+        VoiceSettings settings;
+        int sampleRate;
+        lock (_applyLock)
+        {
+            if (!_dirty || _pendingRate <= 0)
+                return;
+            _dirty = false;
+            settings = _pending;
+            sampleRate = _pendingRate;
+        }
+
+        _settings = settings;
+        var voice = settings.VoiceEnhance ? Enhanced(settings) : settings;
+        _hpf.Configure(sampleRate, voice.HighPassHz);
+        _gate.Configure(sampleRate, voice.GateSettings);
+        _nr.Configure(voice.NoiseReductionAmount);
+        _eq.Configure(sampleRate, voice.EqSettings);
+        _comp.Configure(sampleRate, voice.CompressorSettings);
+        _de.Configure(sampleRate, voice.DeEsserAmount);
+        _tune.Configure(sampleRate, voice.Autotune, voice.AutotuneSettings);
+        _sat.Configure(voice.SaturationAmount);
     }
 
     private static VoiceSettings Enhanced(VoiceSettings src)

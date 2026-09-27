@@ -1,4 +1,5 @@
 using System.Windows;
+using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 
@@ -22,6 +23,15 @@ public static class UiMotion
         if (done is not null)
             a.Completed += (_, _) => done();
         el.BeginAnimation(UIElement.OpacityProperty, a);
+    }
+
+    public static void SetSlider(Slider slider, double value)
+    {
+        if (slider.IsMouseCaptureWithin)
+            return;
+        if (!double.IsNaN(slider.Value) && Math.Abs(slider.Value - value) < 0.0008)
+            return;
+        slider.Value = value;
     }
 
     public static void WidthTo(FrameworkElement el, double to, int ms)

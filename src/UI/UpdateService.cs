@@ -132,7 +132,7 @@ public static class UpdateService
     {
         UpdateKind.Major => "Major update",
         UpdateKind.Minor => "Minor update. You can skip this one.",
-        UpdateKind.Fix => "Fix. You can skip this one.",
+        UpdateKind.Fix => "Minor fixes. You can skip this one.",
         _ => "Update"
     };
 
